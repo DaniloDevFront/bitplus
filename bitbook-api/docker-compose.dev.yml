@@ -1,0 +1,52 @@
+version: '3.8'
+
+services:
+  api:
+    container_name: bitbook-api
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.dev
+    volumes:
+      - .:/app
+      - /app/node_modules
+    ports:
+      - '${APP_PORT}:3000'
+    env_file:
+      - .env.local
+    depends_on:
+      - mysql
+    networks:
+      - bitbook-network
+
+  mysql:
+    container_name: bitbook-mysql
+    image: mysql:8.0
+    ports:
+      - '${MYSQL_PORT}:3306'
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_DATABASE: ${DB_DATABASE}
+    volumes:
+      - mysql-data-dev:/var/lib/mysql
+    networks:
+      - bitbook-network
+
+  phpmyadmin:
+    container_name: bitbook-phpmyadmin-dev
+    image: phpmyadmin/phpmyadmin
+    ports:
+      - '${PHPMYADMIN_PORT}:80'
+    environment:
+      PMA_HOST: mysql
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+    depends_on:
+      - mysql
+    networks:
+      - bitbook-network
+
+volumes:
+  mysql-data-dev:
+
+networks:
+  bitbook-network:
+    driver: bridge

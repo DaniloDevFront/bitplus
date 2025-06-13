@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Detalhes do Módulo de Avaliações</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism.min.css">
+  <style>
+    .module-header {
+      background: linear-gradient(135deg, #7E06F2 0%, #770df0 100%);
+      color: white;
+      padding: 2rem 0;
+      margin-bottom: 2rem;
+    }
+
+    .section-card {
+      margin-bottom: 2rem;
+    }
+
+    .method-badge {
+      font-size: 0.9rem;
+      padding: 0.3rem 0.6rem;
+    }
+
+    .method-post {
+      background-color: #28a745;
+      color: white;
+    }
+
+    .method-get {
+      background-color: #007bff;
+      color: white;
+    }
+
+    .method-put {
+      background-color: #ffc107;
+      color: black;
+    }
+
+    .method-delete {
+      background-color: #dc3545;
+      color: white;
+    }
+
+    .nav-pills .nav-link {
+      color: #770df0;
+    }
+
+    .nav-pills .nav-link.active {
+      background-color: #770df0;
+    }
+
+    .content-section {
+      display: none;
+    }
+
+    .content-section.active {
+      display: block;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Module Header -->
+  <div class="module-header">
+    <div class="container">
+      <h1>Módulo de Avaliações</h1>
+      <p class="lead">Documentação detalhada do sistema de avaliações de livros</p>
+
+      <a href="/" class="btn text-white text-decoration-underline px-0">Voltar</a>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="row">
+      <!-- Sidebar Navigation -->
+      <div class="col-md-3">
+        <div class="position-sticky">
+          <div class="nav flex-column nav-pills">
+            <a class="nav-link active" href="#" data-section="overview">Visão Geral</a>
+            <a class="nav-link" href="#" data-section="controllers">Controllers</a>
+            <a class="nav-link" href="#" data-section="dtos">DTOs</a>
+            <a class="nav-link" href="#" data-section="entities">Entidades</a>
+            <a class="nav-link" href="#" data-section="flow">Fluxo de Dados</a>
+            <a class="nav-link" href="#" data-section="endpoints">Endpoints</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Content -->
+      <div class="col-md-9">
+        <!-- Overview Section -->
+        <div id="overview" class="content-section active">
+          <h2>Visão Geral</h2>
+          <p>O módulo de Avaliações é responsável por gerenciar as avaliações e notas dos livros pelos usuários. Este
+            módulo implementa:</p>
+          <ul>
+            <li>Cadastro e atualização de avaliações</li>
+            <li>Atribuição de notas aos livros</li>
+            <li>Comentários e resenhas</li>
+            <li>Busca e filtragem de avaliações</li>
+          </ul>
+        </div>
+
+        <!-- Controllers Section -->
+        <div id="controllers" class="content-section">
+          <h2>Controllers</h2>
+          <div class="card section-card">
+            <div class="card-body">
+              <h5 class="card-title">RateController</h5>
+              <p class="card-text">Controlador principal responsável por gerenciar todas as operações relacionadas a
+                avaliações.</p>
+              <pre><code class="language-typescript">@Controller('rates')
+export class RateController {
+  constructor(private readonly rateService: RateService) {}
+
+  @Post()
+  async createRate(@Body() payload: CreateRateDto)
+
+  @Put(':id')
+  async updateRate(@Param('id') id: string, @Body() payload: UpdateRateDto)
+
+  @Delete(':id')
+  async deleteRate(@Param('id') id: string)
+
+  @Get()
+  async findRates(@Query() query: FindRateDto)
+
+  @Get(':id')
+  async findRateById(@Param('id') id: string)
+}</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- DTOs Section -->
+        <div id="dtos" class="content-section">
+          <h2>DTOs (Data Transfer Objects)</h2>
+          <div class="card section-card">
+            <div class="card-body">
+              <h5 class="card-title">CreateRateDto</h5>
+              <pre><code class="language-typescript">export class CreateRateDto {
+  @IsString()
+  @IsNotEmpty()
+  bookId: string;
+
+  @IsNumber()
+  @Min(1)
+  @Max(5)
+  rating: number;
+
+  @IsString()
+  @IsOptional()
+  comment?: string;
+}</code></pre>
+            </div>
+          </div>
+          <div class="card section-card">
+            <div class="card-body">
+              <h5 class="card-title">UpdateRateDto</h5>
+              <pre><code class="language-typescript">export class UpdateRateDto {
+  @IsNumber()
+  @IsOptional()
+  @Min(1)
+  @Max(5)
+  rating?: number;
+
+  @IsString()
+  @IsOptional()
+  comment?: string;
+}</code></pre>
+            </div>
+          </div>
+          <div class="card section-card">
+            <div class="card-body">
+              <h5 class="card-title">FindRateDto</h5>
+              <pre><code class="language-typescript">export class FindRateDto {
+  @IsString()
+  @IsOptional()
+  bookId?: string;
+
+  @IsString()
+  @IsOptional()
+  userId?: string;
+}</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Entities Section -->
+        <div id="entities" class="content-section">
+          <h2>Entidades</h2>
+          <div class="card section-card">
+            <div class="card-body">
+              <h5 class="card-title">Rate</h5>
+              <pre><code class="language-typescript">@Entity('rates')
+export class Rate {
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
+
+  @Column()
+  bookId: string;
+
+  @Column()
+  userId: string;
+
+  @Column()
+  rating: number;
+
+  @Column({ nullable: true })
+  comment: string;
+
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
+}</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Flow Section -->
+        <div id="flow" class="content-section">
+          <h2>Fluxo de Dados</h2>
+          <div class="card section-card">
+            <div class="card-body">
+              <h5 class="card-title">Fluxo de Criação de Avaliação</h5>
+              <ol>
+                <li>Cliente envia dados da avaliação para /rates</li>
+                <li>Sistema valida os dados usando CreateRateDto</li>
+                <li>Avaliação é criada no banco de dados</li>
+                <li>Dados da avaliação são retornados ao cliente</li>
+              </ol>
+            </div>
+          </div>
+          <div class="card section-card">
+            <div class="card-body">
+              <h5 class="card-title">Fluxo de Atualização de Avaliação</h5>
+              <ol>
+                <li>Cliente envia dados atualizados para /rates/:id</li>
+                <li>Sistema valida os dados usando UpdateRateDto</li>
+                <li>Avaliação é atualizada no banco de dados</li>
+                <li>Dados atualizados da avaliação são retornados ao cliente</li>
+              </ol>
+            </div>
+          </div>
+        </div>
+
+        <!-- Endpoints Section -->
+        <div id="endpoints" class="content-section">
+          <h2>Endpoints</h2>
+          <!-- Create Rate -->
+          <div class="card section-card">
+            <div class="card-header">
+              <span class="badge method-badge method-post">POST</span>
+              <span class="ms-2">/rates</span>
+            </div>
+            <div class="card-body">
+              <h5 class="card-title">Criar Avaliação</h5>
+              <p class="card-text">Endpoint para criação de novas avaliações de livros.</p>
+
+              <h6>Request Body:</h6>
+              <pre><code class="language-json">{
+    "bookId": "550e8400-e29b-41d4-a716-446655440000",
+    "rating": 5,
+    "comment": "Excelente livro! Recomendo fortemente."
+}</code></pre>
+
+              <h6>Response (201):</h6>
+              <pre><code class="language-json">{
+    "id": "550e8400-e29b-41d4-a716-446655440001",
+    "bookId": "550e8400-e29b-41d4-a716-446655440000",
+    "userId": "550e8400-e29b-41d4-a716-446655440002",
+    "rating": 5,
+    "comment": "Excelente livro! Recomendo fortemente.",
+    "createdAt": "2024-03-21T10:00:00Z",
+    "updatedAt": "2024-03-21T10:00:00Z"
+}</code></pre>
+            </div>
+          </div>
+
+          <!-- Update Rate -->
+          <div class="card section-card">
+            <div class="card-header">
+              <span class="badge method-badge method-put">PUT</span>
+              <span class="ms-2">/rates/:id</span>
+            </div>
+            <div class="card-body">
+              <h5 class="card-title">Atualizar Avaliação</h5>
+              <p class="card-text">Endpoint para atualização de avaliações existentes.</p>
+
+              <h6>Request Body:</h6>
+              <pre><code class="language-json">{
+    "rating": 4,
+    "comment": "Muito bom livro, mas poderia ser melhor."
+}</code></pre>
+
+              <h6>Response (200):</h6>
+              <pre><code class="language-json">{
+    "id": "550e8400-e29b-41d4-a716-446655440001",
+    "bookId": "550e8400-e29b-41d4-a716-446655440000",
+    "userId": "550e8400-e29b-41d4-a716-446655440002",
+    "rating": 4,
+    "comment": "Muito bom livro, mas poderia ser melhor.",
+    "createdAt": "2024-03-21T10:00:00Z",
+    "updatedAt": "2024-03-21T11:00:00Z"
+}</code></pre>
+            </div>
+          </div>
+
+          <!-- Get Rates -->
+          <div class="card section-card">
+            <div class="card-header">
+              <span class="badge method-badge method-get">GET</span>
+              <span class="ms-2">/rates</span>
+            </div>
+            <div class="card-body">
+              <h5 class="card-title">Buscar Avaliações</h5>
+              <p class="card-text">Endpoint para busca de avaliações com filtros opcionais.</p>
+
+              <h6>Query Parameters:</h6>
+              <ul>
+                <li><code>bookId</code>: ID do livro</li>
+                <li><code>userId</code>: ID do usuário</li>
+              </ul>
+
+              <h6>Response (200):</h6>
+              <pre><code class="language-json">[
+    {
+        "id": "550e8400-e29b-41d4-a716-446655440001",
+        "bookId": "550e8400-e29b-41d4-a716-446655440000",
+        "userId": "550e8400-e29b-41d4-a716-446655440002",
+        "rating": 4,
+        "comment": "Muito bom livro, mas poderia ser melhor.",
+        "createdAt": "2024-03-21T10:00:00Z",
+        "updatedAt": "2024-03-21T11:00:00Z"
+    },
+    {
+        "id": "550e8400-e29b-41d4-a716-446655440003",
+        "bookId": "550e8400-e29b-41d4-a716-446655440000",
+        "userId": "550e8400-e29b-41d4-a716-446655440004",
+        "rating": 5,
+        "comment": "Melhor livro que já li!",
+        "createdAt": "2024-03-21T12:00:00Z",
+        "updatedAt": "2024-03-21T12:00:00Z"
+    }
+]</code></pre>
+            </div>
+          </div>
+
+          <!-- Get Rate by ID -->
+          <div class="card section-card">
+            <div class="card-header">
+              <span class="badge method-badge method-get">GET</span>
+              <span class="ms-2">/rates/:id</span>
+            </div>
+            <div class="card-body">
+              <h5 class="card-title">Buscar Avaliação por ID</h5>
+              <p class="card-text">Endpoint para buscar uma avaliação específica pelo seu ID.</p>
+
+              <h6>Response (200):</h6>
+              <pre><code class="language-json">{
+    "id": "550e8400-e29b-41d4-a716-446655440001",
+    "bookId": "550e8400-e29b-41d4-a716-446655440000",
+    "userId": "550e8400-e29b-41d4-a716-446655440002",
+    "rating": 4,
+    "comment": "Muito bom livro, mas poderia ser melhor.",
+    "createdAt": "2024-03-21T10:00:00Z",
+    "updatedAt": "2024-03-21T11:00:00Z"
+}</code></pre>
+            </div>
+          </div>
+
+          <!-- Delete Rate -->
+          <div class="card section-card">
+            <div class="card-header">
+              <span class="badge method-badge method-delete">DELETE</span>
+              <span class="ms-2">/rates/:id</span>
+            </div>
+            <div class="card-body">
+              <h5 class="card-title">Remover Avaliação</h5>
+              <p class="card-text">Endpoint para remover uma avaliação do sistema.</p>
+
+              <h6>Response (204):</h6>
+              <p>No Content</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-typescript.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-json.min.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const navLinks = document.querySelectorAll('.nav-link');
+      const contentSections = document.querySelectorAll('.content-section');
+
+      navLinks.forEach(link => {
+        link.addEventListener('click', function (e) {
+          e.preventDefault();
+
+          // Remove active class from all links and sections
+          navLinks.forEach(l => l.classList.remove('active'));
+          contentSections.forEach(s => s.classList.remove('active'));
+
+          // Add active class to clicked link
+          this.classList.add('active');
+
+          // Show corresponding section
+          const sectionId = this.getAttribute('data-section');
+          document.getElementById(sectionId).classList.add('active');
+        });
+      });
+    });
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Detalhes do Módulo de Categorias</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism.min.css">
+  <style>
+    .module-header {
+      background: linear-gradient(135deg, #7E06F2 0%, #770df0 100%);
+      color: white;
+      padding: 2rem 0;
+      margin-bottom: 2rem;
+    }
+
+    .section-card {
+      margin-bottom: 2rem;
+    }
+
+    .method-badge {
+      font-size: 0.9rem;
+      padding: 0.3rem 0.6rem;
+    }
+
+    .method-post {
+      background-color: #28a745;
+      color: white;
+    }
+
+    .method-get {
+      background-color: #007bff;
+      color: white;
+    }
+
+    .method-put {
+      background-color: #ffc107;
+      color: black;
+    }
+
+    .method-delete {
+      background-color: #dc3545;
+      color: white;
+    }
+
+    .nav-pills .nav-link {
+      color: #770df0;
+    }
+
+    .nav-pills .nav-link.active {
+      background-color: #770df0;
+    }
+
+    .content-section {
+      display: none;
+    }
+
+    .content-section.active {
+      display: block;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Module Header -->
+  <div class="module-header">
+    <div class="container">
+      <h1>Módulo de Categorias</h1>
+      <p class="lead">Documentação detalhada do sistema de gerenciamento de categorias</p>
+
+      <a href="/" class="btn text-white text-decoration-underline px-0">Voltar</a>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="row">
+      <!-- Sidebar Navigation -->
+      <div class="col-md-3">
+        <div class="position-sticky">
+          <div class="nav flex-column nav-pills">
+            <a class="nav-link active" href="#" data-section="overview">Visão Geral</a>
+            <a class="nav-link" href="#" data-section="controllers">Controllers</a>
+            <a class="nav-link" href="#" data-section="dtos">DTOs</a>
+            <a class="nav-link" href="#" data-section="entities">Entidades</a>
+            <a class="nav-link" href="#" data-section="flow">Fluxo de Dados</a>
+            <a class="nav-link" href="#" data-section="endpoints">Endpoints</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Content -->
+      <div class="col-md-9">
+        <!-- Overview Section -->
+        <div id="overview" class="content-section active">
+          <h2>Visão Geral</h2>
+          <p>O módulo de Categorias é responsável por gerenciar as categorias de livros do sistema. Este módulo
+            implementa:</p>
+          <ul>
+            <li>Cadastro e atualização de categorias</li>
+            <li>Organização hierárquica de categorias</li>
+            <li>Associação de livros a categorias</li>
+            <li>Busca e filtragem de categorias</li>
+          </ul>
+        </div>
+
+        <!-- Controllers Section -->
+        <div id="controllers" class="content-section">
+          <h2>Controllers</h2>
+          <div class="card section-card">
+            <div class="card-body">
+              <h5 class="card-title">CategoryController</h5>
+              <p class="card-text">Controlador principal responsável por gerenciar todas as operações relacionadas a
+                categorias.</p>
+              <pre><code class="language-typescript">@Controller('categories')
+export class CategoryController {
+  constructor(private readonly categoryService: CategoryService) {}
+
+  @Post()
+  async createCategory(@Body() payload: CreateCategoryDto)
+
+  @Put(':id')
+  async updateCategory(@Param('id') id: string, @Body() payload: UpdateCategoryDto)
+
+  @Delete(':id')
+  async deleteCategory(@Param('id') id: string)
+
+  @Get()
+  async findCategories(@Query() query: FindCategoryDto)
+
+  @Get(':id')
+  async findCategoryById(@Param('id') id: string)
+}</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- DTOs Section -->
+        <div id="dtos" class="content-section">
+          <h2>DTOs (Data Transfer Objects)</h2>
+          <div class="card section-card">
+            <div class="card-body">
+              <h5 class="card-title">CreateCategoryDto</h5>
+              <pre><code class="language-typescript">export class CreateCategoryDto {
+  @IsString()
+  @IsNotEmpty()
+  name: string;
+
+  @IsString()
+  @IsOptional()
+  description?: string;
+
+  @IsString()
+  @IsOptional()
+  parentId?: string;
+}</code></pre>
+            </div>
+          </div>
+          <div class="card section-card">
+            <div class="card-body">
+              <h5 class="card-title">UpdateCategoryDto</h5>
+              <pre><code class="language-typescript">export class UpdateCategoryDto {
+  @IsString()
+  @IsOptional()
+  name?: string;
+
+  @IsString()
+  @IsOptional()
+  description?: string;
+
+  @IsString()
+  @IsOptional()
+  parentId?: string;
+}</code></pre>
+            </div>
+          </div>
+          <div class="card section-card">
+            <div class="card-body">
+              <h5 class="card-title">FindCategoryDto</h5>
+              <pre><code class="language-typescript">export class FindCategoryDto {
+  @IsString()
+  @IsOptional()
+  name?: string;
+
+  @IsString()
+  @IsOptional()
+  parentId?: string;
+}</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Entities Section -->
+        <div id="entities" class="content-section">
+          <h2>Entidades</h2>
+          <div class="card section-card">
+            <div class="card-body">
+              <h5 class="card-title">Category</h5>
+              <pre><code class="language-typescript">@Entity('categories')
+export class Category {
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
+
+  @Column()
+  name: string;
+
+  @Column({ nullable: true })
+  description: string;
+
+  @Column({ nullable: true })
+  parentId: string;
+
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
+}</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Flow Section -->
+        <div id="flow" class="content-section">
+          <h2>Fluxo de Dados</h2>
+          <div class="card section-card">
+            <div class="card-body">
+              <h5 class="card-title">Fluxo de Criação de Categoria</h5>
+              <ol>
+                <li>Cliente envia dados da categoria para /categories</li>
+                <li>Sistema valida os dados usando CreateCategoryDto</li>
+                <li>Categoria é criada no banco de dados</li>
+                <li>Dados da categoria são retornados ao cliente</li>
+              </ol>
+            </div>
+          </div>
+          <div class="card section-card">
+            <div class="card-body">
+              <h5 class="card-title">Fluxo de Atualização de Categoria</h5>
+              <ol>
+                <li>Cliente envia dados atualizados para /categories/:id</li>
+                <li>Sistema valida os dados usando UpdateCategoryDto</li>
+                <li>Categoria é atualizada no banco de dados</li>
+                <li>Dados atualizados da categoria são retornados ao cliente</li>
+              </ol>
+            </div>
+          </div>
+        </div>
+
+        <!-- Endpoints Section -->
+        <div id="endpoints" class="content-section">
+          <h2>Endpoints</h2>
+          <!-- Create Category -->
+          <div class="card section-card">
+            <div class="card-header">
+              <span class="badge method-badge method-post">POST</span>
+              <span class="ms-2">/categories</span>
+            </div>
+            <div class="card-body">
+              <h5 class="card-title">Criar Categoria</h5>
+              <p class="card-text">Endpoint para criação de novas categorias no sistema.</p>
+
+              <h6>Request Body:</h6>
+              <pre><code class="language-json">{
+    "name": "Ficção Científica",
+    "description": "Livros de ficção científica e fantasia",
+    "parentId": "550e8400-e29b-41d4-a716-446655440000"
+}</code></pre>
+
+              <h6>Response (201):</h6>
+              <pre><code class="language-json">{
+    "id": "550e8400-e29b-41d4-a716-446655440001",
+    "name": "Ficção Científica",
+    "description": "Livros de ficção científica e fantasia",
+    "parentId": "550e8400-e29b-41d4-a716-446655440000",
+    "createdAt": "2024-03-21T10:00:00Z",
+    "updatedAt": "2024-03-21T10:00:00Z"
+}</code></pre>
+            </div>
+          </div>
+
+          <!-- Update Category -->
+          <div class="card section-card">
+            <div class="card-header">
+              <span class="badge method-badge method-put">PUT</span>
+              <span class="ms-2">/categories/:id</span>
+            </div>
+            <div class="card-body">
+              <h5 class="card-title">Atualizar Categoria</h5>
+              <p class="card-text">Endpoint para atualização de categorias existentes.</p>
+
+              <h6>Request Body:</h6>
+              <pre><code class="language-json">{
+    "name": "Ficção Científica e Fantasia",
+    "description": "Livros de ficção científica, fantasia e fantástico"
+}</code></pre>
+
+              <h6>Response (200):</h6>
+              <pre><code class="language-json">{
+    "id": "550e8400-e29b-41d4-a716-446655440001",
+    "name": "Ficção Científica e Fantasia",
+    "description": "Livros de ficção científica, fantasia e fantástico",
+    "parentId": "550e8400-e29b-41d4-a716-446655440000",
+    "createdAt": "2024-03-21T10:00:00Z",
+    "updatedAt": "2024-03-21T11:00:00Z"
+}</code></pre>
+            </div>
+          </div>
+
+          <!-- Get Categories -->
+          <div class="card section-card">
+            <div class="card-header">
+              <span class="badge method-badge method-get">GET</span>
+              <span class="ms-2">/categories</span>
+            </div>
+            <div class="card-body">
+              <h5 class="card-title">Buscar Categorias</h5>
+              <p class="card-text">Endpoint para busca de categorias com filtros opcionais.</p>
+
+              <h6>Query Parameters:</h6>
+              <ul>
+                <li><code>name</code>: Nome da categoria</li>
+                <li><code>parentId</code>: ID da categoria pai</li>
+              </ul>
+
+              <h6>Response (200):</h6>
+              <pre><code class="language-json">[
+    {
+        "id": "550e8400-e29b-41d4-a716-446655440000",
+        "name": "Ficção",
+        "description": "Livros de ficção",
+        "parentId": null,
+        "createdAt": "2024-03-21T10:00:00Z",
+        "updatedAt": "2024-03-21T10:00:00Z"
+    },
+    {
+        "id": "550e8400-e29b-41d4-a716-446655440001",
+        "name": "Ficção Científica e Fantasia",
+        "description": "Livros de ficção científica, fantasia e fantástico",
+        "parentId": "550e8400-e29b-41d4-a716-446655440000",
+        "createdAt": "2024-03-21T10:00:00Z",
+        "updatedAt": "2024-03-21T11:00:00Z"
+    }
+]</code></pre>
+            </div>
+          </div>
+
+          <!-- Get Category by ID -->
+          <div class="card section-card">
+            <div class="card-header">
+              <span class="badge method-badge method-get">GET</span>
+              <span class="ms-2">/categories/:id</span>
+            </div>
+            <div class="card-body">
+              <h5 class="card-title">Buscar Categoria por ID</h5>
+              <p class="card-text">Endpoint para buscar uma categoria específica pelo seu ID.</p>
+
+              <h6>Response (200):</h6>
+              <pre><code class="language-json">{
+    "id": "550e8400-e29b-41d4-a716-446655440001",
+    "name": "Ficção Científica e Fantasia",
+    "description": "Livros de ficção científica, fantasia e fantástico",
+    "parentId": "550e8400-e29b-41d4-a716-446655440000",
+    "createdAt": "2024-03-21T10:00:00Z",
+    "updatedAt": "2024-03-21T11:00:00Z"
+}</code></pre>
+            </div>
+          </div>
+
+          <!-- Delete Category -->
+          <div class="card section-card">
+            <div class="card-header">
+              <span class="badge method-badge method-delete">DELETE</span>
+              <span class="ms-2">/categories/:id</span>
+            </div>
+            <div class="card-body">
+              <h5 class="card-title">Remover Categoria</h5>
+              <p class="card-text">Endpoint para remover uma categoria do sistema.</p>
+
+              <h6>Response (204):</h6>
+              <p>No Content</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-typescript.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-json.min.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const navLinks = document.querySelectorAll('.nav-link');
+      const contentSections = document.querySelectorAll('.content-section');
+
+      navLinks.forEach(link => {
+        link.addEventListener('click', function (e) {
+          e.preventDefault();
+
+          // Remove active class from all links and sections
+          navLinks.forEach(l => l.classList.remove('active'));
+          contentSections.forEach(s => s.classList.remove('active'));
+
+          // Add active class to clicked link
+          this.classList.add('active');
+
+          // Show corresponding section
+          const sectionId = this.getAttribute('data-section');
+          document.getElementById(sectionId).classList.add('active');
+        });
+      });
+    });
+  </script>
+</body>
+
+</html>

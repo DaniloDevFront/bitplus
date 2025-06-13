@@ -1,0 +1,50 @@
+version: "3.8"
+
+services:
+  nginx:
+    container_name: bitbook-nginx
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d
+      - ./nginx/ssl:/etc/nginx/ssl
+      - ./nginx/logs:/var/log/nginx
+    depends_on:
+      - bitbook-api
+    networks:
+      - bitbook-network
+
+  bitbook-api:
+    container_name: bitbook-api
+    build:
+      context: ../bitbook-api
+      dockerfile: docker/Dockerfile.prod
+    env_file:
+      - ../bitbook-api/.env.production
+    networks:
+      - bitbook-network
+
+  # Serviços futuros
+  # bittopics-api:
+  #   container_name: bittopics-api
+  #   build:
+  #     context: ../bittopics-api
+  #     dockerfile: Dockerfile.prod
+  #   networks:
+  #     - bitbook-network
+
+  # bittrainers-api:
+  #   container_name: bittrainers-api
+  #   build:
+  #     context: ../bittrainers-api
+  #     dockerfile: Dockerfile.prod
+  #   networks:
+  #     - bitbook-network
+
+networks:
+  bitbook-network:
+    driver: bridge

@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Detalhes do Módulo de Banners</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism.min.css">
+  <style>
+    .module-header {
+      background: linear-gradient(135deg, #7E06F2 0%, #770df0 100%);
+      color: white;
+      padding: 2rem 0;
+      margin-bottom: 2rem;
+    }
+
+    .section-card {
+      margin-bottom: 2rem;
+    }
+
+    .method-badge {
+      font-size: 0.9rem;
+      padding: 0.3rem 0.6rem;
+    }
+
+    .method-post {
+      background-color: #28a745;
+      color: white;
+    }
+
+    .method-get {
+      background-color: #007bff;
+      color: white;
+    }
+
+    .method-put {
+      background-color: #ffc107;
+      color: black;
+    }
+
+    .method-delete {
+      background-color: #dc3545;
+      color: white;
+    }
+
+    .nav-pills .nav-link {
+      color: #770df0;
+    }
+
+    .nav-pills .nav-link.active {
+      background-color: #770df0;
+    }
+
+    .content-section {
+      display: none;
+    }
+
+    .content-section.active {
+      display: block;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Module Header -->
+  <div class="module-header">
+    <div class="container">
+      <h1>Módulo de Banners</h1>
+      <p class="lead">Documentação detalhada do sistema de banners promocionais</p>
+
+      <a href="/" class="btn text-white text-decoration-underline px-0">Voltar</a>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="row">
+      <!-- Sidebar Navigation -->
+      <div class="col-md-3">
+        <div class="position-sticky">
+          <div class="nav flex-column nav-pills">
+            <a class="nav-link active" href="#" data-section="overview">Visão Geral</a>
+            <a class="nav-link" href="#" data-section="controllers">Controllers</a>
+            <a class="nav-link" href="#" data-section="dtos">DTOs</a>
+            <a class="nav-link" href="#" data-section="entities">Entidades</a>
+            <a class="nav-link" href="#" data-section="flow">Fluxo de Dados</a>
+            <a class="nav-link" href="#" data-section="endpoints">Endpoints</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Content -->
+      <div class="col-md-9">
+        <!-- Overview Section -->
+        <div id="overview" class="content-section active">
+          <h2>Visão Geral</h2>
+          <p>O módulo de banners é responsável por gerenciar os banners promocionais do sistema. Este módulo implementa:
+          </p>
+          <ul>
+            <li>Criação de banners promocionais</li>
+            <li>Upload de imagens para banners</li>
+            <li>Gerenciamento de banners premium</li>
+            <li>Vinculação de banners a provedores</li>
+            <li>Ações internas e externas nos banners</li>
+          </ul>
+        </div>
+
+        <!-- Controllers Section -->
+        <div id="controllers" class="content-section">
+          <h2>Controllers</h2>
+          <div class="card section-card">
+            <div class="card-body">
+              <h5 class="card-title">BannerController</h5>
+              <p class="card-text">Controlador principal responsável por gerenciar todas as operações de banners.</p>
+              <pre><code class="language-typescript">@Controller('banners')
+export class BannerController {
+  constructor(private readonly bannerService: BannerService) {}
+
+  @Post()
+  async create(@Body() payload: CreateBannerDto, @UploadedFile() file: Express.Multer.File)
+
+  @Put(':id')
+  async update(@Param('id') id: number, @Body() payload: UpdateBannerDto, @UploadedFile() file: Express.Multer.File)
+
+  @Delete(':id')
+  async delete(@Param('id') id: number)
+
+  @Get()
+  async find(@Query() query: FindBannerDto)
+}</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- DTOs Section -->
+        <div id="dtos" class="content-section">
+          <h2>DTOs (Data Transfer Objects)</h2>
+          <div class="card section-card">
+            <div class="card-body">
+              <h5 class="card-title">CreateBannerDto</h5>
+              <pre><code class="language-typescript">export class CreateBannerDto {
+  @IsString()
+  @IsOptional()
+  banner?: string;
+
+  @IsBoolean()
+  @IsOptional()
+  premium?: boolean;
+
+  @IsNumber()
+  @IsOptional()
+  provider_id?: number;
+
+  @IsString()
+  @IsOptional()
+  action_internal?: string;
+
+  @IsString()
+  @IsOptional()
+  action_external?: string;
+}</code></pre>
+            </div>
+          </div>
+          <div class="card section-card">
+            <div class="card-body">
+              <h5 class="card-title">UpdateBannerDto</h5>
+              <pre><code class="language-typescript">export class UpdateBannerDto extends PartialType(CreateBannerDto) {}</code></pre>
+            </div>
+          </div>
+          <div class="card section-card">
+            <div class="card-body">
+              <h5 class="card-title">FindBannerDto</h5>
+              <pre><code class="language-typescript">export class FindBannerDto {
+  @IsNumber()
+  @IsOptional()
+  id?: number;
+
+  @IsBoolean()
+  @IsOptional()
+  premium?: boolean;
+
+  @IsNumber()
+  @IsOptional()
+  provider_id?: number;
+}</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Entities Section -->
+        <div id="entities" class="content-section">
+          <h2>Entidades</h2>
+          <div class="card section-card">
+            <div class="card-body">
+              <h5 class="card-title">Banner</h5>
+              <pre><code class="language-typescript">@Entity('banners')
+export class Banner {
+  @PrimaryGeneratedColumn()
+  id: number;
+
+  @Column()
+  banner: string;
+
+  @Column({ default: false })
+  premium: boolean;
+
+  @Column({ nullable: true })
+  provider_id: number;
+
+  @Column({ nullable: true })
+  action_internal: string;
+
+  @Column({ nullable: true })
+  action_external: string;
+
+  @CreateDateColumn()
+  created_at: Date;
+
+  @UpdateDateColumn()
+  updated_at: Date;
+}</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Flow Section -->
+        <div id="flow" class="content-section">
+          <h2>Fluxo de Dados</h2>
+          <div class="card section-card">
+            <div class="card-body">
+              <h5 class="card-title">Fluxo de Criação de Banner</h5>
+              <ol>
+                <li>Cliente envia dados do banner e imagem para /banners</li>
+                <li>Sistema valida os dados usando CreateBannerDto</li>
+                <li>Imagem é processada e armazenada</li>
+                <li>Banner é criado no banco de dados</li>
+                <li>Dados do banner são retornados ao cliente</li>
+              </ol>
+            </div>
+          </div>
+          <div class="card section-card">
+            <div class="card-body">
+              <h5 class="card-title">Fluxo de Atualização de Banner</h5>
+              <ol>
+                <li>Cliente envia dados atualizados e nova imagem (opcional) para /banners/:id</li>
+                <li>Sistema valida os dados usando UpdateBannerDto</li>
+                <li>Se houver nova imagem, ela é processada e armazenada</li>
+                <li>Banner é atualizado no banco de dados</li>
+                <li>Dados atualizados do banner são retornados ao cliente</li>
+              </ol>
+            </div>
+          </div>
+        </div>
+
+        <!-- Endpoints Section -->
+        <div id="endpoints" class="content-section">
+          <h2>Endpoints</h2>
+          <!-- Create Banner -->
+          <div class="card section-card">
+            <div class="card-header">
+              <span class="badge method-badge method-post">POST</span>
+              <span class="ms-2">/banners</span>
+            </div>
+            <div class="card-body">
+              <h5 class="card-title">Criar Banner</h5>
+              <p class="card-text">Endpoint para criação de novos banners promocionais.</p>
+
+              <h6>Request Body (multipart/form-data):</h6>
+              <pre><code class="language-json">{
+                "banner": "imagem.jpg",
+                "premium": false,
+                "provider_id": 1,
+                "action_internal": "book/123",
+                "action_external": "https://exemplo.com"
+              }</code></pre>
+
+              <h6>Response (201):</h6>
+              <pre><code class="language-json">{
+    "id": 1,
+    "banner": "uploads/banners/imagem.jpg",
+    "premium": false,
+    "provider_id": 1,
+    "action_internal": "book/123",
+    "action_external": "https://exemplo.com",
+    "created_at": "2024-03-21T10:00:00Z",
+    "updated_at": "2024-03-21T10:00:00Z"
+}</code></pre>
+            </div>
+          </div>
+
+          <!-- Update Banner -->
+          <div class="card section-card">
+            <div class="card-header">
+              <span class="badge method-badge method-put">PUT</span>
+              <span class="ms-2">/banners/:id</span>
+            </div>
+            <div class="card-body">
+              <h5 class="card-title">Atualizar Banner</h5>
+              <p class="card-text">Endpoint para atualização de banners existentes.</p>
+
+              <h6>Request Body (multipart/form-data):</h6>
+              <pre><code class="language-json">{
+    "premium": true,
+    "action_internal": "book/456"
+}</code></pre>
+
+              <h6>Response (200):</h6>
+              <pre><code class="language-json">{
+    "id": 1,
+    "banner": "uploads/banners/imagem.jpg",
+    "premium": true,
+    "provider_id": 1,
+    "action_internal": "book/456",
+    "action_external": "https://exemplo.com",
+    "created_at": "2024-03-21T10:00:00Z",
+    "updated_at": "2024-03-21T11:00:00Z"
+}</code></pre>
+            </div>
+          </div>
+
+          <!-- Get Banners -->
+          <div class="card section-card">
+            <div class="card-header">
+              <span class="badge method-badge method-get">GET</span>
+              <span class="ms-2">/banners</span>
+            </div>
+            <div class="card-body">
+              <h5 class="card-title">Buscar Banners</h5>
+              <p class="card-text">Endpoint para busca de banners com filtros opcionais.</p>
+
+              <h6>Query Parameters:</h6>
+              <ul>
+                <li><code>id</code>: ID específico do banner</li>
+                <li><code>premium</code>: Filtrar por banners premium</li>
+                <li><code>provider_id</code>: Filtrar por provedor</li>
+              </ul>
+
+              <h6>Response (200):</h6>
+              <pre><code class="language-json">[
+    {
+        "id": 1,
+        "banner": "uploads/banners/imagem1.jpg",
+        "premium": true,
+        "provider_id": 1,
+        "action_internal": "book/123",
+        "action_external": "https://exemplo.com",
+        "created_at": "2024-03-21T10:00:00Z",
+        "updated_at": "2024-03-21T10:00:00Z"
+    },
+    {
+        "id": 2,
+        "banner": "uploads/banners/imagem2.jpg",
+        "premium": false,
+        "provider_id": 2,
+        "action_internal": "book/456",
+        "action_external": "https://exemplo2.com",
+        "created_at": "2024-03-21T11:00:00Z",
+        "updated_at": "2024-03-21T11:00:00Z"
+    }
+]</code></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-typescript.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-json.min.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const navLinks = document.querySelectorAll('.nav-link');
+      const contentSections = document.querySelectorAll('.content-section');
+
+      navLinks.forEach(link => {
+        link.addEventListener('click', function (e) {
+          e.preventDefault();
+
+          // Remove active class from all links and sections
+          navLinks.forEach(l => l.classList.remove('active'));
+          contentSections.forEach(s => s.classList.remove('active'));
+
+          // Add active class to clicked link
+          this.classList.add('active');
+
+          // Show corresponding section
+          const sectionId = this.getAttribute('data-section');
+          document.getElementById(sectionId).classList.add('active');
+        });
+      });
+    });
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Detalhes do Módulo de Livros</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism.min.css">
+  <style>
+    .module-header {
+      background: linear-gradient(135deg, #7E06F2 0%, #770df0 100%);
+      color: white;
+      padding: 2rem 0;
+      margin-bottom: 2rem;
+    }
+
+    .section-card {
+      margin-bottom: 2rem;
+    }
+
+    .method-badge {
+      font-size: 0.9rem;
+      padding: 0.3rem 0.6rem;
+    }
+
+    .method-post {
+      background-color: #28a745;
+      color: white;
+    }
+
+    .method-get {
+      background-color: #007bff;
+      color: white;
+    }
+
+    .method-put {
+      background-color: #ffc107;
+      color: black;
+    }
+
+    .method-delete {
+      background-color: #dc3545;
+      color: white;
+    }
+
+    .nav-pills .nav-link {
+      color: #770df0;
+    }
+
+    .nav-pills .nav-link.active {
+      background-color: #770df0;
+    }
+
+    .content-section {
+      display: none;
+    }
+
+    .content-section.active {
+      display: block;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Module Header -->
+  <div class="module-header">
+    <div class="container">
+      <h1>Módulo de Livros</h1>
+      <p class="lead">Documentação detalhada do sistema de gerenciamento de livros</p>
+
+      <a href="/" class="btn text-white text-decoration-underline px-0">Voltar</a>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="row">
+      <!-- Sidebar Navigation -->
+      <div class="col-md-3">
+        <div class="position-sticky">
+          <div class="nav flex-column nav-pills">
+            <a class="nav-link active" href="#" data-section="overview">Visão Geral</a>
+            <a class="nav-link" href="#" data-section="controllers">Controllers</a>
+            <a class="nav-link" href="#" data-section="dtos">DTOs</a>
+            <a class="nav-link" href="#" data-section="entities">Entidades</a>
+            <a class="nav-link" href="#" data-section="flow">Fluxo de Dados</a>
+            <a class="nav-link" href="#" data-section="endpoints">Endpoints</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Content -->
+      <div class="col-md-9">
+        <!-- Overview Section -->
+        <div id="overview" class="content-section active">
+          <h2>Visão Geral</h2>
+          <p>O módulo de Livros é responsável por gerenciar o catálogo de livros do sistema. Este módulo implementa:</p>
+          <ul>
+            <li>Cadastro e atualização de livros</li>
+            <li>Busca e filtragem de livros</li>
+            <li>Gerenciamento de metadados (autor, editora, ISBN, etc.)</li>
+            <li>Integração com serviços externos de dados de livros</li>
+          </ul>
+        </div>
+
+        <!-- Controllers Section -->
+        <div id="controllers" class="content-section">
+          <h2>Controllers</h2>
+          <div class="card section-card">
+            <div class="card-body">
+              <h5 class="card-title">BooksController</h5>
+              <p class="card-text">Controlador principal responsável por gerenciar todas as operações relacionadas a
+                livros.</p>
+              <pre><code class="language-typescript">@Controller('books')
+export class BooksController {
+  constructor(private readonly booksService: BooksService) {}
+
+  @Post()
+  async createBook(@Body() payload: CreateBookDto)
+
+  @Put(':id')
+  async updateBook(@Param('id') id: string, @Body() payload: UpdateBookDto)
+
+  @Delete(':id')
+  async deleteBook(@Param('id') id: string)
+
+  @Get()
+  async findBooks(@Query() query: FindBookDto)
+
+  @Get(':id')
+  async findBookById(@Param('id') id: string)
+}</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- DTOs Section -->
+        <div id="dtos" class="content-section">
+          <h2>DTOs (Data Transfer Objects)</h2>
+          <div class="card section-card">
+            <div class="card-body">
+              <h5 class="card-title">CreateBookDto</h5>
+              <pre><code class="language-typescript">export class CreateBookDto {
+  @IsString()
+  @IsNotEmpty()
+  title: string;
+
+  @IsString()
+  @IsNotEmpty()
+  author: string;
+
+  @IsString()
+  @IsOptional()
+  isbn?: string;
+
+  @IsString()
+  @IsOptional()
+  publisher?: string;
+
+  @IsNumber()
+  @IsOptional()
+  @Min(0)
+  @Max(9999)
+  year?: number;
+
+  @IsString()
+  @IsOptional()
+  description?: string;
+
+  @IsString()
+  @IsOptional()
+  coverUrl?: string;
+}</code></pre>
+            </div>
+          </div>
+          <div class="card section-card">
+            <div class="card-body">
+              <h5 class="card-title">UpdateBookDto</h5>
+              <pre><code class="language-typescript">export class UpdateBookDto {
+  @IsString()
+  @IsOptional()
+  title?: string;
+
+  @IsString()
+  @IsOptional()
+  author?: string;
+
+  @IsString()
+  @IsOptional()
+  isbn?: string;
+
+  @IsString()
+  @IsOptional()
+  publisher?: string;
+
+  @IsNumber()
+  @IsOptional()
+  @Min(0)
+  @Max(9999)
+  year?: number;
+
+  @IsString()
+  @IsOptional()
+  description?: string;
+
+  @IsString()
+  @IsOptional()
+  coverUrl?: string;
+}</code></pre>
+            </div>
+          </div>
+          <div class="card section-card">
+            <div class="card-body">
+              <h5 class="card-title">FindBookDto</h5>
+              <pre><code class="language-typescript">export class FindBookDto {
+  @IsString()
+  @IsOptional()
+  title?: string;
+
+  @IsString()
+  @IsOptional()
+  author?: string;
+
+  @IsString()
+  @IsOptional()
+  isbn?: string;
+
+  @IsString()
+  @IsOptional()
+  publisher?: string;
+
+  @IsNumber()
+  @IsOptional()
+  @Min(0)
+  @Max(9999)
+  year?: number;
+}</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Entities Section -->
+        <div id="entities" class="content-section">
+          <h2>Entidades</h2>
+          <div class="card section-card">
+            <div class="card-body">
+              <h5 class="card-title">Book</h5>
+              <pre><code class="language-typescript">@Entity('books')
+export class Book {
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
+
+  @Column()
+  title: string;
+
+  @Column()
+  author: string;
+
+  @Column({ nullable: true })
+  isbn: string;
+
+  @Column({ nullable: true })
+  publisher: string;
+
+  @Column({ nullable: true })
+  year: number;
+
+  @Column({ nullable: true, type: 'text' })
+  description: string;
+
+  @Column({ nullable: true })
+  coverUrl: string;
+
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
+}</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Flow Section -->
+        <div id="flow" class="content-section">
+          <h2>Fluxo de Dados</h2>
+          <div class="card section-card">
+            <div class="card-body">
+              <h5 class="card-title">Fluxo de Criação de Livro</h5>
+              <ol>
+                <li>Cliente envia dados do livro para /books</li>
+                <li>Sistema valida os dados usando CreateBookDto</li>
+                <li>Livro é criado no banco de dados</li>
+                <li>Dados do livro são retornados ao cliente</li>
+              </ol>
+            </div>
+          </div>
+          <div class="card section-card">
+            <div class="card-body">
+              <h5 class="card-title">Fluxo de Atualização de Livro</h5>
+              <ol>
+                <li>Cliente envia dados atualizados para /books/:id</li>
+                <li>Sistema valida os dados usando UpdateBookDto</li>
+                <li>Livro é atualizado no banco de dados</li>
+                <li>Dados atualizados do livro são retornados ao cliente</li>
+              </ol>
+            </div>
+          </div>
+        </div>
+
+        <!-- Endpoints Section -->
+        <div id="endpoints" class="content-section">
+          <h2>Endpoints</h2>
+          <!-- Create Book -->
+          <div class="card section-card">
+            <div class="card-header">
+              <span class="badge method-badge method-post">POST</span>
+              <span class="ms-2">/books</span>
+            </div>
+            <div class="card-body">
+              <h5 class="card-title">Criar Livro</h5>
+              <p class="card-text">Endpoint para criação de novos livros no sistema.</p>
+
+              <h6>Request Body:</h6>
+              <pre><code class="language-json">{
+    "title": "O Senhor dos Anéis",
+    "author": "J.R.R. Tolkien",
+    "isbn": "9788533613379",
+    "publisher": "Martins Fontes",
+    "year": 2000,
+    "description": "A história de Frodo Bolseiro e sua jornada para destruir o Um Anel",
+    "coverUrl": "https://exemplo.com/covers/senhor-dos-aneis.jpg"
+}</code></pre>
+
+              <h6>Response (201):</h6>
+              <pre><code class="language-json">{
+    "id": "550e8400-e29b-41d4-a716-446655440000",
+    "title": "O Senhor dos Anéis",
+    "author": "J.R.R. Tolkien",
+    "isbn": "9788533613379",
+    "publisher": "Martins Fontes",
+    "year": 2000,
+    "description": "A história de Frodo Bolseiro e sua jornada para destruir o Um Anel",
+    "coverUrl": "https://exemplo.com/covers/senhor-dos-aneis.jpg",
+    "createdAt": "2024-03-21T10:00:00Z",
+    "updatedAt": "2024-03-21T10:00:00Z"
+}</code></pre>
+            </div>
+          </div>
+
+          <!-- Update Book -->
+          <div class="card section-card">
+            <div class="card-header">
+              <span class="badge method-badge method-put">PUT</span>
+              <span class="ms-2">/books/:id</span>
+            </div>
+            <div class="card-body">
+              <h5 class="card-title">Atualizar Livro</h5>
+              <p class="card-text">Endpoint para atualização de livros existentes.</p>
+
+              <h6>Request Body:</h6>
+              <pre><code class="language-json">{
+    "publisher": "HarperCollins",
+    "year": 2020,
+    "coverUrl": "https://exemplo.com/covers/senhor-dos-aneis-nova.jpg"
+}</code></pre>
+
+              <h6>Response (200):</h6>
+              <pre><code class="language-json">{
+    "id": "550e8400-e29b-41d4-a716-446655440000",
+    "title": "O Senhor dos Anéis",
+    "author": "J.R.R. Tolkien",
+    "isbn": "9788533613379",
+    "publisher": "HarperCollins",
+    "year": 2020,
+    "description": "A história de Frodo Bolseiro e sua jornada para destruir o Um Anel",
+    "coverUrl": "https://exemplo.com/covers/senhor-dos-aneis-nova.jpg",
+    "createdAt": "2024-03-21T10:00:00Z",
+    "updatedAt": "2024-03-21T11:00:00Z"
+}</code></pre>
+            </div>
+          </div>
+
+          <!-- Get Books -->
+          <div class="card section-card">
+            <div class="card-header">
+              <span class="badge method-badge method-get">GET</span>
+              <span class="ms-2">/books</span>
+            </div>
+            <div class="card-body">
+              <h5 class="card-title">Buscar Livros</h5>
+              <p class="card-text">Endpoint para busca de livros com filtros opcionais.</p>
+
+              <h6>Query Parameters:</h6>
+              <ul>
+                <li><code>title</code>: Título do livro</li>
+                <li><code>author</code>: Nome do autor</li>
+                <li><code>isbn</code>: ISBN do livro</li>
+                <li><code>publisher</code>: Nome da editora</li>
+                <li><code>year</code>: Ano de publicação</li>
+              </ul>
+
+              <h6>Response (200):</h6>
+              <pre><code class="language-json">[
+    {
+        "id": "550e8400-e29b-41d4-a716-446655440000",
+        "title": "O Senhor dos Anéis",
+        "author": "J.R.R. Tolkien",
+        "isbn": "9788533613379",
+        "publisher": "HarperCollins",
+        "year": 2020,
+        "description": "A história de Frodo Bolseiro e sua jornada para destruir o Um Anel",
+        "coverUrl": "https://exemplo.com/covers/senhor-dos-aneis-nova.jpg",
+        "createdAt": "2024-03-21T10:00:00Z",
+        "updatedAt": "2024-03-21T11:00:00Z"
+    },
+    {
+        "id": "550e8400-e29b-41d4-a716-446655440001",
+        "title": "1984",
+        "author": "George Orwell",
+        "isbn": "9788535909552",
+        "publisher": "Companhia das Letras",
+        "year": 2009,
+        "description": "Uma distopia sobre vigilância e controle social",
+        "coverUrl": "https://exemplo.com/covers/1984.jpg",
+        "createdAt": "2024-03-21T12:00:00Z",
+        "updatedAt": "2024-03-21T12:00:00Z"
+    }
+]</code></pre>
+            </div>
+          </div>
+
+          <!-- Get Book by ID -->
+          <div class="card section-card">
+            <div class="card-header">
+              <span class="badge method-badge method-get">GET</span>
+              <span class="ms-2">/books/:id</span>
+            </div>
+            <div class="card-body">
+              <h5 class="card-title">Buscar Livro por ID</h5>
+              <p class="card-text">Endpoint para buscar um livro específico pelo seu ID.</p>
+
+              <h6>Response (200):</h6>
+              <pre><code class="language-json">{
+    "id": "550e8400-e29b-41d4-a716-446655440000",
+    "title": "O Senhor dos Anéis",
+    "author": "J.R.R. Tolkien",
+    "isbn": "9788533613379",
+    "publisher": "HarperCollins",
+    "year": 2020,
+    "description": "A história de Frodo Bolseiro e sua jornada para destruir o Um Anel",
+    "coverUrl": "https://exemplo.com/covers/senhor-dos-aneis-nova.jpg",
+    "createdAt": "2024-03-21T10:00:00Z",
+    "updatedAt": "2024-03-21T11:00:00Z"
+}</code></pre>
+            </div>
+          </div>
+
+          <!-- Delete Book -->
+          <div class="card section-card">
+            <div class="card-header">
+              <span class="badge method-badge method-delete">DELETE</span>
+              <span class="ms-2">/books/:id</span>
+            </div>
+            <div class="card-body">
+              <h5 class="card-title">Remover Livro</h5>
+              <p class="card-text">Endpoint para remover um livro do sistema.</p>
+
+              <h6>Response (204):</h6>
+              <p>No Content</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-typescript.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-json.min.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const navLinks = document.querySelectorAll('.nav-link');
+      const contentSections = document.querySelectorAll('.content-section');
+
+      navLinks.forEach(link => {
+        link.addEventListener('click', function (e) {
+          e.preventDefault();
+
+          // Remove active class from all links and sections
+          navLinks.forEach(l => l.classList.remove('active'));
+          contentSections.forEach(s => s.classList.remove('active'));
+
+          // Add active class to clicked link
+          this.classList.add('active');
+
+          // Show corresponding section
+          const sectionId = this.getAttribute('data-section');
+          document.getElementById(sectionId).classList.add('active');
+        });
+      });
+    });
+  </script>
+</body>
+
+</html>

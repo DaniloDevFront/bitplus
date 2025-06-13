@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Detalhes do Módulo de Uploads</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism.min.css">
+  <style>
+    .module-header {
+      background: linear-gradient(135deg, #7E06F2 0%, #770df0 100%);
+      color: white;
+      padding: 2rem 0;
+      margin-bottom: 2rem;
+    }
+
+    .section-card {
+      margin-bottom: 2rem;
+    }
+
+    .method-badge {
+      font-size: 0.9rem;
+      padding: 0.3rem 0.6rem;
+    }
+
+    .method-post {
+      background-color: #28a745;
+      color: white;
+    }
+
+    .method-get {
+      background-color: #007bff;
+      color: white;
+    }
+
+    .method-put {
+      background-color: #ffc107;
+      color: black;
+    }
+
+    .method-delete {
+      background-color: #dc3545;
+      color: white;
+    }
+
+    .nav-pills .nav-link {
+      color: #770df0;
+    }
+
+    .nav-pills .nav-link.active {
+      background-color: #770df0;
+    }
+
+    .content-section {
+      display: none;
+    }
+
+    .content-section.active {
+      display: block;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Module Header -->
+  <div class="module-header">
+    <div class="container">
+      <h1>Módulo de Uploads</h1>
+      <p class="lead">Documentação detalhada do sistema de upload de arquivos</p>
+
+      <a href="/" class="btn text-white text-decoration-underline px-0">Voltar</a>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="row">
+      <!-- Sidebar Navigation -->
+      <div class="col-md-3">
+        <div class="position-sticky">
+          <div class="nav flex-column nav-pills">
+            <a class="nav-link active" href="#" data-section="overview">Visão Geral</a>
+            <a class="nav-link" href="#" data-section="controllers">Controllers</a>
+            <a class="nav-link" href="#" data-section="dtos">DTOs</a>
+            <a class="nav-link" href="#" data-section="interceptors">Interceptors</a>
+            <a class="nav-link" href="#" data-section="flow">Fluxo de Dados</a>
+            <a class="nav-link" href="#" data-section="endpoints">Endpoints</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Content -->
+      <div class="col-md-9">
+        <!-- Overview Section -->
+        <div id="overview" class="content-section active">
+          <h2>Visão Geral</h2>
+          <p>O módulo de Uploads é responsável por gerenciar o upload de arquivos no sistema. Este módulo implementa:
+          </p>
+          <ul>
+            <li>Upload de imagens de perfil</li>
+            <li>Upload de capas de livros</li>
+            <li>Validação de tipos de arquivo</li>
+            <li>Otimização de imagens</li>
+          </ul>
+        </div>
+
+        <!-- Controllers Section -->
+        <div id="controllers" class="content-section">
+          <h2>Controllers</h2>
+          <div class="card section-card">
+            <div class="card-body">
+              <h5 class="card-title">UploadsController</h5>
+              <p class="card-text">Controlador principal responsável por gerenciar todas as operações relacionadas a
+                uploads.</p>
+              <pre><code class="language-typescript">@Controller('uploads')
+export class UploadsController {
+  constructor(private readonly uploadsService: UploadsService) {}
+
+  @Post('profile')
+  @UseInterceptors(FileInterceptor('file'))
+  async uploadProfileImage(@UploadedFile() file: Express.Multer.File)
+
+  @Post('book-cover')
+  @UseInterceptors(FileInterceptor('file'))
+  async uploadBookCover(@UploadedFile() file: Express.Multer.File)
+}</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- DTOs Section -->
+        <div id="dtos" class="content-section">
+          <h2>DTOs (Data Transfer Objects)</h2>
+          <div class="card section-card">
+            <div class="card-body">
+              <h5 class="card-title">UploadFileDto</h5>
+              <pre><code class="language-typescript">export class UploadFileDto {
+  @IsString()
+  @IsNotEmpty()
+  fieldname: string;
+
+  @IsString()
+  @IsNotEmpty()
+  originalname: string;
+
+  @IsString()
+  @IsNotEmpty()
+  encoding: string;
+
+  @IsString()
+  @IsNotEmpty()
+  mimetype: string;
+
+  @IsNumber()
+  @IsNotEmpty()
+  size: number;
+
+  @IsBuffer()
+  @IsNotEmpty()
+  buffer: Buffer;
+}</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Interceptors Section -->
+        <div id="interceptors" class="content-section">
+          <h2>Interceptors</h2>
+          <div class="card section-card">
+            <div class="card-body">
+              <h5 class="card-title">FileInterceptor</h5>
+              <p class="card-text">Interceptor responsável por processar o upload de arquivos.</p>
+              <pre><code class="language-typescript">@Injectable()
+export class FileInterceptor implements NestInterceptor {
+  constructor(
+    private readonly fieldName: string,
+    private readonly options: MulterOptions
+  ) {}
+
+  intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
+    // Implementação do interceptor
+  }
+}</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Flow Section -->
+        <div id="flow" class="content-section">
+          <h2>Fluxo de Dados</h2>
+          <div class="card section-card">
+            <div class="card-body">
+              <h5 class="card-title">Fluxo de Upload de Arquivo</h5>
+              <ol>
+                <li>Cliente envia arquivo para o endpoint de upload</li>
+                <li>FileInterceptor processa o arquivo</li>
+                <li>Sistema valida o tipo e tamanho do arquivo</li>
+                <li>Arquivo é processado e otimizado</li>
+                <li>URL do arquivo é retornada ao cliente</li>
+              </ol>
+            </div>
+          </div>
+        </div>
+
+        <!-- Endpoints Section -->
+        <div id="endpoints" class="content-section">
+          <h2>Endpoints</h2>
+          <!-- Upload Profile Image -->
+          <div class="card section-card">
+            <div class="card-header">
+              <span class="badge method-badge method-post">POST</span>
+              <span class="ms-2">/uploads/profile</span>
+            </div>
+            <div class="card-body">
+              <h5 class="card-title">Upload de Imagem de Perfil</h5>
+              <p class="card-text">Endpoint para upload de imagens de perfil de usuário.</p>
+
+              <h6>Request Body (multipart/form-data):</h6>
+              <ul>
+                <li><code>file</code>: Arquivo de imagem (jpg, png, gif)</li>
+              </ul>
+
+              <h6>Response (201):</h6>
+              <pre><code class="language-json">{
+    "url": "https://storage.example.com/profiles/550e8400-e29b-41d4-a716-446655440000.jpg",
+    "filename": "550e8400-e29b-41d4-a716-446655440000.jpg",
+    "mimetype": "image/jpeg",
+    "size": 102400
+}</code></pre>
+            </div>
+          </div>
+
+          <!-- Upload Book Cover -->
+          <div class="card section-card">
+            <div class="card-header">
+              <span class="badge method-badge method-post">POST</span>
+              <span class="ms-2">/uploads/book-cover</span>
+            </div>
+            <div class="card-body">
+              <h5 class="card-title">Upload de Capa de Livro</h5>
+              <p class="card-text">Endpoint para upload de capas de livros.</p>
+
+              <h6>Request Body (multipart/form-data):</h6>
+              <ul>
+                <li><code>file</code>: Arquivo de imagem (jpg, png)</li>
+              </ul>
+
+              <h6>Response (201):</h6>
+              <pre><code class="language-json">{
+    "url": "https://storage.example.com/covers/550e8400-e29b-41d4-a716-446655440001.jpg",
+    "filename": "550e8400-e29b-41d4-a716-446655440001.jpg",
+    "mimetype": "image/jpeg",
+    "size": 204800
+}</code></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-typescript.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-json.min.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const navLinks = document.querySelectorAll('.nav-link');
+      const contentSections = document.querySelectorAll('.content-section');
+
+      navLinks.forEach(link => {
+        link.addEventListener('click', function (e) {
+          e.preventDefault();
+
+          // Remove active class from all links and sections
+          navLinks.forEach(l => l.classList.remove('active'));
+          contentSections.forEach(s => s.classList.remove('active'));
+
+          // Add active class to clicked link
+          this.classList.add('active');
+
+          // Show corresponding section
+          const sectionId = this.getAttribute('data-section');
+          document.getElementById(sectionId).classList.add('active');
+        });
+      });
+    });
+  </script>
+</body>
+
+</html>

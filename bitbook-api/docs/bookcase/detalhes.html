@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Detalhes do Módulo de Estante do Usuário</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism.min.css">
+  <style>
+    .module-header {
+      background: linear-gradient(135deg, #7E06F2 0%, #770df0 100%);
+      color: white;
+      padding: 2rem 0;
+      margin-bottom: 2rem;
+    }
+
+    .section-card {
+      margin-bottom: 2rem;
+    }
+
+    .method-badge {
+      font-size: 0.9rem;
+      padding: 0.3rem 0.6rem;
+    }
+
+    .method-post {
+      background-color: #28a745;
+      color: white;
+    }
+
+    .method-get {
+      background-color: #007bff;
+      color: white;
+    }
+
+    .method-put {
+      background-color: #ffc107;
+      color: black;
+    }
+
+    .method-delete {
+      background-color: #dc3545;
+      color: white;
+    }
+
+    .nav-pills .nav-link {
+      color: #770df0;
+    }
+
+    .nav-pills .nav-link.active {
+      background-color: #770df0;
+    }
+
+    .content-section {
+      display: none;
+    }
+
+    .content-section.active {
+      display: block;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Module Header -->
+  <div class="module-header">
+    <div class="container">
+      <h1>Módulo de Estante do Usuário</h1>
+      <p class="lead">Documentação detalhada do sistema de gerenciamento de biblioteca pessoal</p>
+
+      <a href="/" class="btn text-white text-decoration-underline px-0">Voltar</a>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="row">
+      <!-- Sidebar Navigation -->
+      <div class="col-md-3">
+        <div class="position-sticky">
+          <div class="nav flex-column nav-pills">
+            <a class="nav-link active" href="#" data-section="overview">Visão Geral</a>
+            <a class="nav-link" href="#" data-section="controllers">Controllers</a>
+            <a class="nav-link" href="#" data-section="dtos">DTOs</a>
+            <a class="nav-link" href="#" data-section="entities">Entidades</a>
+            <a class="nav-link" href="#" data-section="flow">Fluxo de Dados</a>
+            <a class="nav-link" href="#" data-section="endpoints">Endpoints</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Content -->
+      <div class="col-md-9">
+        <!-- Overview Section -->
+        <div id="overview" class="content-section active">
+          <h2>Visão Geral</h2>
+          <p>O módulo de Estante do Usuário é responsável por gerenciar a biblioteca pessoal de cada usuário. Este
+            módulo implementa:</p>
+          <ul>
+            <li>Adicionar e remover livros da estante</li>
+            <li>Organizar livros em categorias</li>
+            <li>Gerenciar status de leitura</li>
+            <li>Adicionar anotações e avaliações</li>
+          </ul>
+        </div>
+
+        <!-- Controllers Section -->
+        <div id="controllers" class="content-section">
+          <h2>Controllers</h2>
+          <div class="card section-card">
+            <div class="card-body">
+              <h5 class="card-title">BookcaseController</h5>
+              <p class="card-text">Controlador principal responsável por gerenciar todas as operações da estante do
+                usuário.</p>
+              <pre><code class="language-typescript">@Controller('bookcase')
+export class BookcaseController {
+  constructor(private readonly bookcaseService: BookcaseService) {}
+
+  @Post()
+  async addBookToBookcase(@Body() payload: CreateBookcaseEntryDto)
+
+  @Put(':id')
+  async updateBookStatus(@Param('id') id: string, @Body() payload: UpdateBookcaseEntryDto)
+
+  @Delete(':id')
+  async removeBookFromBookcase(@Param('id') id: string)
+
+  @Get()
+  async getUserBookcase(@Query() query: FindBookcaseEntryDto)
+}</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- DTOs Section -->
+        <div id="dtos" class="content-section">
+          <h2>DTOs (Data Transfer Objects)</h2>
+          <div class="card section-card">
+            <div class="card-body">
+              <h5 class="card-title">CreateBookcaseEntryDto</h5>
+              <pre><code class="language-typescript">export class CreateBookcaseEntryDto {
+  @IsString()
+  @IsNotEmpty()
+  bookId: string;
+
+  @IsEnum(ReadingStatus)
+  @IsNotEmpty()
+  status: ReadingStatus;
+
+  @IsString()
+  @IsOptional()
+  notes?: string;
+}</code></pre>
+            </div>
+          </div>
+          <div class="card section-card">
+            <div class="card-body">
+              <h5 class="card-title">UpdateBookcaseEntryDto</h5>
+              <pre><code class="language-typescript">export class UpdateBookcaseEntryDto {
+  @IsEnum(ReadingStatus)
+  @IsOptional()
+  status?: ReadingStatus;
+
+  @IsNumber()
+  @IsOptional()
+  @Min(1)
+  @Max(5)
+  rating?: number;
+
+  @IsString()
+  @IsOptional()
+  notes?: string;
+}</code></pre>
+            </div>
+          </div>
+          <div class="card section-card">
+            <div class="card-body">
+              <h5 class="card-title">FindBookcaseEntryDto</h5>
+              <pre><code class="language-typescript">export class FindBookcaseEntryDto {
+  @IsString()
+  @IsOptional()
+  bookId?: string;
+
+  @IsEnum(ReadingStatus)
+  @IsOptional()
+  status?: ReadingStatus;
+}</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Entities Section -->
+        <div id="entities" class="content-section">
+          <h2>Entidades</h2>
+          <div class="card section-card">
+            <div class="card-body">
+              <h5 class="card-title">BookcaseEntry</h5>
+              <pre><code class="language-typescript">@Entity('bookcase_entries')
+export class BookcaseEntry {
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
+
+  @Column()
+  userId: string;
+
+  @Column()
+  bookId: string;
+
+  @Column({
+    type: 'enum',
+    enum: ReadingStatus,
+    default: ReadingStatus.WANT_TO_READ
+  })
+  status: ReadingStatus;
+
+  @Column({ nullable: true })
+  rating: number;
+
+  @Column({ nullable: true })
+  notes: string;
+
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
+}</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Flow Section -->
+        <div id="flow" class="content-section">
+          <h2>Fluxo de Dados</h2>
+          <div class="card section-card">
+            <div class="card-body">
+              <h5 class="card-title">Fluxo de Adição de Livro à Estante</h5>
+              <ol>
+                <li>Cliente envia dados do livro para /bookcase</li>
+                <li>Sistema valida os dados usando CreateBookcaseEntryDto</li>
+                <li>Entrada é criada no banco de dados</li>
+                <li>Dados da entrada são retornados ao cliente</li>
+              </ol>
+            </div>
+          </div>
+          <div class="card section-card">
+            <div class="card-body">
+              <h5 class="card-title">Fluxo de Atualização de Status</h5>
+              <ol>
+                <li>Cliente envia dados atualizados para /bookcase/:id</li>
+                <li>Sistema valida os dados usando UpdateBookcaseEntryDto</li>
+                <li>Entrada é atualizada no banco de dados</li>
+                <li>Dados atualizados são retornados ao cliente</li>
+              </ol>
+            </div>
+          </div>
+        </div>
+
+        <!-- Endpoints Section -->
+        <div id="endpoints" class="content-section">
+          <h2>Endpoints</h2>
+          <!-- Get Bookcase -->
+          <div class="card section-card">
+            <div class="card-header">
+              <span class="badge method-badge method-get">GET</span>
+              <span class="ms-2">/bookcase</span>
+            </div>
+            <div class="card-body">
+              <h5 class="card-title">Buscar Estante</h5>
+              <p class="card-text">Endpoint para busca de livros na estante do usuário com filtros opcionais.</p>
+
+              <h6>Query Parameters:</h6>
+              <ul>
+                <li><code>bookId</code>: ID específico do livro</li>
+                <li><code>status</code>: Filtrar por status de leitura (READING|COMPLETED|WANT_TO_READ)</li>
+              </ul>
+
+              <h6>Response (200):</h6>
+              <pre><code class="language-json">[
+    {
+        "id": "550e8400-e29b-41d4-a716-446655440000",
+        "userId": "550e8400-e29b-41d4-a716-446655440001",
+        "bookId": "550e8400-e29b-41d4-a716-446655440002",
+        "title": "O Senhor dos Anéis",
+        "author": "J.R.R. Tolkien",
+        "status": "READING",
+        "rating": 5,
+        "notes": "Excelente leitura",
+        "createdAt": "2024-03-21T10:00:00Z",
+        "updatedAt": "2024-03-21T10:00:00Z"
+    },
+    {
+        "id": "550e8400-e29b-41d4-a716-446655440003",
+        "userId": "550e8400-e29b-41d4-a716-446655440001",
+        "bookId": "550e8400-e29b-41d4-a716-446655440004",
+        "title": "1984",
+        "author": "George Orwell",
+        "status": "COMPLETED",
+        "rating": 4,
+        "notes": "Muito relevante para os dias atuais",
+        "createdAt": "2024-03-21T11:00:00Z",
+        "updatedAt": "2024-03-21T11:00:00Z"
+    }
+]</code></pre>
+            </div>
+          </div>
+
+          <!-- Add Book to Bookcase -->
+          <div class="card section-card">
+            <div class="card-header">
+              <span class="badge method-badge method-post">POST</span>
+              <span class="ms-2">/bookcase</span>
+            </div>
+            <div class="card-body">
+              <h5 class="card-title">Adicionar Livro à Estante</h5>
+              <p class="card-text">Endpoint para adicionar um novo livro à estante do usuário.</p>
+
+              <h6>Request Body:</h6>
+              <pre><code class="language-json">{
+    "bookId": "550e8400-e29b-41d4-a716-446655440002",
+    "status": "READING",
+    "notes": "Começando a leitura"
+}</code></pre>
+
+              <h6>Response (201):</h6>
+              <pre><code class="language-json">{
+    "id": "550e8400-e29b-41d4-a716-446655440000",
+    "userId": "550e8400-e29b-41d4-a716-446655440001",
+    "bookId": "550e8400-e29b-41d4-a716-446655440002",
+    "status": "READING",
+    "notes": "Começando a leitura",
+    "createdAt": "2024-03-21T10:00:00Z",
+    "updatedAt": "2024-03-21T10:00:00Z"
+}</code></pre>
+            </div>
+          </div>
+
+          <!-- Update Book Status -->
+          <div class="card section-card">
+            <div class="card-header">
+              <span class="badge method-badge method-put">PUT</span>
+              <span class="ms-2">/bookcase/:id</span>
+            </div>
+            <div class="card-body">
+              <h5 class="card-title">Atualizar Status do Livro</h5>
+              <p class="card-text">Endpoint para atualizar informações de um livro na estante.</p>
+
+              <h6>Request Body:</h6>
+              <pre><code class="language-json">{
+    "status": "COMPLETED",
+    "rating": 5,
+    "notes": "Finalizado - Excelente livro!"
+}</code></pre>
+
+              <h6>Response (200):</h6>
+              <pre><code class="language-json">{
+    "id": "550e8400-e29b-41d4-a716-446655440000",
+    "userId": "550e8400-e29b-41d4-a716-446655440001",
+    "bookId": "550e8400-e29b-41d4-a716-446655440002",
+    "status": "COMPLETED",
+    "rating": 5,
+    "notes": "Finalizado - Excelente livro!",
+    "createdAt": "2024-03-21T10:00:00Z",
+    "updatedAt": "2024-03-21T11:00:00Z"
+}</code></pre>
+            </div>
+          </div>
+
+          <!-- Remove Book from Bookcase -->
+          <div class="card section-card">
+            <div class="card-header">
+              <span class="badge method-badge method-delete">DELETE</span>
+              <span class="ms-2">/bookcase/:id</span>
+            </div>
+            <div class="card-body">
+              <h5 class="card-title">Remover Livro da Estante</h5>
+              <p class="card-text">Endpoint para remover um livro da estante do usuário.</p>
+
+              <h6>Response (204):</h6>
+              <p>No Content</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-typescript.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-json.min.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const navLinks = document.querySelectorAll('.nav-link');
+      const contentSections = document.querySelectorAll('.content-section');
+
+      navLinks.forEach(link => {
+        link.addEventListener('click', function (e) {
+          e.preventDefault();
+          const targetSection = this.getAttribute('data-section');
+
+          // Update active states
+          navLinks.forEach(l => l.classList.remove('active'));
+          this.classList.add('active');
+
+          // Show target section
+          contentSections.forEach(section => {
+            section.classList.remove('active');
+            if (section.id === targetSection) {
+              section.classList.add('active');
+            }
+          });
+        });
+      });
+    });
+  </script>
+</body>
+
+</html>
