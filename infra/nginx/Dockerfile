@@ -13,5 +13,9 @@ RUN mkdir -p /var/log/nginx && \
 # Expõe as portas 80 e 443
 EXPOSE 80 443
 
-# Comando para iniciar o Nginx
-CMD ["nginx", "-g", "daemon off;"] 
+# Instala o wait-for-it
+ADD https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.sh /wait-for-it.sh
+RUN chmod +x /wait-for-it.sh
+
+# Altere o entrypoint para aguardar o bitbook-api:3000
+ENTRYPOINT ["/wait-for-it.sh", "bitbook-api:3000", "--", "nginx", "-g", "daemon off;"] 
