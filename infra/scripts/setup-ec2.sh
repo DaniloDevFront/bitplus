@@ -6,24 +6,6 @@ sudo dnf update -y
 # Instalar dependências
 sudo dnf install -y git
 
-# Configurar SSH para Git
-mkdir -p ~/.ssh
-chmod 700 ~/.ssh
-ssh-keygen -t rsa -b 4096 -f ~/.ssh/ec2-bitplus -N "" -C "ec2-bitplus"
-chmod 600 ~/.ssh/ec2-bitplus
-chmod 644 ~/.ssh/ec2-bitplus.pub
-
-# Mostrar a chave pública para ser adicionada ao GitHub/GitLab
-echo "Adicione a seguinte chave pública ao seu GitHub/GitLab:"
-cat ~/.ssh/ec2-bitplus.pub
-
-# Configurar SSH para usar a chave
-echo "Host github.com
-    IdentityFile ~/.ssh/ec2-bitplus
-    User git" >> ~/.ssh/config
-
-chmod 600 ~/.ssh/config
-
 # Instalar MySQL Client
 sudo dnf install -y mariadb105
 

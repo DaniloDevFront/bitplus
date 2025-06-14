@@ -24,13 +24,59 @@
 
 ```bash
 # Ajuste as permissões do arquivo .pem
-chmod 400 bitplus-test.pem
+chmod 400 bitplus.pem
 
 # Conecte via SSH
-ssh -i bitplus-test.pem ec2-user@<seu-elastic-ip>
+ssh -i bitplus.pem ec2-user@<seu-elastic-ip>
 ```
 
-## 4. Instalar Git e Clonar Repositório
+## 4. Configurar SSH para Git
+
+1. Criar e configurar chave SSH:
+
+```bash
+# Criar diretório .ssh com permissões corretas
+mkdir -p ~/.ssh
+chmod 700 ~/.ssh
+
+# Gerar chave SSH
+ssh-keygen -t rsa -b 4096 -f ~/.ssh/ec2-bitplus -N "" -C "ec2-bitplus"
+
+# Configurar permissões
+chmod 600 ~/.ssh/ec2-bitplus
+chmod 644 ~/.ssh/ec2-bitplus.pub
+
+# Mostrar a chave pública
+cat ~/.ssh/ec2-bitplus.pub
+```
+
+2. Adicionar a chave ao GitHub/GitLab:
+
+   - GitHub: Settings > SSH and GPG keys > New SSH key
+   - GitLab: Preferences > SSH Keys
+
+3. Configurar SSH para usar a chave:
+
+```bash
+# Criar/editar arquivo de configuração SSH
+echo "Host github.com
+    IdentityFile ~/.ssh/ec2-bitplus
+    User git" >> ~/.ssh/config
+
+chmod 600 ~/.ssh/config
+```
+
+4. Testar conexão:
+
+```bash
+# Para GitHub
+ssh -T git@github.com
+
+# Para GitLab
+ssh -T git@gitlab.com
+```
+
+## 5. Instalar Git e Clonar Repositório
 
 ```bash
 # Instalar Git
@@ -40,7 +86,7 @@ sudo dnf install -y git
 git clone <seu-repositorio> ~/bitplus
 ```
 
-## 5. Configurar Ambiente
+## 6. Configurar Ambiente
 
 1. Tornar o script executável:
 
@@ -56,7 +102,7 @@ chmod +x ~/bitplus/infra/scripts/setup-ec2.sh
 
 3. Faça logout e login novamente
 
-## 6. Configurar Aplicação
+## 7. Configurar Aplicação
 
 1. Configure as variáveis de ambiente:
 
@@ -72,7 +118,7 @@ cd ~/bitplus/infra
 docker-compose up -d
 ```
 
-## 7. Verificar Deploy
+## 8. Verificar Deploy
 
 1. Acesse a aplicação:
 
@@ -84,7 +130,7 @@ docker-compose up -d
 docker-compose logs -f
 ```
 
-## 8. Comandos Úteis
+## 9. Comandos Úteis
 
 ```bash
 # Ver status dos containers
@@ -103,7 +149,7 @@ docker-compose down
 docker-compose up -d --build
 ```
 
-## 9. Monitoramento Básico
+## 10. Monitoramento Básico
 
 1. Acesse o CloudWatch no console AWS
 2. Verifique as métricas básicas:
@@ -111,7 +157,7 @@ docker-compose up -d --build
    - Memória
    - Disco
 
-## 10. Backup Básico
+## 11. Backup Básico
 
 1. Backup do banco de dados:
 
@@ -128,7 +174,7 @@ mkdir -p ~/backups
 tar -czf ~/backups/bitplus-$(date +%Y%m%d).tar.gz ~/bitplus
 ```
 
-## 11. Próximos Passos
+## 12. Próximos Passos
 
 1. Configurar HTTPS
 2. Implementar monitoramento avançado
