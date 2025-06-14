@@ -115,7 +115,7 @@ cp bitbook-api/.env.example bitbook-api/.env.production
 
 ```bash
 cd ~/bitplus/infra
-docker-compose up -d
+docker-compose up -d --build
 ```
 
 ## 8. Verificar Deploy
