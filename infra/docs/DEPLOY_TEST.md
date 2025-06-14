@@ -5,7 +5,7 @@
 1. Acesse o Console AWS
 2. Vá para EC2 > Instances > Launch Instance
 3. Configure a instância:
-   - Nome: bitplus-test
+   - Nome: bitplus-homolog
    - AMI: Amazon Linux 2023
    - Tipo: t2.micro (Free Tier)
    - Par de chaves: Criar novo

@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Detalhes do Módulo de Usuário</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism.min.css">
+  <style>
+    .module-header {
+      background: linear-gradient(135deg, #7E06F2 0%, #770df0 100%);
+      color: white;
+      padding: 2rem 0;
+      margin-bottom: 2rem;
+    }
+
+    .section-card {
+      margin-bottom: 2rem;
+    }
+
+    .method-badge {
+      font-size: 0.9rem;
+      padding: 0.3rem 0.6rem;
+    }
+
+    .method-post {
+      background-color: #28a745;
+      color: white;
+    }
+
+    .method-get {
+      background-color: #007bff;
+      color: white;
+    }
+
+    .method-put {
+      background-color: #ffc107;
+      color: black;
+    }
+
+    .method-delete {
+      background-color: #dc3545;
+      color: white;
+    }
+
+    .nav-pills .nav-link {
+      color: #770df0;
+    }
+
+    .nav-pills .nav-link.active {
+      background-color: #770df0;
+    }
+
+    .content-section {
+      display: none;
+    }
+
+    .content-section.active {
+      display: block;
+    }
+
+    .container-title {
+      background: linear-gradient(45deg, #2c3e50, #3498db);
+      color: white;
+      padding: 10px 15px;
+      border-radius: 5px;
+      margin: 20px 0 15px 0;
+      font-size: 1.2rem;
+      display: flex;
+      align-items: center;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .container-title::before {
+      content: '📦';
+      margin-right: 10px;
+      font-size: 1.4rem;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Module Header -->
+  <div class="module-header">
+    <div class="container">
+      <h1>Módulo de Ambientes</h1>
+      <p class="lead">Documentação detalhada do sistema de gerenciamento de ambientes</p>
+
+      <a href="/" class="btn text-white text-decoration-underline px-0">Voltar</a>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="row">
+      <!-- Sidebar Navigation -->
+      <div class="col-md-3">
+        <div class="position-sticky">
+          <div class="nav flex-column nav-pills">
+            <a class="nav-link active" href="#" data-section="overview">Visão Geral</a>
+            <a class="nav-link" href="#" data-section="homolog">Homologação</a>
+            <a class="nav-link" href="#" data-section="local">Local</a>
+            <a class="nav-link" href="#" data-section="production">Produção</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Content -->
+      <div class="col-md-9">
+        <!-- Overview Section -->
+        <div id="overview" class="content-section active">
+          <h2>Visão Geral</h2>
+          <p>Desenvolvido 3 ambientes para o sistema BitPlus.</p>
+
+          <div class="alert alert-info">
+            <h5 class="alert-heading">Sobre o Ambiente Local</h5>
+            <p>Para ambiente local, a execucao é individualizada para cada aplicacao, com a execucao de um compose para
+              cada aplicacao.</p>
+          </div>
+
+          <div class="alert alert-info">
+            <h5 class="alert-heading">Sobre o Ambiente Homologação</h5>
+            <p>O ambiente de homologação é uma réplica do ambiente de produção, hospedado na AWS, com o propósito de
+              validar a aplicação antes de seu lançamento em produção. O sistema do bitbook é integrado junto com o
+              sistema do bittopics e bittrainers. Onde possui um unico compose para gerenciar todos os sistemas</p>
+          </div>
+
+          <div class="alert alert-info">
+            <h5 class="alert-heading">Sobre o Ambiente Produção</h5>
+            <p>O ambiente de produção é o ambiente em que a aplicação é executada para clientes e usuarios finais.
+              O sistema do bitbook é integrado junto com o sistema do bittopics e bittrainers. Onde possui um unico
+              compose para gerenciar todos os sistemas</p>
+          </div>
+
+          <!-- Migrations -->
+          <div class="card section-card">
+            <div class="card-body">
+              <h5 class="card-title">Gerenciamento de Migrations</h5>
+              <div class="container-description">
+                <div class="container-title">Ambiente Local</div>
+                <ul>
+                  <li>Ambiente principal para desenvolvimento e teste de migrations</li>
+                  <li>Fluxo de trabalho:
+                    <ol>
+                      <li>Criar migration: <code>npm run migration:create</code></li>
+                      <li>Desenvolver e testar localmente</li>
+                      <li>Executar migration: <code>npm run migration:run</code></li>
+                      <li>Verificar se tudo está funcionando</li>
+                      <li>Se necessário, reverter: <code>npm run migration:revert</code></li>
+                    </ol>
+                  </li>
+                  <li>Banco de dados local para testes e desenvolvimento</li>
+                  <li>Importante: Todas as migrations devem ser testadas localmente antes de subir para homologação</li>
+                </ul>
+
+                <div class="alert alert-info mt-3">
+                  <strong>Fluxo de Migrations:</strong>
+                  <p class="mb-0">Local → Homologação → Produção</p>
+                  <small>As migrations devem seguir este fluxo, sendo testadas em cada ambiente antes de avançar para o
+                    próximo.</small>
+                </div>
+
+                <div class="container-title">Ambiente Homologação</div>
+                <ul>
+                  <li>Ambiente de validação e teste de migrations antes da produção</li>
+                  <li>Fluxo de trabalho:
+                    <ol>
+                      <li>Verificar migrations pendentes:
+                        <pre><code class="language-bash"># Na pasta do projeto
+npm run migration:show</code></pre>
+                      </li>
+                      <li>Backup automático do banco RDS antes da execução</li>
+                      <li>Execução das migrations durante o deploy:
+                        <pre><code class="language-bash"># Durante o deploy
+npm run migration:run</code></pre>
+                      </li>
+                      <li>Verificação automática de sucesso:
+                        <ul>
+                          <li>Logs de execução</li>
+                          <li>Status das tabelas</li>
+                          <li>Integridade dos dados</li>
+                        </ul>
+                      </li>
+                      <li>Rollback automático em caso de falha</li>
+                    </ol>
+                  </li>
+                  <li>Banco RDS compartilhado entre todas as APIs</li>
+                  <li>Logs de migrations são mantidos para auditoria</li>
+                </ul>
+
+                <div class="alert alert-warning mt-3">
+                  <strong>Pontos de Atenção:</strong>
+                  <ul class="mb-0">
+                    <li>Migrations devem ser testadas localmente antes</li>
+                    <li>Backup é realizado automaticamente</li>
+                    <li>Rollback é executado em caso de erro</li>
+                    <li>Logs são essenciais para debug</li>
+                  </ul>
+                </div>
+
+                <div class="container-title">Ambiente Produção</div>
+                <ul>
+                  <li>Migrations são executadas com confirmação manual</li>
+                  <li>Processo de deploy separado das migrations</li>
+                  <li>Backup automático antes de cada migration</li>
+                  <li>Janela de manutenção para execução</li>
+                  <li>Monitoramento em tempo real durante a execução</li>
+                </ul>
+
+                <div class="alert alert-warning mt-3">
+                  <strong>Importante:</strong>
+                  <ul class="mb-0">
+                    <li>Migrations em produção requerem aprovação</li>
+                    <li>Backup é obrigatório antes de qualquer alteração</li>
+                    <li>Testar migrations em homologação antes de produção</li>
+                    <li>Manter histórico de todas as alterações</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Controllers Section -->
+        <div id="local" class="content-section">
+          <h2>Ambiente Local</h2>
+
+          <!-- Configuração do Ambiente -->
+          <div class="card section-card">
+            <div class="card-body">
+              <h5 class="card-title">Configuração do Ambiente</h5>
+              <p class="card-text">O ambiente local utiliza Docker e Docker Compose para gerenciar os containers
+                necessários.</p>
+              <h6>Containers:</h6>
+              <ul>
+                <li>bitbook-api</li>
+                <li>mysql</li>
+                <li>phpmyadmin</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="card section-card">
+            <div class="card-body">
+              <h5 class="card-title">Funcionalidades</h5>
+              <div class="container-description">
+                <div class="container-title">bitbook-api</div>
+                <p>Container principal que executa a aplicação NestJS. Responsável por:</p>
+                <ul>
+                  <li>Servir a API REST</li>
+                  <li>Gerenciar conexões com o banco de dados</li>
+                  <li>Processar requisições HTTP</li>
+                  <li>Executar validações e regras de negócio</li>
+                  <li>Fornecer documentação via Swagger</li>
+                </ul>
+
+                <div class="container-title">mysql</div>
+                <p>Container do banco de dados MySQL. Responsável por:</p>
+                <ul>
+                  <li>Armazenar dados persistentes</li>
+                  <li>Gerenciar transações</li>
+                  <li>Executar queries e procedimentos</li>
+                  <li>Manter a integridade dos dados</li>
+                </ul>
+
+                <div class="container-title">phpmyadmin</div>
+                <p>Interface web para gerenciamento do MySQL. Permite:</p>
+                <ul>
+                  <li>Visualizar e editar dados</li>
+                  <li>Executar queries SQL</li>
+                  <li>Gerenciar estrutura do banco</li>
+                  <li>Importar/exportar dados</li>
+                  <li>Monitorar performance</li>
+                </ul>
+
+                <div class="alert alert-info mt-3">
+                  <strong>Nota:</strong> Todos os containers são configurados através do arquivo
+                  <code>docker-compose.yml</code> e suas variáveis de ambiente são definidas no <code>.env.local</code>.
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Como Executar -->
+          <div class="card section-card">
+            <div class="card-body">
+              <h5 class="card-title">Como Executar</h5>
+              <ol>
+                <li>Criar o arquivo .env.local baseado no .env.example</li>
+                <li>Executar na raiz do projeto bitbook-api:</li>
+                <pre><code class="language-bash">npm run docker:local</code></pre>
+              </ol>
+            </div>
+          </div>
+
+          <!-- Acessos -->
+          <div class="card section-card">
+            <div class="card-body">
+              <h5 class="card-title">Acessos</h5>
+
+              <ul>
+                <li>PHPMyAdmin: <a href="http://localhost:8080" target="_blank">http://localhost:8080</a>
+                </li>
+                <li>API: <a href="http://localhost:3000" target="_blank">http://localhost:3000</a></li>
+                <li>Swagger: <a href="http://localhost:3000/api" target="_blank">http://localhost:3000/api</a></li>
+                <li>Sumário: <a href="http://localhost:3000/summary" target="_blank">http://localhost:3000/summary</a>
+                </li>
+              </ul>
+
+              <div class="alert alert-info mt-3">
+                <strong>Nota:</strong> Os links acima são para o ambiente local. E de acordo com as variáveis de
+                ambiente definidas no <code>.env.local</code>.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="homolog" class="content-section">
+          <h2>Ambiente Homologação</h2>
+
+          <div class="alert alert-info">
+            <h5 class="alert-heading">Sobre o Ambiente</h5>
+            <p>O ambiente de homologação é uma réplica do ambiente de produção, hospedado na AWS, com o propósito de
+              validar a aplicação antes de seu lançamento em produção.</p>
+            <hr>
+            <p class="mb-0"><strong>Características Principais:</strong></p>
+            <ul class="mb-0">
+              <li>Uma única instância EC2 para gerenciar todas as APIs da BitPlus</li>
+              <li>Docker Compose centralizado para orquestrar os containers</li>
+              <li>Configurações específicas para ambiente de teste</li>
+              <li>Recursos otimizados para homologação (t2.micro)</li>
+            </ul>
+          </div>
+
+          <!-- Configuração AWS -->
+          <div class="card section-card">
+            <div class="card-body">
+              <h5 class="card-title">Configuração AWS</h5>
+              <div class="container-description">
+                <div class="container-title">EC2</div>
+                <ul>
+                  <li><strong>Nome:</strong> bitplus-homolog</li>
+                  <li><strong>AMI:</strong> Amazon Linux 2023</li>
+                  <li><strong>Tipo:</strong> t2.micro (Free Tier)</li>
+                  <li><strong>Par de chaves:</strong> bitplus.pem</li>
+                  <li><strong>Security Group:</strong> rds-ec2-6 (sg-0d8914eb4bcecff54)</li>
+                  <li><strong>Portas:</strong>
+                    <ul>
+                      <li>SSH (22)</li>
+                      <li>HTTP (80)</li>
+                      <li>HTTPS (443)</li>
+                    </ul>
+                  </li>
+                  <li><strong>Região:</strong> Brasil São Paulo (sa-east-1)</li>
+                </ul>
+
+                <div class="container-title">RDS</div>
+                <ul>
+                  <li><strong>Nome:</strong> bitplus</li>
+                  <li><strong>Engine:</strong> MySQL</li>
+                  <li><strong>Versão:</strong> 8.0.32</li>
+                  <li><strong>Instância:</strong> db.t3.micro</li>
+                  <li><strong>Security Group:</strong> rds-ec2-6 (sg-0d8914eb4bcecff54)</li>
+                  <li><strong>Região:</strong> Brasil São Paulo (sa-east-1)</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <!-- Configuração SSH -->
+          <div class="card section-card">
+            <div class="card-body">
+              <h5 class="card-title">Configuração SSH</h5>
+              <div class="container-description">
+                <pre><code class="language-bash"># Criar diretório .ssh com permissões corretas
+mkdir -p ~/.ssh
+chmod 700 ~/.ssh
+
+# Gerar chave SSH
+ssh-keygen -t rsa -b 4096 -f ~/.ssh/ec2-bitplus -N "" -C "ec2-bitplus"
+
+# Configurar permissões
+chmod 600 ~/.ssh/ec2-bitplus
+chmod 644 ~/.ssh/ec2-bitplus.pub
+
+# Configurar SSH para usar a chave
+echo "Host github.com
+IdentityFile ~/.ssh/ec2-bitplus
+User git" >> ~/.ssh/config
+
+chmod 600 ~/.ssh/config</code></pre>
+              </div>
+            </div>
+          </div>
+
+          <!-- Configuração do Projeto -->
+          <div class="card section-card">
+            <div class="card-body">
+              <h5 class="card-title">Configuração do Projeto</h5>
+              <div class="container-description">
+                <div class="container-title">Estrutura de Containers</div>
+                <p>O ambiente de homologação utiliza um Docker Compose centralizado em <code>/infra</code> que gerencia:
+                </p>
+                <ul>
+                  <li>Container bitbook-api</li>
+                  <li>Container bittopics-api</li>
+                  <li>Container bittrainers-api</li>
+                  <li>Container nginx</li>
+                </ul>
+
+                <div class="container-title">Funcionalidades</div>
+                <h6>bitbook-api</h6>
+                <ul>
+                  <li>Servir a API REST</li>
+                  <li>Gerenciar conexões com o banco de dados RDS</li>
+                  <li>Processar requisições HTTP</li>
+                  <li>Executar validações e regras de negócio</li>
+                  <li>Fornecer documentação via Swagger</li>
+                </ul>
+
+                <h6>bittopics-api</h6>
+                <p><em>Em breve</em></p>
+
+                <h6>bittrainers-api</h6>
+                <p><em>Em breve</em></p>
+
+                <h6>nginx</h6>
+                <ul>
+                  <li>Proxy reverso para todas as APIs</li>
+                  <li>Balanceamento de carga</li>
+                  <li>Gerenciamento de domínios</li>
+                  <li>SSL/TLS</li>
+                  <li>Cache e compressão</li>
+                </ul>
+
+                <div class="alert alert-info mt-3">
+                  <strong>Como Executar:</strong>
+                  <ol>
+                    <li>Acessar o diretório: <code>cd bitplus-backend/infra</code></li>
+                    <li>Executar: <code>docker compose up -d --build</code></li>
+                    <li>Verificar containers: <code>docker ps</code></li>
+                  </ol>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-typescript.min.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-json.min.js"></script>
+      <script>
+        document.addEventListener('DOMContentLoaded', function () {
+          const navLinks = document.querySelectorAll('.nav-link');
+          const contentSections = document.querySelectorAll('.content-section');
+
+          navLinks.forEach(link => {
+            link.addEventListener('click', function (e) {
+              e.preventDefault();
+
+              // Remove active class from all links and sections
+              navLinks.forEach(l => l.classList.remove('active'));
+              contentSections.forEach(s => s.classList.remove('active'));
+
+              // Add active class to clicked link
+              this.classList.add('active');
+
+              // Show corresponding section
+              const sectionId = this.getAttribute('data-section');
+              document.getElementById(sectionId).classList.add('active');
+            });
+          });
+        });
+      </script>
+</body>
+
+</html>
