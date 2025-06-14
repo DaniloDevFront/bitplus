@@ -23,10 +23,10 @@ COPY . .
 # Build da aplicação
 RUN npm run build
 
-# Imagem de produção
+# Imagem de desenvolvimento
 FROM node:20-slim
 
-# Instala apenas as dependências necessárias para produção
+# Instala apenas as dependências necessárias
 RUN apt-get update && apt-get install -y \
     libvips-dev \
     && rm -rf /var/lib/apt/lists/*
@@ -37,6 +37,7 @@ WORKDIR /app
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package*.json ./
+COPY --from=builder /app/src/core/database/typeorm.config.ts ./src/core/database/typeorm.config.ts
 
 # Define variáveis de ambiente
 ENV NODE_ENV=development
@@ -44,5 +45,5 @@ ENV NODE_ENV=development
 # Expõe a porta da aplicação
 EXPOSE 3000
 
-# Comando para iniciar a aplicação
+# Comando para iniciar a aplicação em modo desenvolvimento
 CMD ["npm", "run", "start:development"]
