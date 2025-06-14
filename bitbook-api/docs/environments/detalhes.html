@@ -102,6 +102,7 @@
             <a class="nav-link" href="#" data-section="local">Local</a>
             <a class="nav-link" href="#" data-section="production">Produção</a>
             <a class="nav-link" href="#" data-section="migrations">Migrations</a>
+            <a class="nav-link" href="#" data-section="deploy">Deploy</a>
           </div>
         </div>
       </div>
@@ -455,35 +456,300 @@ chmod 600 ~/.ssh/config</code></pre>
             </div>
           </div>
         </div>
+
+        <div id="deploy" class="content-section">
+          <h2>Deploy</h2>
+
+          <div class="card section-card">
+            <div class="card-body">
+              <h5 class="card-title">Sistema de Deploy para Homologação</h5>
+              <div class="container-description">
+                <div class="container-title">GitHub Actions</div>
+                <p>O deploy em homologação é automatizado através do GitHub Actions, que gerencia todo o processo de
+                  forma segura e controlada.</p>
+
+                <div class="container-title">Fluxo de Deploy em Homologação</div>
+                <ol>
+                  <li>Criação de Pull Request para a branch homolog</li>
+                  <li>Detecção automática das APIs alteradas</li>
+                  <li>Backup do banco de dados</li>
+                  <li>Processamento das APIs afetadas:
+                    <ul>
+                      <li>Instalação de dependências</li>
+                      <li>Verificação de migrations</li>
+                      <li>Execução de migrations</li>
+                      <li>Rollback automático em caso de erro</li>
+                    </ul>
+                  </li>
+                  <li>Deploy seletivo no EC2:
+                    <ul>
+                      <li>Apenas as APIs alteradas são rebuildadas</li>
+                      <li>Containers não afetados permanecem inalterados</li>
+                    </ul>
+                  </li>
+                </ol>
+
+                <div class="alert alert-info mt-3">
+                  <strong>Exemplo:</strong>
+                  <p class="mb-0">Se você alterar apenas a bitbook-api, apenas ela será rebuildada, mantendo as outras
+                    APIs estáveis.</p>
+                </div>
+
+                <div class="container-title">Segurança em Homologação</div>
+                <ul>
+                  <li>Backup automático do banco antes de qualquer alteração</li>
+                  <li>Rollback automático em caso de falha</li>
+                  <li>Credenciais protegidas via GitHub Secrets</li>
+                  <li>Deploy seletivo por API</li>
+                </ul>
+
+                <div class="container-title">Monitoramento</div>
+                <ul>
+                  <li>Logs detalhados no GitHub Actions</li>
+                  <li>Notificações de sucesso/falha</li>
+                  <li>Status do deploy por API</li>
+                </ul>
+
+                <div class="alert alert-warning mt-3">
+                  <strong>Importante:</strong>
+                  <ul class="mb-0">
+                    <li>Migrations são executadas automaticamente</li>
+                    <li>Backup é realizado antes de cada deploy</li>
+                    <li>Rollback é executado em caso de erro</li>
+                    <li>Deploy é seletivo por API</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card section-card">
+            <div class="card-body">
+              <h5 class="card-title">Sistema de Deploy para Produção</h5>
+              <div class="container-description">
+                <div class="container-title">GitHub Actions</div>
+                <p>O deploy em produção é gerenciado através do GitHub Actions com processos adicionais de segurança e
+                  validação.</p>
+
+                <div class="container-title">Fluxo de Deploy em Produção</div>
+                <ol>
+                  <li>Criação de Pull Request para a branch main</li>
+                  <li>Validações obrigatórias:
+                    <ul>
+                      <li>Testes automatizados</li>
+                      <li>Análise de código</li>
+                      <li>Verificação de vulnerabilidades</li>
+                      <li>Aprovação manual obrigatória</li>
+                    </ul>
+                  </li>
+                  <li>Janela de manutenção:
+                    <ul>
+                      <li>Agendamento prévio</li>
+                      <li>Notificação à equipe</li>
+                      <li>Horário de menor impacto</li>
+                    </ul>
+                  </li>
+                  <li>Processo de deploy:
+                    <ul>
+                      <li>Backup completo do banco</li>
+                      <li>Verificação de migrations pendentes</li>
+                      <li>Execução de migrations com confirmação manual</li>
+                      <li>Deploy seletivo por API</li>
+                      <li>Monitoramento em tempo real</li>
+                    </ul>
+                  </li>
+                  <li>Pós-deploy:
+                    <ul>
+                      <li>Verificação de logs</li>
+                      <li>Testes de smoke</li>
+                      <li>Monitoramento de métricas</li>
+                    </ul>
+                  </li>
+                </ol>
+
+                <div class="alert alert-danger mt-3">
+                  <strong>Restrições em Produção:</strong>
+                  <ul class="mb-0">
+                    <li>Deploy apenas em horário comercial</li>
+                    <li>Migrations requerem aprovação manual</li>
+                    <li>Backup obrigatório antes de qualquer alteração</li>
+                    <li>Rollback manual em caso de falha</li>
+                  </ul>
+                </div>
+
+                <div class="container-title">Segurança em Produção</div>
+                <ul>
+                  <li>Backup completo antes do deploy</li>
+                  <li>Validações múltiplas de segurança</li>
+                  <li>Aprovação manual obrigatória</li>
+                  <li>Monitoramento em tempo real</li>
+                  <li>Plano de rollback documentado</li>
+                </ul>
+
+                <div class="container-title">Monitoramento</div>
+                <ul>
+                  <li>Logs detalhados no GitHub Actions</li>
+                  <li>Notificações em tempo real</li>
+                  <li>Métricas de performance</li>
+                  <li>Alertas de erro</li>
+                </ul>
+
+                <div class="alert alert-warning mt-3">
+                  <strong>Checklist de Produção:</strong>
+                  <ul class="mb-0">
+                    <li>Testes em homologação aprovados</li>
+                    <li>Backup do banco realizado</li>
+                    <li>Janela de manutenção agendada</li>
+                    <li>Equipe notificada</li>
+                    <li>Plano de rollback revisado</li>
+                  </ul>
+                </div>
+
+                <div class="container-title">Configuração</div>
+                <p>O sistema requer as seguintes configurações no GitHub, organizadas por ambiente e API:</p>
+
+                <div class="container-title">Secrets para Homologação</div>
+                <ul>
+                  <li>Banco de dados (Homolog):
+                    <ul>
+                      <li>HOMOLOG_DB_HOST: Host do banco de dados</li>
+                      <li>HOMOLOG_DB_USER: Usuário do banco de dados</li>
+                      <li>HOMOLOG_DB_PASSWORD: Senha do banco de dados</li>
+                      <li>HOMOLOG_BANCO_BITBOOK: Banco da bitbook-api</li>
+                      <li>HOMOLOG_BANCO_BITTOPICS: Banco da bittopics-api</li>
+                      <li>HOMOLOG_BANCO_BITTRAINERS: Banco da bittrainers-api</li>
+                    </ul>
+                  </li>
+                  <li>EC2 (Homolog):
+                    <ul>
+                      <li>HOMOLOG_EC2_HOST: Endereço IP ou DNS da instância EC2</li>
+                      <li>HOMOLOG_EC2_USER: Usuário SSH para acesso ao EC2</li>
+                      <li>HOMOLOG_EC2_SSH_KEY: Chave SSH privada para acesso ao EC2</li>
+                    </ul>
+                  </li>
+                </ul>
+
+                <div class="container-title">Secrets para Produção</div>
+                <ul>
+                  <li>Banco de dados (Produção):
+                    <ul>
+                      <li>PROD_DB_HOST: Host do banco de dados</li>
+                      <li>PROD_DB_USER: Usuário do banco de dados</li>
+                      <li>PROD_DB_PASSWORD: Senha do banco de dados</li>
+                      <li>PROD_BANCO_BITBOOK: Banco da bitbook-api</li>
+                      <li>PROD_BANCO_BITTOPICS: Banco da bittopics-api</li>
+                      <li>PROD_BANCO_BITTRAINERS: Banco da bittrainers-api</li>
+                    </ul>
+                  </li>
+                  <li>EC2 (Produção):
+                    <ul>
+                      <li>PROD_EC2_HOST: Endereço IP ou DNS da instância EC2</li>
+                      <li>PROD_EC2_USER: Usuário SSH para acesso ao EC2</li>
+                      <li>PROD_EC2_SSH_KEY: Chave SSH privada para acesso ao EC2</li>
+                    </ul>
+                  </li>
+                </ul>
+
+                <div class="alert alert-info mt-3">
+                  <strong>Como configurar os Secrets:</strong>
+                  <ol class="mb-0">
+                    <li>Acesse o repositório no GitHub</li>
+                    <li>Vá em Settings > Secrets and variables > Actions</li>
+                    <li>Clique em "New repository secret"</li>
+                    <li>Adicione cada um dos secrets listados acima</li>
+                  </ol>
+                </div>
+
+                <div class="alert alert-warning mt-3">
+                  <strong>Importante:</strong>
+                  <ul class="mb-0">
+                    <li>Mantenha os secrets atualizados</li>
+                    <li>Não compartilhe as chaves</li>
+                    <li>Use chaves SSH diferentes para homolog e prod</li>
+                    <li>Mantenha backups das chaves em local seguro</li>
+                    <li>Cada API tem seu próprio banco de dados em cada ambiente</li>
+                  </ul>
+                </div>
+
+                <div class="container-title">Exemplo de Uso</div>
+                <p>No workflow, os secrets são selecionados automaticamente baseado no ambiente e API:</p>
+                <pre><code class="language-yaml"># Exemplo para Homologação
+- name: Backup database (Homolog)
+  if: github.ref == 'refs/heads/homolog'
+  run: |
+    if [[ "$api" == "bitbook-api" ]]; then
+      DB_NAME=${{ secrets.HOMOLOG_BANCO_BITBOOK }}
+      DB_HOST=${{ secrets.HOMOLOG_DB_HOST }}
+      DB_USER=${{ secrets.HOMOLOG_DB_USER }}
+      DB_PASSWORD=${{ secrets.HOMOLOG_DB_PASSWORD }}
+    elif [[ "$api" == "bittopics-api" ]]; then
+      DB_NAME=${{ secrets.HOMOLOG_BANCO_BITTOPICS }}
+      DB_HOST=${{ secrets.HOMOLOG_DB_HOST }}
+      DB_USER=${{ secrets.HOMOLOG_DB_USER }}
+      DB_PASSWORD=${{ secrets.HOMOLOG_DB_PASSWORD }}
+    elif [[ "$api" == "bittrainers-api" ]]; then
+      DB_NAME=${{ secrets.HOMOLOG_BANCO_BITTRAINERS }}
+      DB_HOST=${{ secrets.HOMOLOG_DB_HOST }}
+      DB_USER=${{ secrets.HOMOLOG_DB_USER }}
+      DB_PASSWORD=${{ secrets.HOMOLOG_DB_PASSWORD }}
+    fi
+    mysqldump -h $DB_HOST -u $DB_USER -p$DB_PASSWORD $DB_NAME > backup_${api}_homolog.sql
+
+# Exemplo para Produção
+- name: Backup database (Production)
+  if: github.ref == 'refs/heads/main'
+  run: |
+    if [[ "$api" == "bitbook-api" ]]; then
+      DB_NAME=${{ secrets.PROD_BANCO_BITBOOK }}
+      DB_HOST=${{ secrets.PROD_DB_HOST }}
+      DB_USER=${{ secrets.PROD_DB_USER }}
+      DB_PASSWORD=${{ secrets.PROD_DB_PASSWORD }}
+    elif [[ "$api" == "bittopics-api" ]]; then
+      DB_NAME=${{ secrets.PROD_BANCO_BITTOPICS }}
+      DB_HOST=${{ secrets.PROD_DB_HOST }}
+      DB_USER=${{ secrets.PROD_DB_USER }}
+      DB_PASSWORD=${{ secrets.PROD_DB_PASSWORD }}
+    elif [[ "$api" == "bittrainers-api" ]]; then
+      DB_NAME=${{ secrets.PROD_BANCO_BITTRAINERS }}
+      DB_HOST=${{ secrets.PROD_DB_HOST }}
+      DB_USER=${{ secrets.PROD_DB_USER }}
+      DB_PASSWORD=${{ secrets.PROD_DB_PASSWORD }}
+    fi
+    mysqldump -h $DB_HOST -u $DB_USER -p$DB_PASSWORD $DB_NAME > backup_${api}_prod.sql</code></pre>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
+    </div>
 
-      <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-      <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script>
-      <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-typescript.min.js"></script>
-      <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-json.min.js"></script>
-      <script>
-        document.addEventListener('DOMContentLoaded', function () {
-          const navLinks = document.querySelectorAll('.nav-link');
-          const contentSections = document.querySelectorAll('.content-section');
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-typescript.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-json.min.js"></script>
+    <script>
+      document.addEventListener('DOMContentLoaded', function () {
+        const navLinks = document.querySelectorAll('.nav-link');
+        const contentSections = document.querySelectorAll('.content-section');
 
-          navLinks.forEach(link => {
-            link.addEventListener('click', function (e) {
-              e.preventDefault();
+        navLinks.forEach(link => {
+          link.addEventListener('click', function (e) {
+            e.preventDefault();
 
-              // Remove active class from all links and sections
-              navLinks.forEach(l => l.classList.remove('active'));
-              contentSections.forEach(s => s.classList.remove('active'));
+            // Remove active class from all links and sections
+            navLinks.forEach(l => l.classList.remove('active'));
+            contentSections.forEach(s => s.classList.remove('active'));
 
-              // Add active class to clicked link
-              this.classList.add('active');
+            // Add active class to clicked link
+            this.classList.add('active');
 
-              // Show corresponding section
-              const sectionId = this.getAttribute('data-section');
-              document.getElementById(sectionId).classList.add('active');
-            });
+            // Show corresponding section
+            const sectionId = this.getAttribute('data-section');
+            document.getElementById(sectionId).classList.add('active');
           });
         });
-      </script>
+      });
+    </script>
 </body>
 
 </html>

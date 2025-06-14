@@ -1,0 +1,104 @@
+name: Deploy Produção
+
+on:
+  workflow_dispatch:
+    inputs:
+      api:
+        description: "API para deploy"
+        required: true
+        type: choice
+        options:
+          - bitbook-api
+          - bittopics-api
+          - bittrainers-api
+      version:
+        description: "Versão para deploy"
+        required: true
+        type: string
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Deploy API
+        run: |
+          api=${{ github.event.inputs.api }}
+          version=${{ github.event.inputs.version }}
+          echo "Deploying $api version $version..."
+
+          # Configurar variáveis do banco de dados
+          if [[ "$api" == "bitbook-api" ]]; then
+            DB_NAME=${{ secrets.PROD_BANCO_BITBOOK }}
+            DB_HOST=${{ secrets.PROD_DB_HOST }}
+            DB_USER=${{ secrets.PROD_DB_USER }}
+            DB_PASSWORD=${{ secrets.PROD_DB_PASSWORD }}
+          elif [[ "$api" == "bittopics-api" ]]; then
+            DB_NAME=${{ secrets.PROD_BANCO_BITTOPICS }}
+            DB_HOST=${{ secrets.PROD_DB_HOST }}
+            DB_USER=${{ secrets.PROD_DB_USER }}
+            DB_PASSWORD=${{ secrets.PROD_DB_PASSWORD }}
+          elif [[ "$api" == "bittrainers-api" ]]; then
+            DB_NAME=${{ secrets.PROD_BANCO_BITTRAINERS }}
+            DB_HOST=${{ secrets.PROD_DB_HOST }}
+            DB_USER=${{ secrets.PROD_DB_USER }}
+            DB_PASSWORD=${{ secrets.PROD_DB_PASSWORD }}
+          fi
+
+          # Backup do banco de dados
+          echo "Backing up database..."
+          backup_file="backup_${api}_prod_$(date +%Y%m%d_%H%M%S).sql"
+          mysqldump -h $DB_HOST -u $DB_USER -p$DB_PASSWORD $DB_NAME > $backup_file
+
+          # Instalar dependências
+          cd $api
+          npm ci
+
+          # Verificar migrations pendentes
+          echo "Checking pending migrations..."
+          npm run migration:show
+
+          # Executar migrations
+          echo "Running migrations..."
+          npm run migration:run
+
+          # Build da aplicação
+          echo "Building application..."
+          npm run build
+
+          # Configurar SSH
+          echo "Setting up SSH..."
+          mkdir -p ~/.ssh
+          echo "${{ secrets.PROD_EC2_SSH_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -H ${{ secrets.PROD_EC2_HOST }} >> ~/.ssh/known_hosts
+
+          # Deploy via SSH
+          echo "Deploying to EC2..."
+          rsync -avz --delete \
+            --exclude 'node_modules' \
+            --exclude '.git' \
+            --exclude '*.sql' \
+            ./ ${{ secrets.PROD_EC2_USER }}@${{ secrets.PROD_EC2_HOST }}:/var/www/$api/
+
+          # Reiniciar aplicação
+          ssh -i ~/.ssh/deploy_key ${{ secrets.PROD_EC2_USER }}@${{ secrets.PROD_EC2_HOST }} \
+            "cd /var/www/$api && \
+            npm ci --production && \
+            pm2 restart $api || pm2 start dist/main.js --name $api"
+
+          cd ..
+
+      - name: Notify on failure
+        if: failure()
+        run: |
+          echo "Deployment failed for ${{ github.event.inputs.api }}"
+          exit 1
