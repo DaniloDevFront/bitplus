@@ -1,60 +1,63 @@
-# Checklist de Preparação para Deploy AWS
+# Checklist de Deploy na AWS EC2 (Ambiente de Teste - Free Tier)
 
-## Configuração do Ambiente EC2
-[ ] Docker instalado e configurado
-[ ] Node.js e npm instalados
-[ ] Git instalado
-[ ] Portas 80 e 443 liberadas no Security Group
+## 1. Preparação do Ambiente AWS (Free Tier)
+- [ ] Criar uma instância EC2 t2.micro (Free Tier)
+- [ ] Selecionar Amazon Linux 2023 AMI
+- [ ] Configurar Security Group básico:
+  - [ ] SSH (porta 22)
+  - [ ] HTTP (porta 80)
+  - [ ] HTTPS (porta 443)
+- [ ] Criar e baixar par de chaves (.pem)
+- [ ] Configurar Elastic IP (Free Tier permite 1)
 
-## Configuração do Docker
-[ ] Docker Compose configurado corretamente
-[ ] Serviços definidos adequadamente
-[ ] Networks configuradas
-[ ] Volumes mapeados corretamente
+## 2. Configuração Inicial do Servidor
+- [ ] Conectar via SSH
+- [ ] Atualizar sistema
+- [ ] Instalar Docker
+- [ ] Instalar Docker Compose
+- [ ] Configurar timezone para America/Sao_Paulo
+- [ ] Configurar swap (1GB)
+- [ ] Instalar o Git
 
-## Configuração do Nginx
-[ ] Configuração SSL implementada
-[ ] Certificados SSL gerados e configurados
-[ ] Proxy reverso configurado
-[ ] Logs configurados
-[ ] Timeouts ajustados
+## 3. Configuração do Projeto
+- [ ] Clonar repositório
+- [ ] Criar .env.production básico
+- [ ] Configurar Nginx para HTTP (inicialmente)
+- [ ] Testar build local dos containers
 
-## Configuração da API (Bitbook)
-[ ] Dockerfile.prod otimizado
-[ ] Multi-stage build implementado
-[ ] Dependências instaladas corretamente
-[ ] Build da aplicação configurado
-[ ] Variáveis de ambiente definidas
+## 4. Configuração do Nginx (HTTP)
+- [ ] Atualizar default.conf para ambiente de teste
+- [ ] Configurar logs básicos
+- [ ] Testar proxy reverso
 
-## Banco de Dados (RDS)
-[ ] Instância RDS criada
-[ ] Security Group configurado
-[ ] Credenciais definidas
-[ ] Conexão testada
+## 5. Docker e Docker Compose
+- [ ] Testar build dos containers
+- [ ] Configurar volumes básicos
+- [ ] Implementar restart policy básica
+- [ ] Testar comunicação entre containers
 
-## AWS S3
-[ ] Bucket criado
-[ ] Permissões configuradas
-[ ] Credenciais AWS configuradas
-[ ] Acesso testado
+## 6. Testes Básicos
+- [ ] Testar acesso HTTP
+- [ ] Verificar logs
+- [ ] Testar restart dos containers
+- [ ] Verificar consumo de recursos
 
-## Segurança
-[ ] Variáveis de ambiente protegidas
-[ ] JWT_SECRET configurado
-[ ] Credenciais AWS seguras
-[ ] Certificados SSL válidos
+## 7. Monitoramento Básico
+- [ ] Configurar CloudWatch básico
+- [ ] Monitorar CPU e memória
+- [ ] Configurar alertas básicos
 
-## Monitoramento
-[ ] Logs configurados
-[ ] Métricas definidas
-[ ] Alertas configurados
+## 8. Backup Básico
+- [ ] Configurar backup manual do banco
+- [ ] Documentar processo de backup
 
-## Backup
-[ ] Estratégia de backup definida
-[ ] Backup do banco de dados configurado
-[ ] Backup dos arquivos configurado
+## 9. Documentação
+- [ ] Documentar configuração do ambiente
+- [ ] Criar manual básico de deploy
+- [ ] Documentar comandos úteis
 
-## Documentação
-[ ] README atualizado
-[ ] Documentação de deploy criada
-[ ] Procedimentos de rollback documentados 
+## 10. Próximos Passos (Produção)
+- [ ] Planejar migração para HTTPS
+- [ ] Planejar configuração de domínios
+- [ ] Planejar monitoramento avançado
+- [ ] Planejar backup automatizado 

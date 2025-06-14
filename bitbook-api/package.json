@@ -22,8 +22,8 @@
     "docker:prod": "docker compose -f docker-compose.yml --env-file .env.production up --build",
     "docker:down": "docker compose down",
     "typeorm": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js",
-    "migration:run": "npm run typeorm migration:run -- -d src/config/typeorm.config.ts",
-    "migration:revert": "npm run typeorm migration:revert -- -d src/config/typeorm.config.ts"
+    "migration:run": "npm run typeorm migration:run -- -d src/core/database/typeorm.config.ts",
+    "migration:revert": "npm run typeorm migration:revert -- -d src/core/database/typeorm.config.ts"
   },
   "keywords": [],
   "author": "",
