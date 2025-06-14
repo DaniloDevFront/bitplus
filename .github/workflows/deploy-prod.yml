@@ -23,6 +23,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          ref: master # Garante que estamos usando a branch master
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -33,7 +35,7 @@ jobs:
         run: |
           api=${{ github.event.inputs.api }}
           version=${{ github.event.inputs.version }}
-          echo "Deploying $api version $version..."
+          echo "Deploying $api version $version from master branch..."
 
           # Configurar variáveis do banco de dados
           if [[ "$api" == "bitbook-api" ]]; then
@@ -93,7 +95,7 @@ jobs:
           ssh -i ~/.ssh/deploy_key ${{ secrets.PROD_EC2_USER }}@${{ secrets.PROD_EC2_HOST }} \
             "cd /var/www/$api && \
             npm ci --production && \
-            pm2 restart $api || pm2 start dist/main.js --name $api"
+            pm2 restart $api || pm2 start dist/master.js --name $api"
 
           cd ..
 
