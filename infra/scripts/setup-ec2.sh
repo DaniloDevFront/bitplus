@@ -35,4 +35,4 @@ sudo chown -R ec2-user:ec2-user ~/bitplus-backend
 # Mensagem de conclusão
 echo "Configuração inicial concluída!"
 echo "Por favor, faça logout e login novamente para que as alterações tenham efeito."
-echo "Em seguida, execute: cd ~/bitplus/infra && docker-compose up -d" 
+echo "Em seguida, execute: cd ~/bitplus-backend/infra && docker-compose up -d --build" 
