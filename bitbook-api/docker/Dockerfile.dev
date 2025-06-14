@@ -1,30 +1,48 @@
-FROM node:20-slim
+FROM node:20-slim AS builder
 
-# Instala pacotes necessários para dependências nativas (ex: bcrypt)
+# Instala pacotes necessários para dependências nativas
 RUN apt-get update && apt-get install -y \
     python3 \
     make \
     g++ \
-    procps \ 
+    procps \
     libvips-dev \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
+# Copia arquivos de dependências
 COPY package*.json ./
 
-# Define ambiente para instalar devDependencies
-ENV NODE_ENV=development
-
-# Instala dependências e limpa o cache do npm
-RUN npm install && \
-    npm cache clean --force
-
-COPY . .
-
-# Garante que os módulos do node estão no lugar certo
+# Instala dependências
 RUN npm install
 
+# Copia o código fonte
+COPY . .
+
+# Build da aplicação
+RUN npm run build
+
+# Imagem de produção
+FROM node:20-slim
+
+# Instala apenas as dependências necessárias para produção
+RUN apt-get update && apt-get install -y \
+    libvips-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# Copia apenas os arquivos necessários da etapa de build
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/package*.json ./
+
+# Define variáveis de ambiente
+ENV NODE_ENV=development
+
+# Expõe a porta da aplicação
 EXPOSE 3000
 
-CMD ["sh", "-c", "npm run start:${NODE_ENV}"]
+# Comando para iniciar a aplicação
+CMD ["npm", "run", "start:development"]

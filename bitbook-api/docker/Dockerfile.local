@@ -1,0 +1,30 @@
+FROM node:20-slim
+
+# Instala pacotes necessários para dependências nativas (ex: bcrypt)
+RUN apt-get update && apt-get install -y \
+    python3 \
+    make \
+    g++ \
+    procps \ 
+    libvips-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+COPY package*.json ./
+
+# Define ambiente para instalar devDependencies
+ENV NODE_ENV=development
+
+# Instala dependências e limpa o cache do npm
+RUN npm install && \
+    npm cache clean --force
+
+COPY . .
+
+# Garante que os módulos do node estão no lugar certo
+RUN npm install
+
+EXPOSE 3000
+
+CMD ["sh", "-c", "npm run start:${NODE_ENV}"]
