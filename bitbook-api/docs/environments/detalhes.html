@@ -101,6 +101,7 @@
             <a class="nav-link" href="#" data-section="homolog">Homologação</a>
             <a class="nav-link" href="#" data-section="local">Local</a>
             <a class="nav-link" href="#" data-section="production">Produção</a>
+            <a class="nav-link" href="#" data-section="migrations">Migrations</a>
           </div>
         </div>
       </div>
@@ -130,94 +131,6 @@
             <p>O ambiente de produção é o ambiente em que a aplicação é executada para clientes e usuarios finais.
               O sistema do bitbook é integrado junto com o sistema do bittopics e bittrainers. Onde possui um unico
               compose para gerenciar todos os sistemas</p>
-          </div>
-
-          <!-- Migrations -->
-          <div class="card section-card">
-            <div class="card-body">
-              <h5 class="card-title">Gerenciamento de Migrations</h5>
-              <div class="container-description">
-                <div class="container-title">Ambiente Local</div>
-                <ul>
-                  <li>Ambiente principal para desenvolvimento e teste de migrations</li>
-                  <li>Fluxo de trabalho:
-                    <ol>
-                      <li>Criar migration: <code>npm run migration:create</code></li>
-                      <li>Desenvolver e testar localmente</li>
-                      <li>Executar migration: <code>npm run migration:run</code></li>
-                      <li>Verificar se tudo está funcionando</li>
-                      <li>Se necessário, reverter: <code>npm run migration:revert</code></li>
-                    </ol>
-                  </li>
-                  <li>Banco de dados local para testes e desenvolvimento</li>
-                  <li>Importante: Todas as migrations devem ser testadas localmente antes de subir para homologação</li>
-                </ul>
-
-                <div class="alert alert-info mt-3">
-                  <strong>Fluxo de Migrations:</strong>
-                  <p class="mb-0">Local → Homologação → Produção</p>
-                  <small>As migrations devem seguir este fluxo, sendo testadas em cada ambiente antes de avançar para o
-                    próximo.</small>
-                </div>
-
-                <div class="container-title">Ambiente Homologação</div>
-                <ul>
-                  <li>Ambiente de validação e teste de migrations antes da produção</li>
-                  <li>Fluxo de trabalho:
-                    <ol>
-                      <li>Verificar migrations pendentes:
-                        <pre><code class="language-bash"># Na pasta do projeto
-npm run migration:show</code></pre>
-                      </li>
-                      <li>Backup automático do banco RDS antes da execução</li>
-                      <li>Execução das migrations durante o deploy:
-                        <pre><code class="language-bash"># Durante o deploy
-npm run migration:run</code></pre>
-                      </li>
-                      <li>Verificação automática de sucesso:
-                        <ul>
-                          <li>Logs de execução</li>
-                          <li>Status das tabelas</li>
-                          <li>Integridade dos dados</li>
-                        </ul>
-                      </li>
-                      <li>Rollback automático em caso de falha</li>
-                    </ol>
-                  </li>
-                  <li>Banco RDS compartilhado entre todas as APIs</li>
-                  <li>Logs de migrations são mantidos para auditoria</li>
-                </ul>
-
-                <div class="alert alert-warning mt-3">
-                  <strong>Pontos de Atenção:</strong>
-                  <ul class="mb-0">
-                    <li>Migrations devem ser testadas localmente antes</li>
-                    <li>Backup é realizado automaticamente</li>
-                    <li>Rollback é executado em caso de erro</li>
-                    <li>Logs são essenciais para debug</li>
-                  </ul>
-                </div>
-
-                <div class="container-title">Ambiente Produção</div>
-                <ul>
-                  <li>Migrations são executadas com confirmação manual</li>
-                  <li>Processo de deploy separado das migrations</li>
-                  <li>Backup automático antes de cada migration</li>
-                  <li>Janela de manutenção para execução</li>
-                  <li>Monitoramento em tempo real durante a execução</li>
-                </ul>
-
-                <div class="alert alert-warning mt-3">
-                  <strong>Importante:</strong>
-                  <ul class="mb-0">
-                    <li>Migrations em produção requerem aprovação</li>
-                    <li>Backup é obrigatório antes de qualquer alteração</li>
-                    <li>Testar migrations em homologação antes de produção</li>
-                    <li>Manter histórico de todas as alterações</li>
-                  </ul>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
 
@@ -440,6 +353,103 @@ chmod 600 ~/.ssh/config</code></pre>
                     <li>Executar: <code>docker compose up -d --build</code></li>
                     <li>Verificar containers: <code>docker ps</code></li>
                   </ol>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="migrations" class="content-section">
+          <h2>Migrations</h2>
+
+          <div class="card section-card">
+            <div class="card-body">
+              <h5 class="card-title">Gerenciamento de Migrations</h5>
+              <div class="container-description">
+                <div class="alert alert-info">
+                  <strong>Fluxo de Trabalho:</strong>
+                  <p class="mb-0">Local → Homologação → Produção</p>
+                  <small>As migrations devem seguir este fluxo, sendo testadas em cada ambiente antes de avançar para o
+                    próximo.</small>
+                </div>
+
+                <div class="container-title">Fluxo de Desenvolvimento</div>
+                <ol>
+                  <li>Antes de começar o desenvolvimento:
+                    <pre><code class="language-bash">npm run migration:create</code></pre>
+                  </li>
+                  <li>Desenvolver as alterações no banco</li>
+                  <li>Ao finalizar o desenvolvimento:
+                    <pre><code class="language-bash">npm run migration:generate</code></pre>
+                  </li>
+                  <li>Testar localmente:
+                    <pre><code class="language-bash">npm run migration:run</code></pre>
+                  </li>
+                  <li>Em caso de erro:
+                    <pre><code class="language-bash">npm run migration:revert</code></pre>
+                  </li>
+                </ol>
+
+                <div class="container-title">Deploy em Homologação</div>
+                <ol>
+                  <li>Verificar migrations pendentes:
+                    <pre><code class="language-bash">npm run migration:show</code></pre>
+                  </li>
+                  <li>Executar migrations:
+                    <pre><code class="language-bash">npm run migration:run</code></pre>
+                  </li>
+                </ol>
+
+                <div class="alert alert-warning mt-3">
+                  <strong>Pontos de Atenção:</strong>
+                  <ul class="mb-0">
+                    <li>Sempre crie a migration antes de começar o desenvolvimento</li>
+                    <li>Teste as migrations localmente antes de commitar</li>
+                    <li>Verifique as migrations pendentes antes de cada deploy</li>
+                    <li>Em caso de erro, use <code>npm run migration:revert</code></li>
+                    <li>Migrations em produção requerem aprovação</li>
+                    <li>Backup é obrigatório antes de qualquer alteração</li>
+                  </ul>
+                </div>
+
+                <div class="container-title">Ambientes</div>
+                <div class="row">
+                  <div class="col-md-4">
+                    <div class="card">
+                      <div class="card-body">
+                        <h6 class="card-title">Local</h6>
+                        <ul class="mb-0">
+                          <li>Banco de dados local</li>
+                          <li>Desenvolvimento e testes</li>
+                          <li>Rollback fácil</li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    <div class="card">
+                      <div class="card-body">
+                        <h6 class="card-title">Homologação</h6>
+                        <ul class="mb-0">
+                          <li>Banco RDS compartilhado</li>
+                          <li>Backup automático</li>
+                          <li>Rollback automático</li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    <div class="card">
+                      <div class="card-body">
+                        <h6 class="card-title">Produção</h6>
+                        <ul class="mb-0">
+                          <li>Confirmação manual</li>
+                          <li>Janela de manutenção</li>
+                          <li>Monitoramento em tempo real</li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
