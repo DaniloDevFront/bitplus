@@ -180,3 +180,43 @@ tar -czf ~/backups/bitplus-$(date +%Y%m%d).tar.gz ~/bitplus
 2. Implementar monitoramento avançado
 3. Configurar backup automatizado
 4. Preparar para ambiente de produção
+
+<!-- Quando houver alteracoes no docker file ou deps -->
+
+# Na pasta do projeto
+
+cd ~/bitplus-backend
+
+# Atualizar código
+
+git pull
+
+# Reconstruir e reiniciar apenas o container da API
+
+docker-compose up -d --build bitbook-api
+
+# Ver logs em tempo real
+
+docker-compose logs -f bitbook-api
+
+<!-- Quando houver apenas em codigos -->
+
+# Na pasta do projeto
+
+cd ~/bitplus-backend
+
+# Atualizar código
+
+git pull
+
+# Reconstruir a aplicação dentro do container
+
+docker-compose exec bitbook-api npm run build
+
+# Reiniciar apenas o container da API
+
+docker-compose restart bitbook-api
+
+# Ver logs em tempo real
+
+docker-compose logs -f bitbook-api
