@@ -29,15 +29,8 @@ sudo mkswap /swapfile
 sudo swapon /swapfile
 echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
 
-# Criar diretórios necessários
-mkdir -p ~/bitplus
-cd ~/bitplus
-
-# Clonar repositório (substitua pela URL do seu repositório)
-# git clone <seu-repositorio>
-
 # Configurar permissões
-sudo chown -R ec2-user:ec2-user ~/bitplus
+sudo chown -R ec2-user:ec2-user ~/bitplus-backend
 
 # Mensagem de conclusão
 echo "Configuração inicial concluída!"
