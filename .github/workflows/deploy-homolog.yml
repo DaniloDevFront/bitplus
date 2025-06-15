@@ -104,7 +104,8 @@ jobs:
             echo "Backing up database through EC2..."
             backup_file="backup_${api}_homolog_$(date +%Y%m%d_%H%M%S).sql"
             ssh -i ~/.ssh/deploy_key ${{ secrets.HOMOLOG_EC2_USER }}@${{ secrets.HOMOLOG_EC2_HOST }} \
-              "mysqldump -h ${{ secrets.HOMOLOG_DB_HOST }} -u ${{ secrets.HOMOLOG_DB_USER }} -p${{ secrets.HOMOLOG_DB_PASSWORD }} $DB_NAME > /tmp/$backup_file"
+              "mkdir -p /home/ec2-user/bitplus-backend/backups && \
+              mysqldump -h ${{ secrets.HOMOLOG_DB_HOST }} -u ${{ secrets.HOMOLOG_DB_USER }} -p${{ secrets.HOMOLOG_DB_PASSWORD }} $DB_NAME > /home/ec2-user/bitplus-backend/backups/$backup_file"
 
             # Instalar dependências
             cd $api
@@ -120,12 +121,12 @@ jobs:
               --exclude 'node_modules' \
               --exclude '.git' \
               --exclude '*.sql' \
-              ./ ${{ secrets.HOMOLOG_EC2_USER }}@${{ secrets.HOMOLOG_EC2_HOST }}:/var/www/$api/
+              ./ ${{ secrets.HOMOLOG_EC2_USER }}@${{ secrets.HOMOLOG_EC2_HOST }}:/home/ec2-user/bitplus-backend/$api/
 
             # Executar migrations e reiniciar aplicação via EC2
             echo "Running migrations and restarting application..."
             ssh -i ~/.ssh/deploy_key ${{ secrets.HOMOLOG_EC2_USER }}@${{ secrets.HOMOLOG_EC2_HOST }} \
-              "cd /var/www/$api && \
+              "cd /home/ec2-user/bitplus-backend/$api && \
               npm ci --production && \
               echo 'Running migrations...' && \
               npm run migration:show && \
