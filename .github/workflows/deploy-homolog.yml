@@ -120,14 +120,11 @@ jobs:
               "mkdir -p /home/ec2-user/bitplus-backend/backups && \
               mysqldump -h ${{ secrets.HOMOLOG_DB_HOST }} -u ${{ secrets.HOMOLOG_DB_USER }} -p${{ secrets.HOMOLOG_DB_PASSWORD }} $DB_NAME > /home/ec2-user/bitplus-backend/backups/$backup_file"
 
-            # Deploy via SSH
-            echo "Deploying to EC2..."
-            rsync -avz --delete \
-              --exclude 'node_modules' \
-              --exclude '.git' \
-              --exclude '*.sql' \
-              -e "ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no" \
-              ./ ${{ secrets.HOMOLOG_EC2_USER }}@${{ secrets.HOMOLOG_EC2_HOST }}:/home/ec2-user/bitplus-backend/
+            # Deploy via Git
+            echo "Pulling latest changes..."
+            ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no ${{ secrets.HOMOLOG_EC2_USER }}@${{ secrets.HOMOLOG_EC2_HOST }} \
+              "cd /home/ec2-user/bitplus-backend && \
+              git pull origin homolog"
 
             # Executar Docker Compose
             echo "Running Docker Compose..."
@@ -137,10 +134,26 @@ jobs:
 
             # Executar migrations via Docker
             echo "Running migrations..."
-            ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no ${{ secrets.HOMOLOG_EC2_USER }}@${{ secrets.HOMOLOG_EC2_HOST }} \
+            if ! ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no ${{ secrets.HOMOLOG_EC2_USER }}@${{ secrets.HOMOLOG_EC2_HOST }} \
               "cd /home/ec2-user/bitplus-backend/infra && \
               docker-compose exec $api npm run migration:show && \
-              docker-compose exec $api npm run migration:run"
+              docker-compose exec $api npm run migration:run"; then
+              
+              echo "Migration failed, rolling back..."
+              # Rollback do banco
+              ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no ${{ secrets.HOMOLOG_EC2_USER }}@${{ secrets.HOMOLOG_EC2_HOST }} \
+                "mysql -h ${{ secrets.HOMOLOG_DB_HOST }} -u ${{ secrets.HOMOLOG_DB_USER }} -p${{ secrets.HOMOLOG_DB_PASSWORD }} $DB_NAME < /home/ec2-user/bitplus-backend/backups/$backup_file"
+              
+              # Rollback do código
+              ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no ${{ secrets.HOMOLOG_EC2_USER }}@${{ secrets.HOMOLOG_EC2_HOST }} \
+                "cd /home/ec2-user/bitplus-backend && \
+                git reset --hard HEAD^ && \
+                cd /home/ec2-user/bitplus-backend/infra && \
+                docker-compose up -d --build $api"
+              
+              echo "Rollback completed"
+              exit 1
+            fi
           done
 
       - name: Notify on failure
