@@ -84,43 +84,14 @@ jobs:
             # Configurar variáveis do banco de dados
             if [[ "$api" == "bitbook-api" ]]; then
               DB_NAME=${{ secrets.HOMOLOG_BANCO_BITBOOK }}
-              DB_HOST=${{ secrets.HOMOLOG_DB_HOST }}
-              DB_USER=${{ secrets.HOMOLOG_DB_USER }}
-              DB_PASSWORD=${{ secrets.HOMOLOG_DB_PASSWORD }}
             elif [[ "$api" == "bittopics-api" ]]; then
               DB_NAME=${{ secrets.HOMOLOG_BANCO_BITTOPICS }}
-              DB_HOST=${{ secrets.HOMOLOG_DB_HOST }}
-              DB_USER=${{ secrets.HOMOLOG_DB_USER }}
-              DB_PASSWORD=${{ secrets.HOMOLOG_DB_PASSWORD }}
             elif [[ "$api" == "bittrainers-api" ]]; then
               DB_NAME=${{ secrets.HOMOLOG_BANCO_BITTRAINERS }}
-              DB_HOST=${{ secrets.HOMOLOG_DB_HOST }}
-              DB_USER=${{ secrets.HOMOLOG_DB_USER }}
-              DB_PASSWORD=${{ secrets.HOMOLOG_DB_PASSWORD }}
             else
               echo "Error: Invalid API detected"
               exit 1
             fi
-
-            # Backup do banco de dados
-            echo "Backing up database..."
-            mysqldump -h $DB_HOST -u $DB_USER -p$DB_PASSWORD $DB_NAME > backup_${api}_homolog.sql
-
-            # Instalar dependências
-            cd $api
-            npm ci
-
-            # Verificar migrations pendentes
-            echo "Checking pending migrations..."
-            npm run migration:show
-
-            # Executar migrations
-            echo "Running migrations..."
-            npm run migration:run
-
-            # Build da aplicação
-            echo "Building application..."
-            npm run build
 
             # Configurar SSH
             echo "Setting up SSH..."
@@ -128,6 +99,20 @@ jobs:
             echo "${{ secrets.HOMOLOG_EC2_SSH_KEY }}" > ~/.ssh/deploy_key
             chmod 600 ~/.ssh/deploy_key
             ssh-keyscan -H ${{ secrets.HOMOLOG_EC2_HOST }} >> ~/.ssh/known_hosts
+
+            # Backup do banco de dados via EC2
+            echo "Backing up database through EC2..."
+            backup_file="backup_${api}_homolog_$(date +%Y%m%d_%H%M%S).sql"
+            ssh -i ~/.ssh/deploy_key ${{ secrets.HOMOLOG_EC2_USER }}@${{ secrets.HOMOLOG_EC2_HOST }} \
+              "mysqldump -h ${{ secrets.HOMOLOG_DB_HOST }} -u ${{ secrets.HOMOLOG_DB_USER }} -p${{ secrets.HOMOLOG_DB_PASSWORD }} $DB_NAME > /tmp/$backup_file"
+
+            # Instalar dependências
+            cd $api
+            npm ci
+
+            # Build da aplicação
+            echo "Building application..."
+            npm run build
 
             # Deploy via SSH
             echo "Deploying to EC2..."
@@ -137,10 +122,15 @@ jobs:
               --exclude '*.sql' \
               ./ ${{ secrets.HOMOLOG_EC2_USER }}@${{ secrets.HOMOLOG_EC2_HOST }}:/var/www/$api/
 
-            # Reiniciar aplicação
+            # Executar migrations e reiniciar aplicação via EC2
+            echo "Running migrations and restarting application..."
             ssh -i ~/.ssh/deploy_key ${{ secrets.HOMOLOG_EC2_USER }}@${{ secrets.HOMOLOG_EC2_HOST }} \
               "cd /var/www/$api && \
               npm ci --production && \
+              echo 'Running migrations...' && \
+              npm run migration:show && \
+              npm run migration:run && \
+              echo 'Restarting application...' && \
               pm2 restart $api || pm2 start dist/main.js --name $api"
 
             cd ..
