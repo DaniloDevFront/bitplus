@@ -15,6 +15,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Busca todo o histórico para comparação
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -25,21 +27,35 @@ jobs:
         id: detect-apis
         run: |
           CHANGED_APIS=()
-          if git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep -q "^bitbook-api/"; then
+          # Usa o último commit para comparação
+          if git diff --name-only HEAD^ HEAD | grep -q "^bitbook-api/"; then
             CHANGED_APIS+=("bitbook-api")
           fi
-          if git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep -q "^bittopics-api/"; then
+          if git diff --name-only HEAD^ HEAD | grep -q "^bittopics-api/"; then
             CHANGED_APIS+=("bittopics-api")
           fi
-          if git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep -q "^bittrainers-api/"; then
+          if git diff --name-only HEAD^ HEAD | grep -q "^bittrainers-api/"; then
             CHANGED_APIS+=("bittrainers-api")
           fi
+
+          if [ ${#CHANGED_APIS[@]} -eq 0 ]; then
+            echo "No APIs changed in this commit"
+            exit 0
+          fi
+
           echo "changed_apis=${CHANGED_APIS[*]}" >> $GITHUB_OUTPUT
+          echo "Changed APIs: ${CHANGED_APIS[*]}"
 
       - name: Deploy each changed API
         run: |
           for api in ${{ steps.detect-apis.outputs.changed_apis }}; do
             echo "Deploying $api..."
+            
+            # Verificar se a API existe
+            if [ ! -d "$api" ]; then
+              echo "Error: API directory $api not found"
+              exit 1
+            fi
             
             # Configurar variáveis do banco de dados
             if [[ "$api" == "bitbook-api" ]]; then
@@ -57,6 +73,9 @@ jobs:
               DB_HOST=${{ secrets.HOMOLOG_DB_HOST }}
               DB_USER=${{ secrets.HOMOLOG_DB_USER }}
               DB_PASSWORD=${{ secrets.HOMOLOG_DB_PASSWORD }}
+            else
+              echo "Error: Invalid API detected"
+              exit 1
             fi
 
             # Backup do banco de dados
