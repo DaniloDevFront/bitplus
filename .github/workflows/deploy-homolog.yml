@@ -120,14 +120,6 @@ jobs:
               "mkdir -p /home/ec2-user/bitplus-backend/backups && \
               mysqldump -h ${{ secrets.HOMOLOG_DB_HOST }} -u ${{ secrets.HOMOLOG_DB_USER }} -p${{ secrets.HOMOLOG_DB_PASSWORD }} $DB_NAME > /home/ec2-user/bitplus-backend/backups/$backup_file"
 
-            # Instalar dependências
-            cd $api
-            npm ci
-
-            # Build da aplicação
-            echo "Building application..."
-            npm run build
-
             # Deploy via SSH
             echo "Deploying to EC2..."
             rsync -avz --delete \
@@ -135,20 +127,20 @@ jobs:
               --exclude '.git' \
               --exclude '*.sql' \
               -e "ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no" \
-              ./ ${{ secrets.HOMOLOG_EC2_USER }}@${{ secrets.HOMOLOG_EC2_HOST }}:/home/ec2-user/bitplus-backend/$api/
+              ./ ${{ secrets.HOMOLOG_EC2_USER }}@${{ secrets.HOMOLOG_EC2_HOST }}:/home/ec2-user/bitplus-backend/
 
-            # Executar migrations e reiniciar aplicação via EC2
-            echo "Running migrations and restarting application..."
+            # Executar Docker Compose
+            echo "Running Docker Compose..."
             ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no ${{ secrets.HOMOLOG_EC2_USER }}@${{ secrets.HOMOLOG_EC2_HOST }} \
-              "cd /home/ec2-user/bitplus-backend/$api && \
-              npm ci --production && \
-              echo 'Running migrations...' && \
-              npm run migration:show && \
-              npm run migration:run && \
-              echo 'Restarting application...' && \
-              pm2 restart $api || pm2 start dist/main.js --name $api"
+              "cd /home/ec2-user/bitplus-backend/infra && \
+              docker compose up -d --build $api"
 
-            cd ..
+            # Executar migrations via Docker
+            echo "Running migrations..."
+            ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no ${{ secrets.HOMOLOG_EC2_USER }}@${{ secrets.HOMOLOG_EC2_HOST }} \
+              "cd /home/ec2-user/bitplus-backend/infra && \
+              docker compose exec $api npm run migration:show && \
+              docker compose exec $api npm run migration:run"
           done
 
       - name: Notify on failure
