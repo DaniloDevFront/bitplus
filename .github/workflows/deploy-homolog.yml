@@ -8,9 +8,19 @@ on:
       - "bitbook-api/**"
       - "bittopics-api/**"
       - "bittrainers-api/**"
+  pull_request:
+    types: [closed]
+    branches:
+      - homolog
+    paths:
+      - "bitbook-api/**"
+      - "bittopics-api/**"
+      - "bittrainers-api/**"
 
 jobs:
   deploy:
+    # Executa apenas se for push direto ou PR mergeado
+    if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true)
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -27,14 +37,28 @@ jobs:
         id: detect-apis
         run: |
           CHANGED_APIS=()
-          # Usa o último commit para comparação
-          if git diff --name-only HEAD^ HEAD | grep -q "^bitbook-api/"; then
+
+          # Determina o commit base para comparação
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            # Para PR, compara com o commit base do PR
+            BASE_SHA="${{ github.event.pull_request.base.sha }}"
+            HEAD_SHA="${{ github.event.pull_request.head.sha }}"
+          else
+            # Para push direto, compara com o commit anterior
+            BASE_SHA="HEAD^"
+            HEAD_SHA="HEAD"
+          fi
+
+          echo "Comparing changes between $BASE_SHA and $HEAD_SHA"
+
+          # Detecta APIs alteradas
+          if git diff --name-only $BASE_SHA $HEAD_SHA | grep -q "^bitbook-api/"; then
             CHANGED_APIS+=("bitbook-api")
           fi
-          if git diff --name-only HEAD^ HEAD | grep -q "^bittopics-api/"; then
+          if git diff --name-only $BASE_SHA $HEAD_SHA | grep -q "^bittopics-api/"; then
             CHANGED_APIS+=("bittopics-api")
           fi
-          if git diff --name-only HEAD^ HEAD | grep -q "^bittrainers-api/"; then
+          if git diff --name-only $BASE_SHA $HEAD_SHA | grep -q "^bittrainers-api/"; then
             CHANGED_APIS+=("bittrainers-api")
           fi
 
