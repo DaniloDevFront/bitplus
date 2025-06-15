@@ -70,6 +70,26 @@ jobs:
           echo "changed_apis=${CHANGED_APIS[*]}" >> $GITHUB_OUTPUT
           echo "Changed APIs: ${CHANGED_APIS[*]}"
 
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          # Limpa a chave de caracteres inválidos e formata corretamente
+          echo "${{ secrets.HOMOLOG_EC2_SSH_KEY }}" | \
+            sed 's/%$//' | \
+            sed 's/\r$//' | \
+            sed 's/^[ \t]*//' | \
+            sed 's/[ \t]*$//' > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -H ${{ secrets.HOMOLOG_EC2_HOST }} >> ~/.ssh/known_hosts
+
+          # Debug: Verificar se a chave foi salva corretamente
+          echo "Checking SSH key format..."
+          ssh-keygen -l -f ~/.ssh/deploy_key || echo "Invalid key format"
+
+          # Debug: Mostrar as primeiras linhas da chave (sem expor o conteúdo completo)
+          echo "First few lines of the key:"
+          head -n 2 ~/.ssh/deploy_key
+
       - name: Deploy each changed API
         run: |
           for api in ${{ steps.detect-apis.outputs.changed_apis }}; do
@@ -93,17 +113,10 @@ jobs:
               exit 1
             fi
 
-            # Configurar SSH
-            echo "Setting up SSH..."
-            mkdir -p ~/.ssh
-            echo "${{ secrets.HOMOLOG_EC2_SSH_KEY }}" > ~/.ssh/deploy_key
-            chmod 600 ~/.ssh/deploy_key
-            ssh-keyscan -H ${{ secrets.HOMOLOG_EC2_HOST }} >> ~/.ssh/known_hosts
-
             # Backup do banco de dados via EC2
             echo "Backing up database through EC2..."
             backup_file="backup_${api}_homolog_$(date +%Y%m%d_%H%M%S).sql"
-            ssh -i ~/.ssh/deploy_key ${{ secrets.HOMOLOG_EC2_USER }}@${{ secrets.HOMOLOG_EC2_HOST }} \
+            ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no ${{ secrets.HOMOLOG_EC2_USER }}@${{ secrets.HOMOLOG_EC2_HOST }} \
               "mkdir -p /home/ec2-user/bitplus-backend/backups && \
               mysqldump -h ${{ secrets.HOMOLOG_DB_HOST }} -u ${{ secrets.HOMOLOG_DB_USER }} -p${{ secrets.HOMOLOG_DB_PASSWORD }} $DB_NAME > /home/ec2-user/bitplus-backend/backups/$backup_file"
 
@@ -121,11 +134,12 @@ jobs:
               --exclude 'node_modules' \
               --exclude '.git' \
               --exclude '*.sql' \
+              -e "ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no" \
               ./ ${{ secrets.HOMOLOG_EC2_USER }}@${{ secrets.HOMOLOG_EC2_HOST }}:/home/ec2-user/bitplus-backend/$api/
 
             # Executar migrations e reiniciar aplicação via EC2
             echo "Running migrations and restarting application..."
-            ssh -i ~/.ssh/deploy_key ${{ secrets.HOMOLOG_EC2_USER }}@${{ secrets.HOMOLOG_EC2_HOST }} \
+            ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no ${{ secrets.HOMOLOG_EC2_USER }}@${{ secrets.HOMOLOG_EC2_HOST }} \
               "cd /home/ec2-user/bitplus-backend/$api && \
               npm ci --production && \
               echo 'Running migrations...' && \
