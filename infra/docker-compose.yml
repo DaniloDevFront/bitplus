@@ -1,3 +1,5 @@
+version: "3.8"
+
 services:
   nginx:
     container_name: bitplus-nginx
@@ -6,11 +8,8 @@ services:
       dockerfile: Dockerfile
     ports:
       - "80:80"
-      - "443:443"
     volumes:
       - ./nginx/conf.d:/etc/nginx/conf.d
-      - ./nginx/ssl:/etc/nginx/ssl
-      - ./nginx/logs:/var/log/nginx
     depends_on:
       - bitbook-api
     networks:
@@ -43,26 +42,51 @@ services:
       dockerfile: docker/Dockerfile.dev
     env_file:
       - ../bitbook-api/.env.development
+    ports:
+      - "3000:3000"
     networks:
       - bitplus-network
 
-  # Serviços futuros
+  # Bittopics API (futuro)
   # bittopics-api:
   #   container_name: bittopics-api
   #   build:
   #     context: ../bittopics-api
-  #     dockerfile: Dockerfile.prod
+  #     dockerfile: docker/Dockerfile.dev
+  #   env_file:
+  #     - ../bittopics-api/.env
+  #   ports:
+  #     - "3001:3000"
   #   networks:
   #     - bitplus-network
 
+  # Bittrainers API (futuro)
   # bittrainers-api:
   #   container_name: bittrainers-api
   #   build:
   #     context: ../bittrainers-api
-  #     dockerfile: Dockerfile.prod
+  #     dockerfile: docker/Dockerfile.dev
+  #   env_file:
+  #     - ../bittrainers-api/.env
+  #   ports:
+  #     - "3002:3000"
   #   networks:
   #     - bitplus-network
 
 networks:
   bitplus-network:
     driver: bridge
+# depois com o ssl configurado adicionar no container nginx
+# nginx:
+#     container_name: bitplus-nginx
+#     build:
+#       context: ./nginx
+#       dockerfile: Dockerfile
+#     ports:
+#       - "80:80"
+#     volumes:
+#       - ./nginx/conf.d:/etc/nginx/conf.d
+#     depends_on:
+#       - bitbook-api
+#     networks:
+#       - bitplus-network
