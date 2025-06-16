@@ -22,11 +22,8 @@ services:
       dockerfile: docker/Dockerfile.dev
     env_file:
       - ../bitbook-api/.env.development
-    volumes:
-      - ../bitbook-api:/app
-      - /app/node_modules
-    depends_on:
-      - phpmyadmin
+    ports:
+      - "3000:3000"
     networks:
       - bitplus-network
 
