@@ -31,6 +31,8 @@ services:
       - PMA_PASSWORD=${DB_PASSWORD}
       - UPLOAD_LIMIT=300M
       - MEMORY_LIMIT=256M
+      - PMA_ARBITRARY=1
+      - PMA_ABSOLUTE_URI=${EC2_HOST}/phpmyadmin/
     networks:
       - bitplus-network
 
