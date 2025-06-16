@@ -15,26 +15,6 @@ services:
     networks:
       - bitplus-network
 
-  phpmyadmin:
-    image: phpmyadmin/phpmyadmin
-    container_name: phpmyadmin
-    restart: always
-    ports:
-      - "8080:80"
-    env_file:
-      - ../bitbook-api/.env.development
-    environment:
-      - PMA_HOST=${DB_HOST}
-      - PMA_PORT=${DB_PORT}
-      - PMA_USER=${DB_USERNAME}
-      - PMA_PASSWORD=${DB_PASSWORD}
-      - UPLOAD_LIMIT=300M
-      - MEMORY_LIMIT=256M
-      - PMA_ARBITRARY=1
-      - PMA_ABSOLUTE_URI=${EC2_HOST}/phpmyadmin/
-    networks:
-      - bitplus-network
-
   bitbook-api:
     container_name: bitbook-api
     build:
@@ -42,8 +22,24 @@ services:
       dockerfile: docker/Dockerfile.dev
     env_file:
       - ../bitbook-api/.env.development
+    volumes:
+      - ../bitbook-api:/app
+      - /app/node_modules
+    depends_on:
+      - phpmyadmin
+    networks:
+      - bitplus-network
+
+  phpmyadmin:
+    container_name: bitplus-phpmyadmin
+    image: phpmyadmin/phpmyadmin
+    environment:
+      - PMA_HOST=bitplus.c74yig0isli4.sa-east-1.rds.amazonaws.com
+      - PMA_PORT=3306
+      - PMA_USER=admin
+      - PMA_PASSWORD=8f7d3b2a1e6c
     ports:
-      - "3000:3000"
+      - "8080:80"
     networks:
       - bitplus-network
 
@@ -76,17 +72,3 @@ services:
 networks:
   bitplus-network:
     driver: bridge
-# depois com o ssl configurado adicionar no container nginx
-# nginx:
-#     container_name: bitplus-nginx
-#     build:
-#       context: ./nginx
-#       dockerfile: Dockerfile
-#     ports:
-#       - "80:80"
-#     volumes:
-#       - ./nginx/conf.d:/etc/nginx/conf.d
-#     depends_on:
-#       - bitbook-api
-#     networks:
-#       - bitplus-network
