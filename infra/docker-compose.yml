@@ -1,6 +1,6 @@
 services:
   nginx:
-    container_name: bitbook-nginx
+    container_name: bitplus-nginx
     build:
       context: ./nginx
       dockerfile: Dockerfile
@@ -14,7 +14,62 @@ services:
     depends_on:
       - bitbook-api
     networks:
-      - bitbook-network
+      - bitplus-network
+
+  phpmyadmin-bitbook:
+    image: phpmyadmin/phpmyadmin
+    container_name: phpmyadmin-bitbook
+    restart: always
+    ports:
+      - "8081:80"
+    env_file:
+      - ../bitbook-api/.env.development
+    environment:
+      - PMA_HOST=${DB_HOST}
+      - PMA_PORT=${DB_PORT}
+      - PMA_USER=${DB_USERNAME}
+      - PMA_PASSWORD=${DB_PASSWORD}
+      - PMA_DB=${DB_DATABASE}
+      - UPLOAD_LIMIT=300M
+      - MEMORY_LIMIT=256M
+    networks:
+      - bitplus-network
+
+  # phpmyadmin-bittopics:
+  #   image: phpmyadmin/phpmyadmin
+  #   container_name: phpmyadmin-bittopics
+  #   restart: always
+  #   ports:
+  #     - "8082:80"
+  #   env_file:
+  #   - ../bitbook-api/.env.development
+  # environment:
+  #   - PMA_HOST=${DB_HOST}
+  #   - PMA_PORT=${DB_PORT}
+  #   - PMA_USER=${DB_USERNAME}
+  #   - PMA_PASSWORD=${DB_PASSWORD}
+  #   - PMA_DB=${DB_DATABASE}
+  #   - UPLOAD_LIMIT=300M
+  #   - MEMORY_LIMIT=256M
+  #   networks:
+  #     - bitplus-network
+
+  # phpmyadmin-bittrainers:
+  #   image: phpmyadmin/phpmyadmin
+  #   container_name: phpmyadmin-bittrainers
+  #   restart: always
+  #   ports:
+  #     - "8083:80"
+  #   environment:
+  #     - PMA_HOST=${DB_HOST}
+  #     - PMA_PORT=${DB_PORT}
+  #     - PMA_USER=${DB_USERNAME}
+  #     - PMA_PASSWORD=${DB_PASSWORD}
+  #     - PMA_DB=${BANCO_BITTRAINERS}
+  #     - UPLOAD_LIMIT=300M
+  #     - MEMORY_LIMIT=256M
+  #   networks:
+  #     - bitplus-network
 
   bitbook-api:
     container_name: bitbook-api
@@ -24,7 +79,7 @@ services:
     env_file:
       - ../bitbook-api/.env.development
     networks:
-      - bitbook-network
+      - bitplus-network
 
   # Serviços futuros
   # bittopics-api:
@@ -33,7 +88,7 @@ services:
   #     context: ../bittopics-api
   #     dockerfile: Dockerfile.prod
   #   networks:
-  #     - bitbook-network
+  #     - bitplus-network
 
   # bittrainers-api:
   #   container_name: bittrainers-api
@@ -41,8 +96,8 @@ services:
   #     context: ../bittrainers-api
   #     dockerfile: Dockerfile.prod
   #   networks:
-  #     - bitbook-network
+  #     - bitplus-network
 
 networks:
-  bitbook-network:
+  bitplus-network:
     driver: bridge
