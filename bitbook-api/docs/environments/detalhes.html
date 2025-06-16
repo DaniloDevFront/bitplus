@@ -468,6 +468,28 @@ chmod 600 ~/.ssh/config</code></pre>
                 <p>O deploy em homologação é automatizado através do GitHub Actions, que gerencia todo o processo de
                   forma segura e controlada.</p>
 
+                <div class="container-title">Configuração</div>
+                <p>O deploy requer as seguintes configurações no GitHub Secrets:</p>
+                <ul>
+                  <li><strong>Banco de Dados:</strong>
+                    <ul>
+                      <li>HOMOLOG_DB_HOST</li>
+                      <li>HOMOLOG_DB_USER</li>
+                      <li>HOMOLOG_DB_PASSWORD</li>
+                      <li>HOMOLOG_BANCO_BITBOOK</li>
+                      <li>HOMOLOG_BANCO_BITTOPICS</li>
+                      <li>HOMOLOG_BANCO_BITTRAINERS</li>
+                    </ul>
+                  </li>
+                  <li><strong>EC2:</strong>
+                    <ul>
+                      <li>HOMOLOG_EC2_HOST</li>
+                      <li>HOMOLOG_EC2_USER</li>
+                      <li>HOMOLOG_EC2_SSH_KEY</li>
+                    </ul>
+                  </li>
+                </ul>
+
                 <div class="container-title">Fluxo de Deploy em Homologação</div>
                 <ol>
                   <li>Criação de Pull Request para a branch homolog</li>
@@ -475,7 +497,8 @@ chmod 600 ~/.ssh/config</code></pre>
                   <li>Backup do banco de dados</li>
                   <li>Processamento das APIs afetadas:
                     <ul>
-                      <li>Instalação de dependências</li>
+                      <li>Pull do código via Git</li>
+                      <li>Build do container via Docker Compose</li>
                       <li>Verificação de migrations</li>
                       <li>Execução de migrations</li>
                       <li>Rollback automático em caso de erro</li>
@@ -498,7 +521,13 @@ chmod 600 ~/.ssh/config</code></pre>
                 <div class="container-title">Segurança em Homologação</div>
                 <ul>
                   <li>Backup automático do banco antes de qualquer alteração</li>
-                  <li>Rollback automático em caso de falha</li>
+                  <li>Rollback automático em caso de falha:
+                    <ul>
+                      <li>Restauração do backup do banco</li>
+                      <li>Reversão do código para o commit anterior</li>
+                      <li>Rebuild do container</li>
+                    </ul>
+                  </li>
                   <li>Credenciais protegidas via GitHub Secrets</li>
                   <li>Deploy seletivo por API</li>
                 </ul>
@@ -517,6 +546,7 @@ chmod 600 ~/.ssh/config</code></pre>
                     <li>Backup é realizado antes de cada deploy</li>
                     <li>Rollback é executado em caso de erro</li>
                     <li>Deploy é seletivo por API</li>
+                    <li>Utiliza Docker Compose para gerenciamento de containers</li>
                   </ul>
                 </div>
               </div>
@@ -528,194 +558,89 @@ chmod 600 ~/.ssh/config</code></pre>
               <h5 class="card-title">Sistema de Deploy para Produção</h5>
               <div class="container-description">
                 <div class="container-title">GitHub Actions</div>
-                <p>O deploy em produção é gerenciado através do GitHub Actions com processos adicionais de segurança e
-                  validação.</p>
+                <p>O deploy em produção é automatizado através do GitHub Actions, que gerencia todo o processo de
+                  forma segura e controlada.</p>
+
+                <div class="container-title">Configuração</div>
+                <p>O deploy requer as seguintes configurações no GitHub Secrets:</p>
+                <ul>
+                  <li><strong>Banco de Dados:</strong>
+                    <ul>
+                      <li>PROD_DB_HOST</li>
+                      <li>PROD_DB_USER</li>
+                      <li>PROD_DB_PASSWORD</li>
+                      <li>PROD_BANCO_BITBOOK</li>
+                      <li>PROD_BANCO_BITTOPICS</li>
+                      <li>PROD_BANCO_BITTRAINERS</li>
+                    </ul>
+                  </li>
+                  <li><strong>EC2:</strong>
+                    <ul>
+                      <li>PROD_EC2_HOST</li>
+                      <li>PROD_EC2_USER</li>
+                      <li>PROD_EC2_SSH_KEY</li>
+                    </ul>
+                  </li>
+                </ul>
 
                 <div class="container-title">Fluxo de Deploy em Produção</div>
                 <ol>
-                  <li>Criação de Pull Request para a branch main</li>
-                  <li>Validações obrigatórias:
+                  <li>Merge na branch main</li>
+                  <li>Backup do banco de dados</li>
+                  <li>Processamento das APIs:
                     <ul>
-                      <li>Testes automatizados</li>
-                      <li>Análise de código</li>
-                      <li>Verificação de vulnerabilidades</li>
-                      <li>Aprovação manual obrigatória</li>
+                      <li>Pull do código via Git</li>
+                      <li>Build do container via Docker Compose</li>
+                      <li>Verificação de migrations</li>
+                      <li>Execução de migrations</li>
+                      <li>Rollback automático em caso de erro</li>
                     </ul>
                   </li>
-                  <li>Janela de manutenção:
+                  <li>Deploy no EC2:
                     <ul>
-                      <li>Agendamento prévio</li>
-                      <li>Notificação à equipe</li>
-                      <li>Horário de menor impacto</li>
-                    </ul>
-                  </li>
-                  <li>Processo de deploy:
-                    <ul>
-                      <li>Backup completo do banco</li>
-                      <li>Verificação de migrations pendentes</li>
-                      <li>Execução de migrations com confirmação manual</li>
-                      <li>Deploy seletivo por API</li>
-                      <li>Monitoramento em tempo real</li>
-                    </ul>
-                  </li>
-                  <li>Pós-deploy:
-                    <ul>
-                      <li>Verificação de logs</li>
-                      <li>Testes de smoke</li>
-                      <li>Monitoramento de métricas</li>
+                      <li>Rebuild de todos os containers</li>
+                      <li>Atualização das configurações</li>
                     </ul>
                   </li>
                 </ol>
 
-                <div class="alert alert-danger mt-3">
-                  <strong>Restrições em Produção:</strong>
-                  <ul class="mb-0">
-                    <li>Deploy apenas em horário comercial</li>
-                    <li>Migrations requerem aprovação manual</li>
-                    <li>Backup obrigatório antes de qualquer alteração</li>
-                    <li>Rollback manual em caso de falha</li>
-                  </ul>
+                <div class="alert alert-info mt-3">
+                  <strong>Exemplo:</strong>
+                  <p class="mb-0">Ao fazer merge na main, todas as APIs são atualizadas para garantir consistência do
+                    ambiente.</p>
                 </div>
 
                 <div class="container-title">Segurança em Produção</div>
                 <ul>
-                  <li>Backup completo antes do deploy</li>
-                  <li>Validações múltiplas de segurança</li>
-                  <li>Aprovação manual obrigatória</li>
-                  <li>Monitoramento em tempo real</li>
-                  <li>Plano de rollback documentado</li>
+                  <li>Backup automático do banco antes de qualquer alteração</li>
+                  <li>Rollback automático em caso de falha:
+                    <ul>
+                      <li>Restauração do backup do banco</li>
+                      <li>Reversão do código para o commit anterior</li>
+                      <li>Rebuild do container</li>
+                    </ul>
+                  </li>
+                  <li>Credenciais protegidas via GitHub Secrets</li>
+                  <li>Deploy completo para garantir consistência</li>
                 </ul>
 
                 <div class="container-title">Monitoramento</div>
                 <ul>
                   <li>Logs detalhados no GitHub Actions</li>
-                  <li>Notificações em tempo real</li>
-                  <li>Métricas de performance</li>
-                  <li>Alertas de erro</li>
+                  <li>Notificações de sucesso/falha</li>
+                  <li>Status do deploy por API</li>
                 </ul>
-
-                <div class="alert alert-warning mt-3">
-                  <strong>Checklist de Produção:</strong>
-                  <ul class="mb-0">
-                    <li>Testes em homologação aprovados</li>
-                    <li>Backup do banco realizado</li>
-                    <li>Janela de manutenção agendada</li>
-                    <li>Equipe notificada</li>
-                    <li>Plano de rollback revisado</li>
-                  </ul>
-                </div>
-
-                <div class="container-title">Configuração</div>
-                <p>O sistema requer as seguintes configurações no GitHub, organizadas por ambiente e API:</p>
-
-                <div class="container-title">Secrets para Homologação</div>
-                <ul>
-                  <li>Banco de dados (Homolog):
-                    <ul>
-                      <li>HOMOLOG_DB_HOST: Host do banco de dados</li>
-                      <li>HOMOLOG_DB_USER: Usuário do banco de dados</li>
-                      <li>HOMOLOG_DB_PASSWORD: Senha do banco de dados</li>
-                      <li>HOMOLOG_BANCO_BITBOOK: Banco da bitbook-api</li>
-                      <li>HOMOLOG_BANCO_BITTOPICS: Banco da bittopics-api</li>
-                      <li>HOMOLOG_BANCO_BITTRAINERS: Banco da bittrainers-api</li>
-                    </ul>
-                  </li>
-                  <li>EC2 (Homolog):
-                    <ul>
-                      <li>HOMOLOG_EC2_HOST: Endereço IP ou DNS da instância EC2</li>
-                      <li>HOMOLOG_EC2_USER: Usuário SSH para acesso ao EC2</li>
-                      <li>HOMOLOG_EC2_SSH_KEY: Chave SSH privada para acesso ao EC2</li>
-                    </ul>
-                  </li>
-                </ul>
-
-                <div class="container-title">Secrets para Produção</div>
-                <ul>
-                  <li>Banco de dados (Produção):
-                    <ul>
-                      <li>PROD_DB_HOST: Host do banco de dados</li>
-                      <li>PROD_DB_USER: Usuário do banco de dados</li>
-                      <li>PROD_DB_PASSWORD: Senha do banco de dados</li>
-                      <li>PROD_BANCO_BITBOOK: Banco da bitbook-api</li>
-                      <li>PROD_BANCO_BITTOPICS: Banco da bittopics-api</li>
-                      <li>PROD_BANCO_BITTRAINERS: Banco da bittrainers-api</li>
-                    </ul>
-                  </li>
-                  <li>EC2 (Produção):
-                    <ul>
-                      <li>PROD_EC2_HOST: Endereço IP ou DNS da instância EC2</li>
-                      <li>PROD_EC2_USER: Usuário SSH para acesso ao EC2</li>
-                      <li>PROD_EC2_SSH_KEY: Chave SSH privada para acesso ao EC2</li>
-                    </ul>
-                  </li>
-                </ul>
-
-                <div class="alert alert-info mt-3">
-                  <strong>Como configurar os Secrets:</strong>
-                  <ol class="mb-0">
-                    <li>Acesse o repositório no GitHub</li>
-                    <li>Vá em Settings > Secrets and variables > Actions</li>
-                    <li>Clique em "New repository secret"</li>
-                    <li>Adicione cada um dos secrets listados acima</li>
-                  </ol>
-                </div>
 
                 <div class="alert alert-warning mt-3">
                   <strong>Importante:</strong>
                   <ul class="mb-0">
-                    <li>Mantenha os secrets atualizados</li>
-                    <li>Não compartilhe as chaves</li>
-                    <li>Use chaves SSH diferentes para homolog e prod</li>
-                    <li>Mantenha backups das chaves em local seguro</li>
-                    <li>Cada API tem seu próprio banco de dados em cada ambiente</li>
+                    <li>Migrations são executadas automaticamente</li>
+                    <li>Backup é realizado antes de cada deploy</li>
+                    <li>Rollback é executado em caso de erro</li>
+                    <li>Deploy é completo para todas as APIs</li>
+                    <li>Utiliza Docker Compose para gerenciamento de containers</li>
                   </ul>
                 </div>
-
-                <div class="container-title">Exemplo de Uso</div>
-                <p>No workflow, os secrets são selecionados automaticamente baseado no ambiente e API:</p>
-                <pre><code class="language-yaml"># Exemplo para Homologação
-- name: Backup database (Homolog)
-  if: github.ref == 'refs/heads/homolog'
-  run: |
-    if [[ "$api" == "bitbook-api" ]]; then
-      DB_NAME=${{ secrets.HOMOLOG_BANCO_BITBOOK }}
-      DB_HOST=${{ secrets.HOMOLOG_DB_HOST }}
-      DB_USER=${{ secrets.HOMOLOG_DB_USER }}
-      DB_PASSWORD=${{ secrets.HOMOLOG_DB_PASSWORD }}
-    elif [[ "$api" == "bittopics-api" ]]; then
-      DB_NAME=${{ secrets.HOMOLOG_BANCO_BITTOPICS }}
-      DB_HOST=${{ secrets.HOMOLOG_DB_HOST }}
-      DB_USER=${{ secrets.HOMOLOG_DB_USER }}
-      DB_PASSWORD=${{ secrets.HOMOLOG_DB_PASSWORD }}
-    elif [[ "$api" == "bittrainers-api" ]]; then
-      DB_NAME=${{ secrets.HOMOLOG_BANCO_BITTRAINERS }}
-      DB_HOST=${{ secrets.HOMOLOG_DB_HOST }}
-      DB_USER=${{ secrets.HOMOLOG_DB_USER }}
-      DB_PASSWORD=${{ secrets.HOMOLOG_DB_PASSWORD }}
-    fi
-    mysqldump -h $DB_HOST -u $DB_USER -p$DB_PASSWORD $DB_NAME > backup_${api}_homolog.sql
-
-# Exemplo para Produção
-- name: Backup database (Production)
-  if: github.ref == 'refs/heads/main'
-  run: |
-    if [[ "$api" == "bitbook-api" ]]; then
-      DB_NAME=${{ secrets.PROD_BANCO_BITBOOK }}
-      DB_HOST=${{ secrets.PROD_DB_HOST }}
-      DB_USER=${{ secrets.PROD_DB_USER }}
-      DB_PASSWORD=${{ secrets.PROD_DB_PASSWORD }}
-    elif [[ "$api" == "bittopics-api" ]]; then
-      DB_NAME=${{ secrets.PROD_BANCO_BITTOPICS }}
-      DB_HOST=${{ secrets.PROD_DB_HOST }}
-      DB_USER=${{ secrets.PROD_DB_USER }}
-      DB_PASSWORD=${{ secrets.PROD_DB_PASSWORD }}
-    elif [[ "$api" == "bittrainers-api" ]]; then
-      DB_NAME=${{ secrets.PROD_BANCO_BITTRAINERS }}
-      DB_HOST=${{ secrets.PROD_DB_HOST }}
-      DB_USER=${{ secrets.PROD_DB_USER }}
-      DB_PASSWORD=${{ secrets.PROD_DB_PASSWORD }}
-    fi
-    mysqldump -h $DB_HOST -u $DB_USER -p$DB_PASSWORD $DB_NAME > backup_${api}_prod.sql</code></pre>
               </div>
             </div>
           </div>
