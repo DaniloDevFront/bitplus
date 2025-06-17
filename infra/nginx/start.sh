@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Iniciar o cron em background
-service cron start
+cron
 
 # Aguardar o bitbook-api estar disponível
 /wait-for-it.sh bitbook-api:3000
