@@ -5,12 +5,24 @@ import 'tsconfig-paths/register';
 
 // Carrega as variáveis de ambiente do arquivo correto baseado no NODE_ENV
 const env = process.env.NODE_ENV;
+if (!env) {
+  throw new Error('NODE_ENV não está definido');
+}
+
 const envFile = `.env.${env}`;
 dotenv.config({ path: envFile });
 
 console.log('NODE_ENV:', process.env.NODE_ENV);
 console.log('Arquivo de env carregado:', envFile);
 console.log('DB_HOST:', process.env.DB_HOST);
+
+// Validação das variáveis de ambiente obrigatórias
+const requiredEnvVars = ['DB_HOST', 'DB_PORT', 'DB_USERNAME', 'DB_PASSWORD', 'DB_DATABASE'];
+for (const envVar of requiredEnvVars) {
+  if (!process.env[envVar]) {
+    throw new Error(`Variável de ambiente ${envVar} não está definida`);
+  }
+}
 
 export default new DataSource({
   type: 'mysql',
