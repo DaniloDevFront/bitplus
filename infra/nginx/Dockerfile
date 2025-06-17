@@ -9,6 +9,7 @@ RUN apt-get update && apt-get install -y \
     curl \
     certbot \
     python3-certbot-nginx \
+    cron \
     && rm -rf /var/lib/apt/lists/*
 
 # Copia as configurações personalizadas
@@ -19,6 +20,9 @@ RUN mkdir -p /var/log/nginx && \
     mkdir -p /etc/nginx/ssl && \
     mkdir -p /var/www/certbot
 
+# Configurar renovação automática do Certbot
+RUN echo "0 12 * * * /usr/bin/certbot renew --quiet --deploy-hook 'nginx -s reload'" | crontab -
+
 # Expõe as portas 80 e 443
 EXPOSE 80 443
 
@@ -26,5 +30,9 @@ EXPOSE 80 443
 ADD https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.sh /wait-for-it.sh
 RUN chmod +x /wait-for-it.sh
 
-# Altere o entrypoint para aguardar o bitbook-api:3000
-ENTRYPOINT ["/wait-for-it.sh", "bitbook-api:3000", "--", "nginx", "-g", "daemon off;"] 
+# Script de inicialização
+COPY start.sh /start.sh
+RUN chmod +x /start.sh
+
+# Altere o entrypoint para aguardar o bitbook-api:3000 e iniciar cron
+ENTRYPOINT ["/start.sh"] 
