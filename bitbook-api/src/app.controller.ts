@@ -26,6 +26,8 @@ export class AppController {
       });
     }
 
+    // teste migration
+
     if (existsSync(filePath)) {
       res.sendFile(filePath);
     } else {
