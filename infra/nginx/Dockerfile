@@ -1,16 +1,7 @@
-FROM nginx:1.24-alpine
+FROM nginx:alpine
 
 # Remove a configuração padrão do Nginx
 RUN rm /etc/nginx/conf.d/default.conf
-
-# Instala dependências básicas
-RUN apk add --no-cache \
-    bash \
-    python3 \
-    py3-pip
-
-# Instala certbot com flag para quebrar proteção do sistema
-RUN pip3 install --break-system-packages certbot certbot-nginx
 
 # Copia as configurações personalizadas
 COPY conf.d/ /etc/nginx/conf.d/
@@ -22,6 +13,9 @@ RUN mkdir -p /var/log/nginx && \
 
 # Expõe as portas 80 e 443
 EXPOSE 80 443
+
+# Instala o bash (necessário para wait-for-it)
+RUN apk add --no-cache bash
 
 # Instala o wait-for-it
 ADD https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.sh /wait-for-it.sh
