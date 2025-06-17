@@ -19,7 +19,11 @@ on:
 
 jobs:
   deploy:
-    if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true)
+    if: |
+      github.event_name == 'push' || 
+      (github.event_name == 'pull_request' && 
+       github.event.action == 'closed' && 
+       github.event.pull_request.merged == true)
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -38,32 +42,44 @@ jobs:
           CHANGED_APIS=()
 
           if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            # Para PRs, verifica se foi MERGED (não apenas fechada)
+            if [[ "${{ github.event.pull_request.merged }}" != "true" ]]; then
+              echo "PR was closed but not merged, skipping deployment"
+              echo "changed_apis=" >> $GITHUB_OUTPUT
+              exit 0
+            fi
+            
             BASE_SHA="${{ github.event.pull_request.base.sha }}"
             HEAD_SHA="${{ github.event.pull_request.head.sha }}"
+            echo "PR was merged, comparing changes between $BASE_SHA and $HEAD_SHA"
           else
+            # Para push direto na homolog
             BASE_SHA="HEAD^"
             HEAD_SHA="HEAD"
+            echo "Direct push to homolog, comparing changes between $BASE_SHA and $HEAD_SHA"
           fi
 
-          echo "Comparing changes between $BASE_SHA and $HEAD_SHA"
-
+          # Verifica se há mudanças nas APIs
           if git diff --name-only $BASE_SHA $HEAD_SHA | grep -q "^bitbook-api/"; then
             CHANGED_APIS+=("bitbook-api")
+            echo "✅ bitbook-api has changes"
           fi
           if git diff --name-only $BASE_SHA $HEAD_SHA | grep -q "^bittopics-api/"; then
             CHANGED_APIS+=("bittopics-api")
+            echo "✅ bittopics-api has changes"
           fi
           if git diff --name-only $BASE_SHA $HEAD_SHA | grep -q "^bittrainers-api/"; then
             CHANGED_APIS+=("bittrainers-api")
+            echo "✅ bittrainers-api has changes"
           fi
 
           if [ ${#CHANGED_APIS[@]} -eq 0 ]; then
-            echo "No APIs changed in this commit"
+            echo "❌ No APIs changed in this commit/merge"
             echo "changed_apis=" >> $GITHUB_OUTPUT
             exit 0
           fi
 
-          echo "Changed APIs: ${CHANGED_APIS[*]}"
+          echo "🚀 Changed APIs: ${CHANGED_APIS[*]}"
           echo "changed_apis=${CHANGED_APIS[*]}" >> $GITHUB_OUTPUT
 
       - name: Setup SSH

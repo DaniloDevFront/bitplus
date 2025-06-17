@@ -14,7 +14,7 @@ WORKDIR /app
 COPY package*.json ./
 
 # Define ambiente para instalar devDependencies
-ENV NODE_ENV=development
+ENV NODE_ENV=local
 
 # Instala dependências e limpa o cache do npm
 RUN npm install && \
