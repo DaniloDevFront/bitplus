@@ -34,6 +34,10 @@ services:
       - PMA_HOST=bitplus.c74yig0isli4.sa-east-1.rds.amazonaws.com
       - PMA_PORT=3306
       - PMA_USER=admin
+      # - PMA_PASSWORD=8f7d3b2a1e6c
+      - PMA_ARBITRARY=1
+      - ALLOW_EMPTY_PASSWORD=0
+      - UPLOAD_LIMIT=300M
     ports:
       - "8080:80"
     networks:
