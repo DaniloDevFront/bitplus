@@ -146,15 +146,21 @@ jobs:
 
             echo "Running migrations..."
             echo "🔍 Verificando migrations pendentes para $api..."
+            echo "📍 Comando que será executado: docker-compose exec $api npm run migration:show"
             if ! ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no ${{ secrets.HOMOLOG_EC2_USER }}@${{ secrets.HOMOLOG_EC2_HOST }} \
               "cd /home/ec2-user/bitplus-backend/infra && \
+              echo '📋 Status dos containers:' && \
+              docker-compose ps && \
               echo '📋 Listando migrations pendentes:' && \
+              echo '🔧 Executando: docker-compose exec $api npm run migration:show' && \
               docker-compose exec $api npm run migration:show && \
               echo '🚀 Executando migrations:' && \
+              echo '🔧 Executando: docker-compose exec $api npm run migration:run' && \
               docker-compose exec $api npm run migration:run && \
               echo '✅ Migrations executadas com sucesso!'"; then
 
               echo "❌ Migration failed, iniciando rollback..."
+              echo "🔍 Último comando executado: docker-compose exec $api npm run migration:run"
 
               echo "🔄 Restaurando backup do banco..."
               ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no ${{ secrets.HOMOLOG_EC2_USER }}@${{ secrets.HOMOLOG_EC2_HOST }} \
