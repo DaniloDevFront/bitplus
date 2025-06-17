@@ -19,14 +19,13 @@ on:
 
 jobs:
   deploy:
-    # Executa apenas se for push direto ou PR mergeado
     if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true)
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0 # Busca todo o histórico para comparação
+          fetch-depth: 0
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -38,20 +37,16 @@ jobs:
         run: |
           CHANGED_APIS=()
 
-          # Determina o commit base para comparação
           if [[ "${{ github.event_name }}" == "pull_request" ]]; then
-            # Para PR, compara com o commit base do PR
             BASE_SHA="${{ github.event.pull_request.base.sha }}"
             HEAD_SHA="${{ github.event.pull_request.head.sha }}"
           else
-            # Para push direto, compara com o commit anterior
             BASE_SHA="HEAD^"
             HEAD_SHA="HEAD"
           fi
 
           echo "Comparing changes between $BASE_SHA and $HEAD_SHA"
 
-          # Detecta APIs alteradas
           if git diff --name-only $BASE_SHA $HEAD_SHA | grep -q "^bitbook-api/"; then
             CHANGED_APIS+=("bitbook-api")
           fi
@@ -64,44 +59,34 @@ jobs:
 
           if [ ${#CHANGED_APIS[@]} -eq 0 ]; then
             echo "No APIs changed in this commit"
+            echo "changed_apis=" >> $GITHUB_OUTPUT
             exit 0
           fi
 
-          echo "changed_apis=${CHANGED_APIS[*]}" >> $GITHUB_OUTPUT
           echo "Changed APIs: ${CHANGED_APIS[*]}"
+          echo "changed_apis=${CHANGED_APIS[*]}" >> $GITHUB_OUTPUT
 
       - name: Setup SSH
         run: |
           mkdir -p ~/.ssh
-          # Limpa a chave de caracteres inválidos e formata corretamente
-          echo "${{ secrets.HOMOLOG_EC2_SSH_KEY }}" | \
-            sed 's/%$//' | \
-            sed 's/\r$//' | \
-            sed 's/^[ \t]*//' | \
-            sed 's/[ \t]*$//' > ~/.ssh/deploy_key
+          echo "${{ secrets.HOMOLOG_EC2_SSH_KEY }}" | sed 's/\r//' | sed 's/%$//' > ~/.ssh/deploy_key
           chmod 600 ~/.ssh/deploy_key
           ssh-keyscan -H ${{ secrets.HOMOLOG_EC2_HOST }} >> ~/.ssh/known_hosts
-
-          # Debug: Verificar se a chave foi salva corretamente
-          echo "Checking SSH key format..."
           ssh-keygen -l -f ~/.ssh/deploy_key || echo "Invalid key format"
-
-          # Debug: Mostrar as primeiras linhas da chave (sem expor o conteúdo completo)
-          echo "First few lines of the key:"
           head -n 2 ~/.ssh/deploy_key
 
-      - name: Deploy each changed API
+      - name: Deploy changed APIs
+        if: steps.detect-apis.outputs.changed_apis != ''
         run: |
-          for api in ${{ steps.detect-apis.outputs.changed_apis }}; do
+          IFS=' ' read -ra APIS <<< "${{ steps.detect-apis.outputs.changed_apis }}"
+          for api in "${APIS[@]}"; do
             echo "Deploying $api..."
-            
-            # Verificar se a API existe
+
             if [ ! -d "$api" ]; then
               echo "Error: API directory $api not found"
               exit 1
             fi
-            
-            # Configurar variáveis do banco de dados
+
             if [[ "$api" == "bitbook-api" ]]; then
               DB_NAME=${{ secrets.HOMOLOG_BANCO_BITBOOK }}
             elif [[ "$api" == "bittopics-api" ]]; then
@@ -113,44 +98,38 @@ jobs:
               exit 1
             fi
 
-            # Backup do banco de dados via EC2
-            echo "Backing up database through EC2..."
             backup_file="backup_${api}_homolog_$(date +%Y%m%d_%H%M%S).sql"
+
+            echo "Backup DB..."
             ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no ${{ secrets.HOMOLOG_EC2_USER }}@${{ secrets.HOMOLOG_EC2_HOST }} \
               "mkdir -p /home/ec2-user/bitplus-backend/backups && \
               mysqldump -h ${{ secrets.HOMOLOG_DB_HOST }} -u ${{ secrets.HOMOLOG_DB_USER }} -p${{ secrets.HOMOLOG_DB_PASSWORD }} $DB_NAME > /home/ec2-user/bitplus-backend/backups/$backup_file"
 
-            # Deploy via Git
-            echo "Pulling latest changes..."
+            echo "Pull latest code..."
             ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no ${{ secrets.HOMOLOG_EC2_USER }}@${{ secrets.HOMOLOG_EC2_HOST }} \
-              "cd /home/ec2-user/bitplus-backend && \
-              git pull origin homolog"
+              "cd /home/ec2-user/bitplus-backend && git pull origin homolog"
 
-            # Executar Docker Compose
-            echo "Running Docker Compose..."
+            echo "Docker Compose up..."
             ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no ${{ secrets.HOMOLOG_EC2_USER }}@${{ secrets.HOMOLOG_EC2_HOST }} \
-              "cd /home/ec2-user/bitplus-backend/infra && \
-              docker-compose up -d --build $api"
+              "cd /home/ec2-user/bitplus-backend/infra && docker-compose up -d --build $api"
 
-            # Executar migrations via Docker
             echo "Running migrations..."
             if ! ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no ${{ secrets.HOMOLOG_EC2_USER }}@${{ secrets.HOMOLOG_EC2_HOST }} \
               "cd /home/ec2-user/bitplus-backend/infra && \
               docker-compose exec $api npm run migration:show && \
               docker-compose exec $api npm run migration:run"; then
-              
+
               echo "Migration failed, rolling back..."
-              # Rollback do banco
+
               ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no ${{ secrets.HOMOLOG_EC2_USER }}@${{ secrets.HOMOLOG_EC2_HOST }} \
                 "mysql -h ${{ secrets.HOMOLOG_DB_HOST }} -u ${{ secrets.HOMOLOG_DB_USER }} -p${{ secrets.HOMOLOG_DB_PASSWORD }} $DB_NAME < /home/ec2-user/bitplus-backend/backups/$backup_file"
-              
-              # Rollback do código
+
               ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no ${{ secrets.HOMOLOG_EC2_USER }}@${{ secrets.HOMOLOG_EC2_HOST }} \
                 "cd /home/ec2-user/bitplus-backend && \
                 git reset --hard HEAD^ && \
                 cd /home/ec2-user/bitplus-backend/infra && \
                 docker-compose up -d --build $api"
-              
+
               echo "Rollback completed"
               exit 1
             fi
