@@ -69,17 +69,26 @@ jobs:
       - name: Setup SSH
         run: |
           mkdir -p ~/.ssh
+
+          # Grava a chave privada no formato correto
           echo "${{ secrets.HOMOLOG_EC2_SSH_KEY }}" > ~/.ssh/deploy_key
           chmod 600 ~/.ssh/deploy_key
+
+          # Adiciona fingerprint do host para evitar prompt interativo
           ssh-keyscan -H ${{ secrets.HOMOLOG_EC2_HOST }} >> ~/.ssh/known_hosts
 
-          # Debug: Verificar se a chave foi salva corretamente
-          echo "Checking SSH key format..."
-          ssh-keygen -l -f ~/.ssh/deploy_key || echo "Invalid key format"
+          # Debug: Valida se a chave tem formato válido
+          echo "🔍 Verificando formato da chave..."
+          ssh-keygen -y -f ~/.ssh/deploy_key >/dev/null 2>&1 || (echo "❌ Formato da chave inválido"; exit 1)
 
-          # Debug: Mostrar as primeiras linhas da chave (sem expor o conteúdo completo)
-          echo "First few lines of the key:"
+          # Debug: Mostra as duas primeiras linhas da chave (sem vazar tudo)
+          echo "🧾 Primeiras linhas da chave:"
           head -n 2 ~/.ssh/deploy_key
+
+          # Testa conexão com o host (substitua ec2-user se necessário)
+          echo "🔌 Testando conexão SSH com o EC2..."
+          ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no ec2-user@${{ secrets.HOMOLOG_EC2_HOST }} 'echo ✅ Conexão SSH OK'
+
 
       - name: Deploy changed APIs
         if: steps.detect-apis.outputs.changed_apis != ''
