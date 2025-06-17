@@ -3,12 +3,8 @@ FROM nginx:1.24
 # Remove a configuração padrão do Nginx
 RUN rm /etc/nginx/conf.d/default.conf
 
-# Adiciona o repositório do Certbot e instala dependências
+# Instala dependências e Certbot
 RUN apt-get update && apt-get install -y \
-    software-properties-common \
-    && add-apt-repository ppa:certbot/certbot \
-    && apt-get update \
-    && apt-get install -y \
     bash \
     curl \
     certbot \
