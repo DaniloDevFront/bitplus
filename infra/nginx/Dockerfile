@@ -6,11 +6,10 @@ RUN rm /etc/nginx/conf.d/default.conf
 # Instala dependências necessárias
 RUN apk add --no-cache \
     bash \
-    certbot \
     python3 \
     py3-pip \
     && pip3 install --upgrade pip \
-    && pip3 install certbot-nginx
+    && pip3 install certbot certbot-nginx
 
 # Copia as configurações personalizadas
 COPY conf.d/ /etc/nginx/conf.d/
