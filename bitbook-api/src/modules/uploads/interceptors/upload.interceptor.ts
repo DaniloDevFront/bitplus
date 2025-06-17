@@ -16,7 +16,7 @@ export class UploadInterceptor implements NestInterceptor {
     [FileType.DOCUMENT]: ['application/pdf'],
   };
 
-  private readonly maxFileSize = 5 * 1024 * 1024; // 5MB
+  private readonly maxFileSize = 12 * 1024 * 1024; // 12MB
 
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
     const request = context.switchToHttp().getRequest();
@@ -28,7 +28,7 @@ export class UploadInterceptor implements NestInterceptor {
     }
 
     if (file.size > this.maxFileSize) {
-      throw new BadRequestException('Arquivo muito grande. Tamanho máximo: 5MB');
+      throw new BadRequestException('Arquivo muito grande. Tamanho máximo: 12MB');
     }
 
     if (!this.allowedMimeTypes[type].includes(file.mimetype)) {

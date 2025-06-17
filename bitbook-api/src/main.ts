@@ -9,6 +9,12 @@ import { NestExpressApplication } from '@nestjs/platform-express';
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
+  // Configuração global do Multer para uploads de até 12MB
+  app.use((req, res, next) => {
+    res.setHeader('Content-Length', '12582912'); // 12MB em bytes
+    next();
+  });
+
   const config = new DocumentBuilder()
     .setTitle('Bitbook API')
     .setDescription('API para o sistema Bitbook')
