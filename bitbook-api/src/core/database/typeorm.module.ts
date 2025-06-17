@@ -19,7 +19,7 @@ import { ConfigService } from '@nestjs/config';
           password: configService.get('DB_PASSWORD'),
           database: configService.get('DB_DATABASE'),
           entities: [entitiesPath],
-          synchronize: ['development', 'local'].includes(configService.get('NODE_ENV')),
+          synchronize: false,
           timezone: 'Z',
           extra: {
             timezone: 'Z'
