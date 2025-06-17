@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEnum, IsOptional, IsString, IsDateString, IsNumber, IsBoolean } from 'class-validator';
+import { IsEnum, IsOptional, IsString, IsDateString, IsNumber } from 'class-validator';
 import { LoginType, LoginStatus } from '../entities/user-log.entity';
 
 export class CreateUserLogDto {
@@ -35,17 +35,7 @@ export class CreateUserLogDto {
   failure_reason?: string;
 }
 
-export class FindUserLogsDto {
-  @ApiProperty({ description: 'Data inicial (YYYY-MM-DD)', required: false })
-  @IsOptional()
-  @IsDateString()
-  startDate?: string;
-
-  @ApiProperty({ description: 'Data final (YYYY-MM-DD)', required: false })
-  @IsOptional()
-  @IsDateString()
-  endDate?: string;
-
+export class FindTodayLogsDto {
   @ApiProperty({ description: 'ID do usuário específico', required: false })
   @IsOptional()
   @IsNumber()
@@ -75,6 +65,18 @@ export class FindUserLogsDto {
   @IsOptional()
   @IsNumber()
   limit?: number = 50;
+}
+
+export class FindStatisticsDto {
+  @ApiProperty({ description: 'Data inicial (YYYY-MM-DD)', required: false })
+  @IsOptional()
+  @IsDateString()
+  start_date?: string;
+
+  @ApiProperty({ description: 'Data final (YYYY-MM-DD)', required: false })
+  @IsOptional()
+  @IsDateString()
+  end_date?: string;
 }
 
 export class UserLogResponseDto {

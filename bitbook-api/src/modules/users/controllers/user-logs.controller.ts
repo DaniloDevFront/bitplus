@@ -1,8 +1,7 @@
-import { Controller, Get, Query, UseGuards, Request } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiQuery, ApiBearerAuth } from '@nestjs/swagger';
-import { JwtAuthGuard } from 'src/core/jwt/jwt-auth.guard';
+import { Controller, Get, Query } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiResponse, ApiQuery } from '@nestjs/swagger';
 import { UserLogsService } from '../services/user-logs.service';
-import { FindUserLogsDto, UserLogResponseDto, LoginStatisticsDto } from '../dto/user-log.dto';
+import { FindTodayLogsDto, FindStatisticsDto } from '../dto/user-log.dto';
 import { LoginType, LoginStatus } from '../entities/user-log.entity';
 
 @Controller('users/logs')
@@ -34,7 +33,7 @@ export class UserLogsController {
   @ApiQuery({ name: 'ip_address', required: false, type: String })
   @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
   @ApiQuery({ name: 'limit', required: false, type: Number, example: 50 })
-  async getTodayLogs(@Query() filters: Partial<FindUserLogsDto>) {
+  async getTodayLogs(@Query() filters: Partial<FindTodayLogsDto>) {
     return this.userLogsService.findTodayLogs(filters);
   }
 
@@ -56,9 +55,9 @@ export class UserLogsController {
       }
     }
   })
-  @ApiQuery({ name: 'startDate', required: false, type: String, example: '2024-01-01' })
-  @ApiQuery({ name: 'endDate', required: false, type: String, example: '2024-01-31' })
-  async getLoginStatistics(@Query() filters: Partial<FindUserLogsDto>) {
+  @ApiQuery({ name: 'start_date', required: false, type: String, example: '2024-01-01' })
+  @ApiQuery({ name: 'end_date', required: false, type: String, example: '2024-01-31' })
+  async getLoginStatistics(@Query() filters: Partial<FindStatisticsDto>) {
     return this.userLogsService.getLoginStatistics(filters);
   }
 } 
