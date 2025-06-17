@@ -94,11 +94,7 @@ export class BooksController {
   async find(@Query() query: FindEbookDto) {
     const { id, title, premium, category, high, arrived, explore, audiobooks, user_id } = query;
 
-    if (id && user_id) {
-      if (!user_id) {
-        throw new BadRequestException('ID do usuário é obrigatório');
-      }
-
+    if (id) {
       return this.booksService.findById(id, user_id);
     }
 
