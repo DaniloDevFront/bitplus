@@ -1,4 +1,4 @@
-FROM nginx:alpine
+FROM nginx:1.24-alpine
 
 # Remove a configuração padrão do Nginx
 RUN rm /etc/nginx/conf.d/default.conf
@@ -8,6 +8,9 @@ RUN apk add --no-cache \
     bash \
     python3 \
     py3-pip
+
+# Instala certbot com flag para quebrar proteção do sistema
+RUN pip3 install --break-system-packages certbot certbot-nginx
 
 # Copia as configurações personalizadas
 COPY conf.d/ /etc/nginx/conf.d/
