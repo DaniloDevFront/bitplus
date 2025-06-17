@@ -20,11 +20,11 @@
     "docker:local": "docker compose -f docker-compose.dev.yml --env-file .env.local up --build",
     "docker:down": "docker compose down",
     "typeorm": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js",
-    "migration:create": "docker exec bitbook-api npx typeorm-ts-node-commonjs migration:create",
-    "migration:generate": "docker exec bitbook-api npx typeorm-ts-node-commonjs migration:generate -d src/core/database/typeorm.config.ts",
-    "migration:run": "docker exec bitbook-api npx typeorm-ts-node-commonjs migration:run -d src/core/database/typeorm.config.ts",
-    "migration:revert": "docker exec bitbook-api npx typeorm-ts-node-commonjs migration:revert -d src/core/database/typeorm.config.ts",
-    "migration:show": "docker exec bitbook-api npx typeorm-ts-node-commonjs migration:show -d src/core/database/typeorm.config.ts"
+    "migration:create": "npx typeorm-ts-node-commonjs migration:create",
+    "migration:generate": "npx typeorm-ts-node-commonjs migration:generate -d src/core/database/typeorm.config.ts",
+    "migration:run": "npx typeorm-ts-node-commonjs migration:run -d src/core/database/typeorm.config.ts",
+    "migration:revert": "npx typeorm-ts-node-commonjs migration:revert -d src/core/database/typeorm.config.ts",
+    "migration:show": "npx typeorm-ts-node-commonjs migration:show -d src/core/database/typeorm.config.ts"
   },
   "keywords": [],
   "author": "",
