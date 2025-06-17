@@ -8,8 +8,12 @@ services:
       dockerfile: Dockerfile
     ports:
       - "80:80"
+      - "443:443"
     volumes:
       - ./nginx/conf.d:/etc/nginx/conf.d
+      - /etc/letsencrypt:/etc/letsencrypt:ro
+      - /var/lib/letsencrypt:/var/lib/letsencrypt:ro
+      - certbot-webroot:/var/www/certbot
     depends_on:
       - bitbook-api
     networks:
@@ -63,11 +67,14 @@ services:
   #     context: ../bittrainers-api
   #     dockerfile: docker/Dockerfile.dev
   #   env_file:
-  #     - ../bittrainers-api/.env
+  #     - ../bittopics-api/.env
   #   ports:
   #     - "3002:3000"
   #   networks:
   #     - bitplus-network
+
+volumes:
+  certbot-webroot:
 
 networks:
   bitplus-network:
