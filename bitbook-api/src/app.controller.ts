@@ -10,6 +10,8 @@ export class AppController {
     res.sendFile(join(process.cwd(), 'docs', 'index.html'));
   }
 
+  // 
+
   @Get('summary/:path(*)')
   async getSummaryFile(@Param('path') path: string, @Res() res: Response) {
     const filePath = join(process.cwd(), 'docs', path);
