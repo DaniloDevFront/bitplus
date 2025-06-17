@@ -143,24 +143,44 @@ jobs:
             echo "Docker Compose up..."
             ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no ${{ secrets.HOMOLOG_EC2_USER }}@${{ secrets.HOMOLOG_EC2_HOST }} \
               "cd /home/ec2-user/bitplus-backend/infra && docker-compose up -d --build $api"
+          done
 
-            echo "Running migrations..."
+      - name: Executar Migrations
+        if: steps.detect-apis.outputs.changed_apis != ''
+        run: |
+          IFS=' ' read -ra APIS <<< "${{ steps.detect-apis.outputs.changed_apis }}"
+          for api in "${APIS[@]}"; do
+            echo "Executando migrations para $api..."
+
+            if [[ "$api" == "bitbook-api" ]]; then
+              DB_NAME=${{ secrets.HOMOLOG_BANCO_BITBOOK }}
+            elif [[ "$api" == "bittopics-api" ]]; then
+              DB_NAME=${{ secrets.HOMOLOG_BANCO_BITTOPICS }}
+            elif [[ "$api" == "bittrainers-api" ]]; then
+              DB_NAME=${{ secrets.HOMOLOG_BANCO_BITTRAINERS }}
+            else
+              echo "Error: Invalid API detected"
+              exit 1
+            fi
+
+            backup_file="backup_${api}_homolog_$(date +%Y%m%d_%H%M%S).sql"
+
             echo "🔍 Verificando migrations pendentes para $api..."
-            echo "📍 Comando que será executado: docker-compose exec -e NODE_ENV=development $api npm run migration:show"
+            echo "📍 Comando que será executado: docker-compose exec $api npm run migration:show"
             if ! ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no ${{ secrets.HOMOLOG_EC2_USER }}@${{ secrets.HOMOLOG_EC2_HOST }} \
               "cd /home/ec2-user/bitplus-backend/infra && \
               echo '📋 Status dos containers:' && \
               docker-compose ps && \
               echo '📋 Listando migrations pendentes:' && \
-              echo '🔧 Executando: docker-compose exec -e NODE_ENV=development $api npm run migration:show' && \
-              docker-compose exec -e NODE_ENV=development $api npm run migration:show && \
+              echo '🔧 Executando: docker-compose exec $api npm run migration:show' && \
+              docker-compose exec $api npm run migration:show && \
               echo '🚀 Executando migrations:' && \
-              echo '🔧 Executando: docker-compose exec -e NODE_ENV=development $api npm run migration:run' && \
-              docker-compose exec -e NODE_ENV=development $api npm run migration:run && \
+              echo '🔧 Executando: docker-compose exec $api npm run migration:run' && \
+              docker-compose exec $api npm run migration:run && \
               echo '✅ Migrations executadas com sucesso!'"; then
 
               echo "❌ Migration failed, iniciando rollback..."
-              echo "🔍 Último comando executado: docker-compose exec -e NODE_ENV=development $api npm run migration:run"
+              echo "🔍 Último comando executado: docker-compose exec $api npm run migration:run"
 
               echo "🔄 Restaurando backup do banco..."
               ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no ${{ secrets.HOMOLOG_EC2_USER }}@${{ secrets.HOMOLOG_EC2_HOST }} \
