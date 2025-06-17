@@ -69,10 +69,16 @@ jobs:
       - name: Setup SSH
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.HOMOLOG_EC2_SSH_KEY }}" | sed 's/\r//' | sed 's/%$//' > ~/.ssh/deploy_key
+          echo "${{ secrets.HOMOLOG_EC2_SSH_KEY }}" > ~/.ssh/deploy_key
           chmod 600 ~/.ssh/deploy_key
           ssh-keyscan -H ${{ secrets.HOMOLOG_EC2_HOST }} >> ~/.ssh/known_hosts
+
+          # Debug: Verificar se a chave foi salva corretamente
+          echo "Checking SSH key format..."
           ssh-keygen -l -f ~/.ssh/deploy_key || echo "Invalid key format"
+
+          # Debug: Mostrar as primeiras linhas da chave (sem expor o conteúdo completo)
+          echo "First few lines of the key:"
           head -n 2 ~/.ssh/deploy_key
 
       - name: Deploy changed APIs
