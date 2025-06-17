@@ -34,7 +34,6 @@ services:
       - PMA_HOST=bitplus.c74yig0isli4.sa-east-1.rds.amazonaws.com
       - PMA_PORT=3306
       - PMA_USER=admin
-      - PMA_PASSWORD=8f7d3b2a1e6c
     ports:
       - "8080:80"
     networks:
