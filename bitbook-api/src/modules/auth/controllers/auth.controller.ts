@@ -1,10 +1,11 @@
-import { Controller, Post, Body, UseGuards, Request, UnauthorizedException } from '@nestjs/common';
+import { Controller, Post, Body, UseGuards, Request, UnauthorizedException, UseInterceptors } from '@nestjs/common';
 import { AuthService } from '../services/auth.service';
 import { ApiBadRequestResponse, ApiBody, ApiCreatedResponse, ApiOperation, ApiResponse, ApiTags, ApiUnauthorizedResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/core/jwt/jwt-auth.guard';
 import { SetBiometricDto, BiometricLoginDto } from '../dto/biometric.dto';
 import { LoginDto, RegisterDto, ForgotPasswordDto } from '../dto/auth.dto';
 import { Access } from '../interfaces/access.interface';
+import { LoginInfoInterceptor, LoginInfo } from '../interceptors/login-info.interceptor';
 
 @Controller('auth')
 @ApiTags('Autenticação')
@@ -12,6 +13,7 @@ export class AuthController {
   constructor(private readonly authService: AuthService) { }
 
   @Post('login')
+  @UseInterceptors(LoginInfoInterceptor)
   @ApiOperation({ summary: 'Login do usuário' })
   @ApiResponse({
     status: 200,
@@ -33,12 +35,14 @@ export class AuthController {
   })
   @ApiUnauthorizedResponse({ description: 'Credenciais inválidas' })
   @ApiBody({ type: LoginDto })
-  async login(@Body() payload: LoginDto): Promise<Access> {
+  async login(@Body() payload: LoginDto, @Request() req): Promise<Access> {
     const { login, password } = payload;
-    return this.authService.login(login, password);
+    const loginInfo: LoginInfo = req.loginInfo;
+    return this.authService.login(login, password, loginInfo);
   }
 
   @Post('register')
+  @UseInterceptors(LoginInfoInterceptor)
   @ApiOperation({ summary: 'Registrar novo usuário' })
   @ApiCreatedResponse({
     description: 'Usuário criado com sucesso',
@@ -58,17 +62,20 @@ export class AuthController {
     }
   })
   @ApiBody({ type: RegisterDto })
-  async register(@Body() payload: RegisterDto): Promise<Access> {
-    return this.authService.register(payload);
+  async register(@Body() payload: RegisterDto, @Request() req): Promise<Access> {
+    const loginInfo: LoginInfo = req.loginInfo;
+    return this.authService.register(payload, loginInfo);
   }
 
   @Post('forgot-password')
+  @UseInterceptors(LoginInfoInterceptor)
   @ApiOperation({ summary: 'Solicitar recuperação de senha' })
   @ApiResponse({ status: 200, description: 'E-mail enviado com instruções' })
   @ApiBadRequestResponse({ description: 'E-mail não encontrado' })
   @ApiBody({ type: ForgotPasswordDto })
-  async forgotPassword(@Body() payload: ForgotPasswordDto) {
-    return this.authService.forgotPassword(payload.login);
+  async forgotPassword(@Body() payload: ForgotPasswordDto, @Request() req) {
+    const loginInfo: LoginInfo = req.loginInfo;
+    return this.authService.forgotPassword(payload.login, loginInfo);
   }
 
   @Post('check-token')
@@ -103,7 +110,8 @@ export class AuthController {
   }
 
   @Post('set-biometric')
-  //@UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(LoginInfoInterceptor)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Ativar login biométrico' })
   @ApiResponse({
@@ -122,10 +130,12 @@ export class AuthController {
   @ApiUnauthorizedResponse({ description: 'Não autorizado' })
   @ApiBody({ type: SetBiometricDto })
   async setBiometric(@Request() req, @Body() body: SetBiometricDto) {
-    return this.authService.setBiometricSecret(req.user.sub, body.biometricSecret);
+    const loginInfo: LoginInfo = req.loginInfo;
+    return this.authService.setBiometricSecret(req.user.sub, body.biometricSecret, loginInfo);
   }
 
   @Post('login/biometric')
+  @UseInterceptors(LoginInfoInterceptor)
   @ApiOperation({ summary: 'Login com autenticação biométrica' })
   @ApiResponse({
     status: 200,
@@ -142,7 +152,8 @@ export class AuthController {
   })
   @ApiUnauthorizedResponse({ description: 'Credenciais biométricas inválidas' })
   @ApiBody({ type: BiometricLoginDto })
-  async biometricLogin(@Body() body: BiometricLoginDto) {
-    return this.authService.biometricLogin(body.biometricSecret);
+  async biometricLogin(@Body() body: BiometricLoginDto, @Request() req) {
+    const loginInfo: LoginInfo = req.loginInfo;
+    return this.authService.biometricLogin(body.biometricSecret, loginInfo);
   }
 } 
