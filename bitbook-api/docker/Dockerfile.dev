@@ -35,10 +35,12 @@ WORKDIR /app
 
 # Copia apenas os arquivos necessários da etapa de build
 COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package*.json ./
 COPY --from=builder /app/src/core/database/typeorm.config.ts ./src/core/database/typeorm.config.ts
 COPY --from=builder /app/docs ./docs
+
+# Instala apenas dependências de produção
+RUN npm ci --only=production
 
 # Define variáveis de ambiente
 ENV NODE_ENV=development
