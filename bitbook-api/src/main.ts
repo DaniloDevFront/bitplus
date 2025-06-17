@@ -33,10 +33,6 @@ async function bootstrap() {
 
   app.useGlobalInterceptors(new TransformInterceptor());
 
-  // Serve static files from the docs directory only under /summary path
-  // app.useStaticAssets(join(process.cwd(), 'docs'));
-  // 
-
   const port = process.env.APP_PORT || 3000;
   const php = process.env.PHPMYADMIN_PORT || 8081;
   await app.listen(port, '0.0.0.0');

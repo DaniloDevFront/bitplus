@@ -10,7 +10,6 @@ import { BooksModule } from './modules/books/books.module';
 import { BookcaseModule } from './modules/bookcase/bookcase.module';
 import { ReadingModule } from './modules/reading/reading.module';
 import { UploadsModule } from './modules/uploads/uploads.module';
-import { DocumentationModule } from './modules/documentation/documentation.module';
 import { AppController } from './app.controller';
 
 @Module({
@@ -25,7 +24,6 @@ import { AppController } from './app.controller';
     BookcaseModule,
     ReadingModule,
     UploadsModule,
-    DocumentationModule
   ],
   controllers: [AppController],
 })
