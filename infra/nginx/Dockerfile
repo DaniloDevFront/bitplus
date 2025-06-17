@@ -3,13 +3,11 @@ FROM nginx:alpine
 # Remove a configuração padrão do Nginx
 RUN rm /etc/nginx/conf.d/default.conf
 
-# Instala dependências necessárias
+# Instala dependências básicas
 RUN apk add --no-cache \
     bash \
     python3 \
-    py3-pip \
-    && pip3 install --upgrade pip \
-    && pip3 install certbot certbot-nginx
+    py3-pip
 
 # Copia as configurações personalizadas
 COPY conf.d/ /etc/nginx/conf.d/
