@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsEnum, IsOptional, IsString, IsDateString, IsNumber } from 'class-validator';
-import { LoginType, LoginStatus } from '../entities/user-log.entity';
+import { LoginType, LoginStatus } from '../entities/logins-logs.entity';
 
 export class CreateUserLogDto {
   @ApiProperty({ description: 'ID do usuário' })
@@ -45,12 +45,6 @@ export class LoginStatisticsDto {
   @ApiProperty({ description: 'Logins falhados' })
   failed_logins: number;
 
-  @ApiProperty({ description: 'Usuários únicos que fizeram login' })
-  unique_users: number;
-
-  @ApiProperty({ description: 'Taxa de sucesso (%)' })
-  success_rate: number;
-
   @ApiProperty({ description: 'Logins por tipo', type: 'object' })
   logins_by_type: Record<LoginType, number>;
 
@@ -68,9 +62,6 @@ export class LoginStatisticsDto {
 
   @ApiProperty({ description: 'Total de registros no período' })
   total_registers: number;
-
-  @ApiProperty({ description: 'Registros bem-sucedidos' })
-  successful_registers: number;
 
   @ApiProperty({ description: 'Registros falhados' })
   failed_registers: number;

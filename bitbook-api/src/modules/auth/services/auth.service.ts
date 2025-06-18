@@ -4,11 +4,11 @@ import { EntityManager } from 'typeorm';
 import { compare, hash, genSalt } from 'bcrypt';
 import { InjectEntityManager } from '@nestjs/typeorm';
 import { UsersService } from '../../users/services/users.service';
-import { UserLogsService } from '../../users/services/user-logs.service';
+import { LoginsLogsService } from '../../logs/services/logins-logs.service';
 import { CreateUserDto } from 'src/modules/users/dto/user.dto';
 import { User } from '../../users/entities/user.entity';
 import { Access } from '../interfaces/access.interface';
-import { LoginType, LoginStatus } from '../../users/entities/user-log.entity';
+import { LoginType, LoginStatus } from '../../logs/entities/logins-logs.entity';
 import { LoginInfo } from '../interceptors/login-info.interceptor';
 
 @Injectable()
@@ -17,7 +17,7 @@ export class AuthService {
     @InjectEntityManager()
     private readonly entityManager: EntityManager,
     private UsersService: UsersService,
-    private userLogsService: UserLogsService,
+    private loginLogsService: LoginsLogsService,
     private jwtService: JwtService,
   ) { }
 
@@ -233,7 +233,7 @@ export class AuthService {
     failureReason?: string
   ): Promise<void> {
     try {
-      await this.userLogsService.createLog({
+      await this.loginLogsService.createLog({
         user_id: userId || 0, // 0 para tentativas sem usuário identificado
         login_at: new Date(),
         ip_address: loginInfo?.ip_address,

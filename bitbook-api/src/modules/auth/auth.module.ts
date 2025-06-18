@@ -6,6 +6,7 @@ import { AuthController } from './controllers/auth.controller';
 import { UsersModule } from '../users/users.module';
 import { AuthAdminController } from './controllers/auth-admin.controller';
 import { AuthAdminService } from './services/auth-admin.service';
+import { LogsModule } from '../logs/logs.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { AuthAdminService } from './services/auth-admin.service';
       signOptions: { expiresIn: '1d' },
     }),
     UsersModule,
+    LogsModule,
   ],
   controllers: [AuthController, AuthAdminController],
   providers: [AuthService, AuthAdminService],

@@ -1,13 +1,11 @@
-import { Controller, Get, Query } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiQuery } from '@nestjs/swagger';
-import { UserLogsService } from '../services/user-logs.service';
+import { Controller, Get } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { LoginsLogsService } from '../services/logins-logs.service';
 
-@Controller('users-logs')
+@Controller('logs')
 @ApiTags('Logs de Login')
-// @UseGuards(JwtAuthGuard)
-// @ApiBearerAuth()
-export class UserLogsController {
-  constructor(private readonly userLogsService: UserLogsService) { }
+export class LoginsLogsController {
+  constructor(private readonly loginsLogsService: LoginsLogsService) { }
 
   @Get('statistics')
   @ApiOperation({ summary: 'Obter estatísticas de login' })
@@ -31,6 +29,6 @@ export class UserLogsController {
     }
   })
   async getLoginStatistics() {
-    return this.userLogsService.getLoginStatistics();
+    return this.loginsLogsService.getLoginStatistics();
   }
 } 

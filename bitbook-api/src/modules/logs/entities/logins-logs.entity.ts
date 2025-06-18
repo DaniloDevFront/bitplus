@@ -7,26 +7,16 @@ import {
   JoinColumn,
   Index,
 } from 'typeorm';
-import { User } from './user.entity';
+import { User } from '../../users/entities/user.entity';
+import { LOGIN_STATUS, LOGIN_TYPE } from '../enums/login.enum';
 
-export enum LoginType {
-  EMAIL_PASSWORD = 'email_password',
-  BIOMETRIC = 'biometric',
-  SOCIAL = 'social',
-  REFRESH_TOKEN = 'refresh_token',
-}
 
-export enum LoginStatus {
-  SUCCESS = 'success',
-  FAILED = 'failed',
-}
-
-@Entity('user_logs')
+@Entity('logins_logs')
 @Index(['user_id', 'login_at'])
 @Index(['login_at'])
 @Index(['ip_address'])
 @Index(['success'])
-export class UserLog {
+export class LoginsLogs {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -44,17 +34,17 @@ export class UserLog {
 
   @Column({
     type: 'enum',
-    enum: LoginStatus,
-    default: LoginStatus.SUCCESS,
+    enum: LOGIN_STATUS,
+    default: LOGIN_STATUS.SUCCESS,
   })
-  success: LoginStatus;
+  success: LOGIN_STATUS;
 
   @Column({
     type: 'enum',
-    enum: LoginType,
-    default: LoginType.EMAIL_PASSWORD,
+    enum: LOGIN_TYPE,
+    default: LOGIN_TYPE.EMAIL_PASSWORD,
   })
-  login_type: LoginType;
+  login_type: LOGIN_TYPE;
 
   @Column({ nullable: true })
   failure_reason: string;
