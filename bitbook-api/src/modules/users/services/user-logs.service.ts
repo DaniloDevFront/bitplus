@@ -23,8 +23,8 @@ export class UserLogsService {
     const now = new Date();
     const saoPauloDate = toZonedTime(now, timeZone);
     const dateString = format(saoPauloDate, 'yyyy-MM-dd', { timeZone });
-    const startOfDay = toZonedTime(`${dateString}T00:00:00`, timeZone);
-    const endOfDay = toZonedTime(`${dateString}T23:59:59.999`, timeZone);
+    const startOfDay = new Date(`${dateString}T00:00:00.000-03:00`);
+    const endOfDay = new Date(`${dateString}T23:59:59.999-03:00`);
 
     // Estatísticas gerais
     const queryBuilder = this.entityManager.createQueryBuilder(UserLog, 'userLog');
