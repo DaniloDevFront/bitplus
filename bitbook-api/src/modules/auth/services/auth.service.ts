@@ -56,9 +56,6 @@ export class AuthService {
 
   async register(payload: CreateUserDto, loginInfo?: LoginInfo): Promise<Access> {
     try {
-      // Registra tentativa de registro
-      await this.logRegistrationAttempt(payload.email, loginInfo);
-
       const user = await this.UsersService.create(payload, loginInfo);
 
       const jwtPayload = { sub: user.id };
