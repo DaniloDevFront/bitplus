@@ -20,6 +20,7 @@ export class UserLogsService {
   async getLoginStatistics(): Promise<LoginStatisticsDto> {
     // Sempre considerar apenas o dia atual
     const today = new Date();
+    const dateString = today.toISOString().slice(0, 10); // 'YYYY-MM-DD'
     const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate());
     const endOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59, 59, 999);
 
@@ -54,32 +55,28 @@ export class UserLogsService {
     });
 
     // Logins do dia atual
-    const loginsToday = await this.entityManager
+    const loginResult = await this.entityManager
       .createQueryBuilder(UserLog, 'userLog')
-      .select('DATE(userLog.login_at)', 'date')
-      .addSelect('COUNT(*)', 'count')
+      .select('COUNT(*)', 'count')
       .where('userLog.login_at BETWEEN :startDate AND :endDate', { startDate: startOfDay, endDate: endOfDay })
-      .groupBy('DATE(userLog.login_at)')
-      .getRawMany();
+      .getRawOne();
 
-    const loginsByDayFormatted = loginsToday.map(item => ({
-      date: item.date,
-      count: typeof item.count === 'string' ? parseInt(item.count) : item.count,
-    }));
+    const loginsByDay = {
+      date: dateString,
+      count: loginResult && loginResult.count ? parseInt(loginResult.count) : 0,
+    };
 
     // Registros do dia atual
-    const registersToday = await this.entityManager
+    const registerResult = await this.entityManager
       .createQueryBuilder(User, 'user')
-      .select('DATE(user.created_at)', 'date')
-      .addSelect('COUNT(*)', 'count')
+      .select('COUNT(*)', 'count')
       .where('user.created_at BETWEEN :startDate AND :endDate', { startDate: startOfDay, endDate: endOfDay })
-      .groupBy('DATE(user.created_at)')
-      .getRawMany();
+      .getRawOne();
 
-    const registersByDay = registersToday.map(item => ({
-      date: item.date,
-      count: typeof item.count === 'string' ? parseInt(item.count) : item.count,
-    }));
+    const registersByDay = {
+      date: dateString,
+      count: registerResult && registerResult.count ? parseInt(registerResult.count) : 0,
+    };
 
     // Total de registros de usuários
     const totalRegisters = await this.entityManager.count(User);
@@ -95,7 +92,7 @@ export class UserLogsService {
       unique_users: parseInt(uniqueUsers.count),
       success_rate: Math.round(successRate * 100) / 100,
       logins_by_type: loginsByTypeMap,
-      logins_by_day: loginsByDayFormatted,
+      logins_by_day: loginsByDay,
       total_registers: totalRegisters,
       successful_registers: successfulRegisters,
       failed_registers: failedRegisters,

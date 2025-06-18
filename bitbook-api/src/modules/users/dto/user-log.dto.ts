@@ -54,17 +54,17 @@ export class LoginStatisticsDto {
   @ApiProperty({ description: 'Logins por tipo', type: 'object' })
   logins_by_type: Record<LoginType, number>;
 
-  @ApiProperty({ description: 'Logins por dia', type: 'array' })
-  logins_by_day: Array<{
+  @ApiProperty({ description: 'Logins do dia', type: 'object' })
+  logins_by_day: {
     date: string;
     count: number;
-  }>;
+  };
 
-  @ApiProperty({ description: 'Registros de usuários por dia', type: 'array' })
-  registers_by_day: Array<{
+  @ApiProperty({ description: 'Registros de usuários do dia', type: 'object' })
+  registers_by_day: {
     date: string;
     count: number;
-  }>;
+  };
 
   @ApiProperty({ description: 'Total de registros no período' })
   total_registers: number;
