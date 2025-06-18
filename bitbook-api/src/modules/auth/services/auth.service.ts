@@ -75,7 +75,7 @@ export class AuthService {
       };
     } catch (error) {
       // Registra falha no registro
-      await this.logRegistrationAttempt(payload.email, loginInfo, `Falha no registro: ${error.message}`);
+      await this.logRegistrationAttempt(payload.email, loginInfo, error.message);
       throw error;
     }
   }
