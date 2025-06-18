@@ -77,4 +77,13 @@ export class LoginStatisticsDto {
     date: string;
     count: number;
   }>;
+
+  @ApiProperty({ description: 'Total de registros no período' })
+  total_registers: number;
+
+  @ApiProperty({ description: 'Registros bem-sucedidos' })
+  successful_registers: number;
+
+  @ApiProperty({ description: 'Registros falhados' })
+  failed_registers: number;
 } 

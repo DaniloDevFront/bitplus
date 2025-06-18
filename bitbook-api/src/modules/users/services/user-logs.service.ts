@@ -75,6 +75,7 @@ export class UserLogsService {
 
     // Registros de usuários por dia
     let registersByDay: { date: string; count: number }[] = [];
+
     if (start_date && end_date) {
       registersByDay = await this.entityManager
         .createQueryBuilder(User, 'user')
@@ -96,18 +97,18 @@ export class UserLogsService {
         .orderBy('date', 'ASC')
         .getRawMany();
     }
+
     registersByDay = registersByDay.map(item => ({
       date: item.date,
       count: typeof item.count === 'string' ? parseInt(item.count) : item.count,
     }));
-    // Transformar em acumulado
-    let acumulado = 0;
-    registersByDay = registersByDay.map(item => {
-      acumulado += item.count;
-      return { date: item.date, count: acumulado };
-    });
 
     const successRate = totalLogins > 0 ? (successfulLogins / totalLogins) * 100 : 0;
+
+    // Total de registros de usuários
+    const totalRegisters = await this.entityManager.count(User);
+    const successfulRegisters = totalRegisters;
+    const failedRegisters = 0;
 
     return {
       total_logins: totalLogins,
@@ -117,6 +118,9 @@ export class UserLogsService {
       success_rate: Math.round(successRate * 100) / 100,
       logins_by_type: loginsByTypeMap,
       logins_by_day: loginsByDayFormatted,
+      total_registers: totalRegisters,
+      successful_registers: successfulRegisters,
+      failed_registers: failedRegisters,
       registers_by_day: registersByDay,
     };
   }
