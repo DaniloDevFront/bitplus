@@ -35,38 +35,6 @@ export class CreateUserLogDto {
   failure_reason?: string;
 }
 
-export class FindTodayLogsDto {
-  @ApiProperty({ description: 'ID do usuário específico', required: false })
-  @IsOptional()
-  @IsNumber()
-  user_id?: number;
-
-  @ApiProperty({ description: 'Status do login', enum: LoginStatus, required: false })
-  @IsOptional()
-  @IsEnum(LoginStatus)
-  success?: LoginStatus;
-
-  @ApiProperty({ description: 'Tipo de login', enum: LoginType, required: false })
-  @IsOptional()
-  @IsEnum(LoginType)
-  login_type?: LoginType;
-
-  @ApiProperty({ description: 'Endereço IP', required: false })
-  @IsOptional()
-  @IsString()
-  ip_address?: string;
-
-  @ApiProperty({ description: 'Página atual', required: false, default: 1 })
-  @IsOptional()
-  @IsNumber()
-  page?: number = 1;
-
-  @ApiProperty({ description: 'Itens por página', required: false, default: 50 })
-  @IsOptional()
-  @IsNumber()
-  limit?: number = 50;
-}
-
 export class FindStatisticsDto {
   @ApiProperty({ description: 'Data inicial (YYYY-MM-DD)', required: false })
   @IsOptional()
@@ -77,41 +45,6 @@ export class FindStatisticsDto {
   @IsOptional()
   @IsDateString()
   end_date?: string;
-}
-
-export class UserLogResponseDto {
-  @ApiProperty({ description: 'ID do log' })
-  id: number;
-
-  @ApiProperty({ description: 'ID do usuário' })
-  user_id: number;
-
-  @ApiProperty({ description: 'Data e hora do login' })
-  login_at: Date;
-
-  @ApiProperty({ description: 'Endereço IP' })
-  ip_address: string;
-
-  @ApiProperty({ description: 'User agent' })
-  user_agent: string;
-
-  @ApiProperty({ description: 'Status do login', enum: LoginStatus })
-  success: LoginStatus;
-
-  @ApiProperty({ description: 'Tipo de login', enum: LoginType })
-  login_type: LoginType;
-
-  @ApiProperty({ description: 'Motivo da falha' })
-  failure_reason: string;
-
-  @ApiProperty({ description: 'Data de criação' })
-  created_at: Date;
-
-  @ApiProperty({ description: 'Nome do usuário' })
-  user_name: string;
-
-  @ApiProperty({ description: 'Email do usuário' })
-  user_email: string;
 }
 
 export class LoginStatisticsDto {

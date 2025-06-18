@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectEntityManager } from '@nestjs/typeorm';
 import { EntityManager } from 'typeorm';
 import { UserLog, LoginType, LoginStatus } from '../entities/user-log.entity';
-import { CreateUserLogDto, FindTodayLogsDto, FindStatisticsDto, UserLogResponseDto, LoginStatisticsDto } from '../dto/user-log.dto';
+import { CreateUserLogDto, FindStatisticsDto, LoginStatisticsDto } from '../dto/user-log.dto';
 import { User } from '../entities/user.entity';
 
 @Injectable()
@@ -15,47 +15,6 @@ export class UserLogsService {
   async createLog(payload: CreateUserLogDto): Promise<UserLog> {
     const userLog = this.entityManager.create(UserLog, payload);
     return await this.entityManager.save(UserLog, userLog);
-  }
-
-  async findTodayLogs(filters?: Partial<FindTodayLogsDto>): Promise<{ logs: UserLogResponseDto[]; total: number }> {
-    const today = new Date();
-    const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-    const endOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59, 59, 999);
-
-    const { page = 1, limit = 50 } = filters || {};
-
-    const queryBuilder = this.entityManager
-      .createQueryBuilder(UserLog, 'userLog')
-      .leftJoinAndSelect('userLog.user', 'user')
-      .leftJoinAndSelect('user.profile', 'profile')
-      .where('userLog.login_at BETWEEN :startDate AND :endDate', {
-        startDate: startOfDay,
-        endDate: endOfDay,
-      });
-
-    // Ordenação e paginação
-    queryBuilder
-      .orderBy('userLog.login_at', 'DESC')
-      .skip((page - 1) * limit)
-      .take(limit);
-
-    const [logs, total] = await queryBuilder.getManyAndCount();
-
-    const responseLogs: UserLogResponseDto[] = logs.map(log => ({
-      id: log.id,
-      user_id: log.user_id,
-      login_at: log.login_at,
-      ip_address: log.ip_address,
-      user_agent: log.user_agent,
-      success: log.success,
-      login_type: log.login_type,
-      failure_reason: log.failure_reason,
-      created_at: log.created_at,
-      user_name: log.user?.profile?.name || 'N/A',
-      user_email: log.user?.email || 'N/A',
-    }));
-
-    return { logs: responseLogs, total };
   }
 
   async getLoginStatistics(filters?: Partial<FindStatisticsDto>): Promise<LoginStatisticsDto> {
