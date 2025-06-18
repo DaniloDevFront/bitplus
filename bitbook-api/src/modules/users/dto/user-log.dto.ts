@@ -35,18 +35,6 @@ export class CreateUserLogDto {
   failure_reason?: string;
 }
 
-export class FindStatisticsDto {
-  @ApiProperty({ description: 'Data inicial (YYYY-MM-DD)', required: false })
-  @IsOptional()
-  @IsDateString()
-  start_date?: string;
-
-  @ApiProperty({ description: 'Data final (YYYY-MM-DD)', required: false })
-  @IsOptional()
-  @IsDateString()
-  end_date?: string;
-}
-
 export class LoginStatisticsDto {
   @ApiProperty({ description: 'Total de logins no período' })
   total_logins: number;

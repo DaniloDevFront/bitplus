@@ -1,7 +1,6 @@
 import { Controller, Get, Query } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiQuery } from '@nestjs/swagger';
 import { UserLogsService } from '../services/user-logs.service';
-import { FindStatisticsDto } from '../dto/user-log.dto';
 
 @Controller('users-logs')
 @ApiTags('Logs de Login')
@@ -24,13 +23,14 @@ export class UserLogsController {
         unique_users: { type: 'number' },
         success_rate: { type: 'number' },
         logins_by_type: { type: 'object' },
-        logins_by_day: { type: 'array' }
+        logins_by_day: { type: 'array' },
+        total_registers: { type: 'number' },
+        successful_registers: { type: 'number' },
+        failed_registers: { type: 'number' }
       }
     }
   })
-  @ApiQuery({ name: 'start_date', required: false, type: String, example: '2024-01-01' })
-  @ApiQuery({ name: 'end_date', required: false, type: String, example: '2024-01-31' })
-  async getLoginStatistics(@Query() filters: Partial<FindStatisticsDto>) {
-    return this.userLogsService.getLoginStatistics(filters);
+  async getLoginStatistics() {
+    return this.userLogsService.getLoginStatistics();
   }
 } 
