@@ -105,7 +105,6 @@ jobs:
           echo "🔌 Testando conexão SSH com o EC2..."
           ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no ec2-user@${{ secrets.HOMOLOG_EC2_HOST }} 'echo ✅ Conexão SSH OK'
 
-
       - name: Deploy changed APIs
         if: steps.detect-apis.outputs.changed_apis != ''
         run: |
@@ -140,7 +139,8 @@ jobs:
             ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no ${{ secrets.HOMOLOG_EC2_USER }}@${{ secrets.HOMOLOG_EC2_HOST }} \
               "cd /home/ec2-user/bitplus-backend && git pull origin homolog"
 
-            echo "Docker Compose up..."
+            echo "docker-compose up -d --build $api"
+
             ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no ${{ secrets.HOMOLOG_EC2_USER }}@${{ secrets.HOMOLOG_EC2_HOST }} \
               "cd /home/ec2-user/bitplus-backend/infra && docker-compose up -d --build $api"
           done
