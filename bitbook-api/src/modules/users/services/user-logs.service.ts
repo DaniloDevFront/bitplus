@@ -4,6 +4,7 @@ import { EntityManager } from 'typeorm';
 import { UserLog, LoginType, LoginStatus } from '../entities/user-log.entity';
 import { CreateUserLogDto, LoginStatisticsDto } from '../dto/user-log.dto';
 import { User } from '../entities/user.entity';
+import { toZonedTime, format } from 'date-fns-tz';
 
 @Injectable()
 export class UserLogsService {
@@ -18,11 +19,12 @@ export class UserLogsService {
   }
 
   async getLoginStatistics(): Promise<LoginStatisticsDto> {
-    // Sempre considerar apenas o dia atual
-    const today = new Date();
-    const dateString = today.toISOString().slice(0, 10); // 'YYYY-MM-DD'
-    const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-    const endOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59, 59, 999);
+    const timeZone = 'America/Sao_Paulo';
+    const now = new Date();
+    const saoPauloDate = toZonedTime(now, timeZone);
+    const dateString = format(saoPauloDate, 'yyyy-MM-dd', { timeZone });
+    const startOfDay = toZonedTime(`${dateString}T00:00:00`, timeZone);
+    const endOfDay = toZonedTime(`${dateString}T23:59:59.999`, timeZone);
 
     // Estatísticas gerais
     const queryBuilder = this.entityManager.createQueryBuilder(UserLog, 'userLog');
