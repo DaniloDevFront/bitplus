@@ -27,7 +27,7 @@ export class CreateUserDto {
   @IsNotEmpty()
   email: string;
 
-  @ApiProperty({ example: '+5511999999999' })
+  @ApiProperty({ example: '(11) 99999-9999' })
   @IsString()
   @IsOptional()
   phone?: string;
@@ -55,6 +55,16 @@ export class CreateUserDto {
   @ApiProperty({ example: true })
   @IsBoolean()
   terms: boolean;
+
+  @ApiProperty({ example: true, default: false })
+  @IsOptional()
+  @IsBoolean()
+  premium?: boolean;
+
+  @ApiProperty({ example: 1, nullable: true, default: null })
+  @IsOptional()
+  @IsNumber()
+  provider_id?: number;
 }
 
 export class UpdateProfileDto {

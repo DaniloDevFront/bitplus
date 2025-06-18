@@ -14,6 +14,8 @@ export class UsersController {
   @Post()
   @ApiOperation({ summary: 'Criar novo usuário' })
   async create(@Body() payload: CreateUserDto) {
+    console.log('payload:', payload);
+
     return this.usersService.create(payload);
   }
 

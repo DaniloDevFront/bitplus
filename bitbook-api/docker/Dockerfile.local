@@ -19,8 +19,7 @@ ENV NODE_ENV=local
 # Instala todas as dependências (incluindo devDependencies)
 RUN npm install
 
-COPY . .
-
+# Não copia o código fonte - será montado via volume
 EXPOSE 3000
 
-CMD ["sh", "-c", "npm run start:${NODE_ENV}"]
+CMD ["npm", "run", "start:local"]

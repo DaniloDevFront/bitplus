@@ -209,6 +209,8 @@ export class AuthService {
           name,
           password: Math.random().toString(36).slice(-8),
           terms: true,
+          premium: false,
+          provider_id: undefined,
         });
       }
 

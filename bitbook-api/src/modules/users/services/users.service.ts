@@ -7,7 +7,6 @@ import { Profile } from '../entities/profile.entity';
 import { UserRole } from '../enums/user-role.enum';
 import { ChangePasswordDto, CreateUserDto, UpdateUserDto } from '../dto/user.dto';
 import { UploadsService } from '../../uploads/uploads.service';
-import { LoginInfo } from 'src/modules/auth/interceptors/login-info.interceptor';
 
 @Injectable()
 export class UsersService {
@@ -19,31 +18,35 @@ export class UsersService {
     private readonly uploadsService: UploadsService,
   ) { }
 
-  async create(userData: CreateUserDto): Promise<User> {
-    const existingEmail = await this.findByEmail(userData.email);
+  async create(payload: CreateUserDto): Promise<User> {
+    const existingEmail = await this.findByEmail(payload.email);
     if (existingEmail) {
       throw new ConflictException('Email já está em uso');
     }
 
-    const existingCpf = await this.findByCpf(userData.cpf);
+    const existingCpf = await this.findByCpf(payload.cpf);
     if (existingCpf) {
       throw new ConflictException('CPF já está em uso');
     }
 
-    const hashedPassword = await hash(userData.password, 10);
+    const hashedPassword = await hash(payload.password, 10);
 
     const profile = this.entityManager.create(Profile, {
-      name: userData.name,
-      phone: userData.phone,
-      cpf: userData.cpf,
-      birth_date: userData.birth_date,
+      name: payload.name,
+      phone: payload.phone,
+      cpf: payload.cpf,
+      birth_date: payload.birth_date,
+      provider_id: payload.provider_id,
     });
 
+    console.log('payload.provider_id:', payload.provider_id);
+
     const user = this.entityManager.create(User, {
-      email: userData.email,
+      email: payload.email,
       password: hashedPassword,
       role: UserRole.CLIENT,
-      terms: userData.terms,
+      premium: payload.premium,
+      terms: payload.terms,
       profile,
     });
 
