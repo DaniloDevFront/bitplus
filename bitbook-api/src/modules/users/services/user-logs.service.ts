@@ -60,45 +60,45 @@ export class UserLogsService {
       loginsByTypeMap[item.type] = parseInt(item.count);
     });
 
-    // Logins por dia
-    const loginsByDay = await queryBuilder
+    // Definir intervalo de data para o dia atual ou último dia do filtro
+    let startOfTargetDay: Date;
+    let endOfTargetDay: Date;
+    if (start_date && end_date) {
+      // Último dia do filtro
+      const lastDay = new Date(end_date);
+      startOfTargetDay = new Date(lastDay.getFullYear(), lastDay.getMonth(), lastDay.getDate());
+      endOfTargetDay = new Date(lastDay.getFullYear(), lastDay.getMonth(), lastDay.getDate(), 23, 59, 59, 999);
+    } else {
+      // Dia atual
+      const today = new Date();
+      startOfTargetDay = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+      endOfTargetDay = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59, 59, 999);
+    }
+
+    // Logins do dia alvo
+    const loginsTargetDay = await this.entityManager
+      .createQueryBuilder(UserLog, 'userLog')
       .select('DATE(userLog.login_at)', 'date')
       .addSelect('COUNT(*)', 'count')
+      .where('userLog.login_at BETWEEN :startDate AND :endDate', { startDate: startOfTargetDay, endDate: endOfTargetDay })
       .groupBy('DATE(userLog.login_at)')
-      .orderBy('date', 'ASC')
       .getRawMany();
 
-    const loginsByDayFormatted = loginsByDay.map(item => ({
+    const loginsByDayFormatted = loginsTargetDay.map(item => ({
       date: item.date,
       count: typeof item.count === 'string' ? parseInt(item.count) : item.count,
     }));
 
-    // Registros de usuários por dia
-    let registersByDay: { date: string; count: number }[] = [];
+    // Registros do dia alvo
+    const registersTargetDay = await this.entityManager
+      .createQueryBuilder(User, 'user')
+      .select('DATE(user.created_at)', 'date')
+      .addSelect('COUNT(*)', 'count')
+      .where('user.created_at BETWEEN :startDate AND :endDate', { startDate: startOfTargetDay, endDate: endOfTargetDay })
+      .groupBy('DATE(user.created_at)')
+      .getRawMany();
 
-    if (start_date && end_date) {
-      registersByDay = await this.entityManager
-        .createQueryBuilder(User, 'user')
-        .select('DATE(user.created_at)', 'date')
-        .addSelect('COUNT(*)', 'count')
-        .where('user.created_at BETWEEN :startDate AND :endDate', {
-          startDate: new Date(start_date),
-          endDate: new Date(end_date + 'T23:59:59.999Z'),
-        })
-        .groupBy('DATE(user.created_at)')
-        .orderBy('date', 'ASC')
-        .getRawMany();
-    } else {
-      registersByDay = await this.entityManager
-        .createQueryBuilder(User, 'user')
-        .select('DATE(user.created_at)', 'date')
-        .addSelect('COUNT(*)', 'count')
-        .groupBy('DATE(user.created_at)')
-        .orderBy('date', 'ASC')
-        .getRawMany();
-    }
-
-    registersByDay = registersByDay.map(item => ({
+    const registersByDay = registersTargetDay.map(item => ({
       date: item.date,
       count: typeof item.count === 'string' ? parseInt(item.count) : item.count,
     }));
