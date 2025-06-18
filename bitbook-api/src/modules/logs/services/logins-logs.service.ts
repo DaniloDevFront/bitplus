@@ -4,6 +4,7 @@ import { EntityManager } from 'typeorm';
 import { toZonedTime, format } from 'date-fns-tz';
 
 import { LoginsLogs } from '../entities/logins-logs.entity';
+import { RegistrationLog } from '../entities/registrations-logs.entity';
 import { CreateUserLogDto, LoginStatisticsDto } from '../dtos/logins-log.dto';
 import { User } from '../../users/entities/user.entity';
 import { LOGIN_STATUS, LOGIN_TYPE } from '../enums/login.enum';
@@ -66,11 +67,11 @@ export class LoginsLogsService {
       count: loginResult && loginResult.count ? parseInt(loginResult.count) : 0,
     };
 
-    // Registros do dia atual
+    // Registros do dia atual usando a nova entity RegistrationLog
     const registerResult = await this.entityManager
-      .createQueryBuilder(User, 'user')
+      .createQueryBuilder(RegistrationLog, 'registrationLog')
       .select('COUNT(*)', 'count')
-      .where('user.created_at BETWEEN :startDate AND :endDate', { startDate: startOfDay, endDate: endOfDay })
+      .where('registrationLog.created_at BETWEEN :startDate AND :endDate', { startDate: startOfDay, endDate: endOfDay })
       .getRawOne();
 
     const registersByDay = {
@@ -78,9 +79,12 @@ export class LoginsLogsService {
       count: registerResult && registerResult.count ? parseInt(registerResult.count) : 0,
     };
 
-    // Total de registros de usuários
-    const totalRegisters = await this.entityManager.count(User);
-    const failedRegisters = 0;
+    // Total de registros de usuários usando a nova entity
+    const totalRegisters = await this.entityManager.count(RegistrationLog);
+    const failedRegisters = await this.entityManager
+      .createQueryBuilder(RegistrationLog, 'registrationLog')
+      .where('registrationLog.failure_reason IS NOT NULL')
+      .getCount();
 
     return {
       total_logins: totalLogins,

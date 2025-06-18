@@ -5,6 +5,7 @@ import { UploadsModule } from '../uploads/uploads.module';
 import { LoginsLogs } from './entities/logins-logs.entity';
 import { RegistrationLog } from './entities/registrations-logs.entity';
 import { LoginsLogsService } from './services/logins-logs.service';
+import { RegistrationsLogsService } from './services/registrations-logs.service';
 import { LoginsLogsController } from './controllers/logs.controller';
 import { User } from '../users/entities/user.entity';
 
@@ -14,7 +15,7 @@ import { User } from '../users/entities/user.entity';
     UploadsModule,
   ],
   controllers: [LoginsLogsController],
-  providers: [LoginsLogsService],
-  exports: [LoginsLogsService],
+  providers: [LoginsLogsService, RegistrationsLogsService],
+  exports: [LoginsLogsService, RegistrationsLogsService],
 })
 export class LogsModule { } 

@@ -5,6 +5,7 @@ import { compare, hash, genSalt } from 'bcrypt';
 import { InjectEntityManager } from '@nestjs/typeorm';
 import { UsersService } from '../../users/services/users.service';
 import { LoginsLogsService } from '../../logs/services/logins-logs.service';
+import { RegistrationsLogsService } from '../../logs/services/registrations-logs.service';
 import { CreateUserDto } from 'src/modules/users/dto/user.dto';
 import { User } from '../../users/entities/user.entity';
 import { Access } from '../interfaces/access.interface';
@@ -18,6 +19,7 @@ export class AuthService {
     private readonly entityManager: EntityManager,
     private UsersService: UsersService,
     private loginLogsService: LoginsLogsService,
+    private registrationsLogsService: RegistrationsLogsService,
     private jwtService: JwtService,
   ) { }
 
@@ -54,6 +56,9 @@ export class AuthService {
 
   async register(payload: CreateUserDto, loginInfo?: LoginInfo): Promise<Access> {
     try {
+      // Registra tentativa de registro
+      await this.logRegistrationAttempt(payload.email, loginInfo);
+
       const user = await this.UsersService.create(payload);
 
       const jwtPayload = { sub: user.id };
@@ -73,7 +78,7 @@ export class AuthService {
       };
     } catch (error) {
       // Registra falha no registro
-      await this.logLoginAttempt(null, LOGIN_STATUS.FAILED, LOGIN_TYPE.EMAIL_PASSWORD, loginInfo, `Falha no registro: ${error.message}`);
+      await this.logRegistrationAttempt(payload.email, loginInfo, `Falha no registro: ${error.message}`);
       throw error;
     }
   }
@@ -245,6 +250,25 @@ export class AuthService {
     } catch (error) {
       // Não queremos que falhas no log afetem o fluxo principal
       console.error('Erro ao registrar log de login:', error);
+    }
+  }
+
+  // Método auxiliar para registrar logs de registro
+  private async logRegistrationAttempt(
+    email: string,
+    loginInfo?: LoginInfo,
+    failureReason?: string
+  ): Promise<void> {
+    try {
+      await this.registrationsLogsService.createLog({
+        email,
+        ip_address: loginInfo?.ip_address,
+        user_agent: loginInfo?.user_agent,
+        failure_reason: failureReason,
+      });
+    } catch (error) {
+      // Não queremos que falhas no log afetem o fluxo principal
+      console.error('Erro ao registrar log de registro:', error);
     }
   }
 }
