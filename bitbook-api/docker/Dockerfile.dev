@@ -41,7 +41,7 @@ COPY --from=builder /app/src/core/database/migrations ./src/core/database/migrat
 COPY --from=builder /app/docs ./docs
 
 # Instala apenas dependências de produção
-RUN npm install --production
+RUN npm ci --only=production
 
 # Define variáveis de ambiente
 ENV NODE_ENV=development
