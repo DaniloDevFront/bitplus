@@ -16,14 +16,10 @@ COPY package*.json ./
 # Define ambiente para instalar devDependencies
 ENV NODE_ENV=local
 
-# Instala dependências e limpa o cache do npm
-RUN npm install && \
-    npm cache clean --force
+# Instala todas as dependências (incluindo devDependencies)
+RUN npm install
 
 COPY . .
-
-# Garante que os módulos do node estão no lugar certo
-RUN npm install
 
 EXPOSE 3000
 

@@ -128,13 +128,6 @@ jobs:
               exit 1
             fi
 
-            backup_file="backup_${api}_homolog_$(date +%Y%m%d_%H%M%S).sql"
-
-            echo "Backup DB..."
-            ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no ${{ secrets.HOMOLOG_EC2_USER }}@${{ secrets.HOMOLOG_EC2_HOST }} \
-              "mkdir -p /home/ec2-user/bitplus-backend/backups && \
-              mysqldump -h ${{ secrets.HOMOLOG_DB_HOST }} -u ${{ secrets.HOMOLOG_DB_USER }} -p${{ secrets.HOMOLOG_DB_PASSWORD }} $DB_NAME > /home/ec2-user/bitplus-backend/backups/$backup_file"
-
             echo "Pull latest code..."
             ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no ${{ secrets.HOMOLOG_EC2_USER }}@${{ secrets.HOMOLOG_EC2_HOST }} \
               "cd /home/ec2-user/bitplus-backend && git pull origin homolog"
@@ -167,34 +160,51 @@ jobs:
 
             echo "🔍 Verificando migrations pendentes para $api..."
             echo "📍 Comando que será executado: docker-compose exec $api npm run migration:show"
-            if ! ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no ${{ secrets.HOMOLOG_EC2_USER }}@${{ secrets.HOMOLOG_EC2_HOST }} \
+            
+            # Verifica se há migrations pendentes
+            PENDING_MIGRATIONS=$(ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no ${{ secrets.HOMOLOG_EC2_USER }}@${{ secrets.HOMOLOG_EC2_HOST }} \
               "cd /home/ec2-user/bitplus-backend/infra && \
-              echo '📋 Status dos containers:' && \
-              docker-compose ps && \
-              echo '📋 Listando migrations pendentes:' && \
-              echo '🔧 Executando: docker-compose exec $api npm run migration:show' && \
-              docker-compose exec $api npm run migration:show && \
-              echo '🚀 Executando migrations:' && \
-              echo '🔧 Executando: docker-compose exec $api npm run migration:run' && \
-              docker-compose exec $api npm run migration:run && \
-              echo '✅ Migrations executadas com sucesso!'"; then
-
-              echo "❌ Migration failed, iniciando rollback..."
-              echo "🔍 Último comando executado: docker-compose exec $api npm run migration:run"
-
-              echo "🔄 Restaurando backup do banco..."
+              docker-compose exec $api npm run migration:show 2>/dev/null | grep -c 'pending' || echo '0'")
+            
+            echo "📊 Migrations pendentes encontradas: $PENDING_MIGRATIONS"
+            
+            if [ "$PENDING_MIGRATIONS" -gt 0 ]; then
+              echo "🚀 Executando migrations pendentes..."
+              
+              # Cria backup antes de executar migrations
+              echo "💾 Criando backup do banco antes das migrations..."
               ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no ${{ secrets.HOMOLOG_EC2_USER }}@${{ secrets.HOMOLOG_EC2_HOST }} \
-                "mysql -h ${{ secrets.HOMOLOG_DB_HOST }} -u ${{ secrets.HOMOLOG_DB_USER }} -p${{ secrets.HOMOLOG_DB_PASSWORD }} $DB_NAME < /home/ec2-user/bitplus-backend/backups/$backup_file"
+                "mkdir -p /home/ec2-user/bitplus-backend/backups && \
+                mysqldump -h ${{ secrets.HOMOLOG_DB_HOST }} -u ${{ secrets.HOMOLOG_DB_USER }} -p${{ secrets.HOMOLOG_DB_PASSWORD }} $DB_NAME > /home/ec2-user/bitplus-backend/backups/$backup_file && \
+                echo '✅ Backup criado: $backup_file'"
+              
+              echo "🔧 Executando: docker-compose exec $api npm run migration:run"
+              
+              if ! ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no ${{ secrets.HOMOLOG_EC2_USER }}@${{ secrets.HOMOLOG_EC2_HOST }} \
+                "cd /home/ec2-user/bitplus-backend/infra && \
+                docker-compose exec $api npm run migration:run"; then
 
-              echo "🔄 Revertendo código para commit anterior..."
-              ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no ${{ secrets.HOMOLOG_EC2_USER }}@${{ secrets.HOMOLOG_EC2_HOST }} \
-                "cd /home/ec2-user/bitplus-backend && \
-                git reset --hard HEAD^ && \
-                cd /home/ec2-user/bitplus-backend/infra && \
-                docker-compose up -d --build $api"
+                echo "❌ Migration failed, iniciando rollback..."
+                echo "🔍 Último comando executado: docker-compose exec $api npm run migration:run"
 
-              echo "✅ Rollback completed"
-              exit 1
+                echo "🔄 Restaurando backup do banco..."
+                ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no ${{ secrets.HOMOLOG_EC2_USER }}@${{ secrets.HOMOLOG_EC2_HOST }} \
+                  "mysql -h ${{ secrets.HOMOLOG_DB_HOST }} -u ${{ secrets.HOMOLOG_DB_USER }} -p${{ secrets.HOMOLOG_DB_PASSWORD }} $DB_NAME < /home/ec2-user/bitplus-backend/backups/$backup_file"
+
+                echo "🔄 Revertendo código para commit anterior..."
+                ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no ${{ secrets.HOMOLOG_EC2_USER }}@${{ secrets.HOMOLOG_EC2_HOST }} \
+                  "cd /home/ec2-user/bitplus-backend && \
+                  git reset --hard HEAD^ && \
+                  cd /home/ec2-user/bitplus-backend/infra && \
+                  docker-compose up -d --build $api"
+
+                echo "✅ Rollback completed"
+                exit 1
+              fi
+              
+              echo "✅ Migrations executadas com sucesso!"
+            else
+              echo "✅ Nenhuma migration pendente para $api"
             fi
           done
 
