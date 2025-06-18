@@ -59,7 +59,7 @@ export class AuthService {
       // Registra tentativa de registro
       await this.logRegistrationAttempt(payload.email, loginInfo);
 
-      const user = await this.UsersService.create(payload);
+      const user = await this.UsersService.create(payload, loginInfo);
 
       const jwtPayload = { sub: user.id };
       const token = this.jwtService.sign(jwtPayload);

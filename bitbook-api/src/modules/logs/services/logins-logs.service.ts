@@ -6,7 +6,6 @@ import { toZonedTime, format } from 'date-fns-tz';
 import { LoginsLogs } from '../entities/logins-logs.entity';
 import { RegistrationLog } from '../entities/registrations-logs.entity';
 import { CreateUserLogDto, LoginStatisticsDto } from '../dtos/logins-log.dto';
-import { User } from '../../users/entities/user.entity';
 import { LOGIN_STATUS, LOGIN_TYPE } from '../enums/login.enum';
 
 

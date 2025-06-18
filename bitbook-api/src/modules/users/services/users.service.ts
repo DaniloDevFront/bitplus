@@ -7,6 +7,8 @@ import { Profile } from '../entities/profile.entity';
 import { UserRole } from '../enums/user-role.enum';
 import { ChangePasswordDto, CreateUserDto, UpdateUserDto } from '../dto/user.dto';
 import { UploadsService } from '../../uploads/uploads.service';
+import { RegistrationsLogsService } from 'src/modules/logs/services/registrations-logs.service';
+import { LoginInfo } from 'src/modules/auth/interceptors/login-info.interceptor';
 
 @Injectable()
 export class UsersService {
@@ -16,16 +18,20 @@ export class UsersService {
     @InjectEntityManager()
     private readonly entityManager: EntityManager,
     private readonly uploadsService: UploadsService,
+    private readonly registrationsLogsService: RegistrationsLogsService,
   ) { }
 
-  async create(userData: CreateUserDto): Promise<User> {
+  async create(userData: CreateUserDto, registrationInfo?: LoginInfo): Promise<User> {
     const existingEmail = await this.findByEmail(userData.email);
     if (existingEmail) {
+
+      await this.logRegistrationAttempt(userData.email, registrationInfo, 'Email já está em uso');
       throw new ConflictException('Email já está em uso');
     }
 
     const existingCpf = await this.findByCpf(userData.cpf);
     if (existingCpf) {
+      await this.logRegistrationAttempt(userData.email, registrationInfo, 'CPF já está em uso');
       throw new ConflictException('CPF já está em uso');
     }
 
@@ -260,6 +266,25 @@ export class UsersService {
           }
         }
       });
+    }
+  }
+
+  // Método auxiliar para registrar logs de registro
+  private async logRegistrationAttempt(
+    email: string,
+    registrationInfo?: LoginInfo,
+    failureReason?: string
+  ): Promise<void> {
+    try {
+      await this.registrationsLogsService.createLog({
+        email,
+        ip_address: registrationInfo?.ip_address,
+        user_agent: registrationInfo?.user_agent,
+        failure_reason: failureReason,
+      });
+    } catch (error) {
+      // Não queremos que falhas no log afetem o fluxo principal
+      console.error('Erro ao registrar log de registro:', error);
     }
   }
 }
