@@ -188,18 +188,18 @@ jobs:
                 echo "🔍 Último comando executado: docker-compose exec $api npm run migration:run"
 
                 echo "🔄 Restaurando backup do banco..."
-                ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no ${{ secrets.HOMOLOG_EC2_USER }}@${{ secrets.HOMOLOG_EC2_HOST }} \
-                  "mysql -h ${{ secrets.HOMOLOG_DB_HOST }} -u ${{ secrets.HOMOLOG_DB_USER }} -p${{ secrets.HOMOLOG_DB_PASSWORD }} $DB_NAME < /home/ec2-user/bitplus-backend/backups/$backup_file"
+              ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no ${{ secrets.HOMOLOG_EC2_USER }}@${{ secrets.HOMOLOG_EC2_HOST }} \
+                "mysql -h ${{ secrets.HOMOLOG_DB_HOST }} -u ${{ secrets.HOMOLOG_DB_USER }} -p${{ secrets.HOMOLOG_DB_PASSWORD }} $DB_NAME < /home/ec2-user/bitplus-backend/backups/$backup_file"
 
                 echo "🔄 Revertendo código para commit anterior..."
-                ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no ${{ secrets.HOMOLOG_EC2_USER }}@${{ secrets.HOMOLOG_EC2_HOST }} \
-                  "cd /home/ec2-user/bitplus-backend && \
-                  git reset --hard HEAD^ && \
-                  cd /home/ec2-user/bitplus-backend/infra && \
-                  docker-compose up -d --build $api"
+              ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no ${{ secrets.HOMOLOG_EC2_USER }}@${{ secrets.HOMOLOG_EC2_HOST }} \
+                "cd /home/ec2-user/bitplus-backend && \
+                git reset --hard HEAD^ && \
+                cd /home/ec2-user/bitplus-backend/infra && \
+                docker-compose up -d --build $api"
 
                 echo "✅ Rollback completed"
-                exit 1
+              exit 1
               fi
               
               echo "✅ Migrations executadas com sucesso!"
