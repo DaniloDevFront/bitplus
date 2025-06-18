@@ -8,7 +8,7 @@ import { LoginsLogsService } from '../../logs/services/logins-logs.service';
 import { CreateUserDto } from 'src/modules/users/dto/user.dto';
 import { User } from '../../users/entities/user.entity';
 import { Access } from '../interfaces/access.interface';
-import { LoginType, LoginStatus } from '../../logs/entities/logins-logs.entity';
+import { LOGIN_TYPE, LOGIN_STATUS } from '../../logs/enums/login.enum';
 import { LoginInfo } from '../interceptors/login-info.interceptor';
 
 @Injectable()
@@ -26,7 +26,7 @@ export class AuthService {
       const user = await this.validateUser(login, password);
       if (!user) {
         // Registra tentativa de login falhada
-        await this.logLoginAttempt(null, LoginStatus.FAILED, LoginType.EMAIL_PASSWORD, loginInfo, 'Credenciais inválidas');
+        await this.logLoginAttempt(null, LOGIN_STATUS.FAILED, LOGIN_TYPE.EMAIL_PASSWORD, loginInfo, 'Credenciais inválidas');
         throw new UnauthorizedException('Credenciais inválidas');
       }
 
@@ -35,7 +35,7 @@ export class AuthService {
       const refreshToken = this.jwtService.sign(payload, { expiresIn: '7d' });
 
       // Registra login bem-sucedido
-      await this.logLoginAttempt(user.id, LoginStatus.SUCCESS, LoginType.EMAIL_PASSWORD, loginInfo);
+      await this.logLoginAttempt(user.id, LOGIN_STATUS.SUCCESS, LOGIN_TYPE.EMAIL_PASSWORD, loginInfo);
 
       return {
         user_id: user.id,
@@ -47,7 +47,7 @@ export class AuthService {
       };
     } catch (error) {
       // Registra erro inesperado
-      await this.logLoginAttempt(null, LoginStatus.FAILED, LoginType.EMAIL_PASSWORD, loginInfo, error.message);
+      await this.logLoginAttempt(null, LOGIN_STATUS.FAILED, LOGIN_TYPE.EMAIL_PASSWORD, loginInfo, error.message);
       throw error;
     }
   }
@@ -61,7 +61,7 @@ export class AuthService {
       const refreshToken = this.jwtService.sign(jwtPayload, { expiresIn: '7d' });
 
       // Registra login após registro
-      await this.logLoginAttempt(user.id, LoginStatus.SUCCESS, LoginType.EMAIL_PASSWORD, loginInfo, 'Login após registro');
+      await this.logLoginAttempt(user.id, LOGIN_STATUS.SUCCESS, LOGIN_TYPE.EMAIL_PASSWORD, loginInfo, 'Login após registro');
 
       return {
         user_id: user.id,
@@ -73,7 +73,7 @@ export class AuthService {
       };
     } catch (error) {
       // Registra falha no registro
-      await this.logLoginAttempt(null, LoginStatus.FAILED, LoginType.EMAIL_PASSWORD, loginInfo, `Falha no registro: ${error.message}`);
+      await this.logLoginAttempt(null, LOGIN_STATUS.FAILED, LOGIN_TYPE.EMAIL_PASSWORD, loginInfo, `Falha no registro: ${error.message}`);
       throw error;
     }
   }
@@ -82,7 +82,7 @@ export class AuthService {
     try {
       const user = await this.UsersService.findByLogin(login);
       if (!user) {
-        await this.logLoginAttempt(null, LoginStatus.FAILED, LoginType.EMAIL_PASSWORD, loginInfo, 'Usuário não encontrado para recuperação de senha');
+        await this.logLoginAttempt(null, LOGIN_STATUS.FAILED, LOGIN_TYPE.EMAIL_PASSWORD, loginInfo, 'Usuário não encontrado para recuperação de senha');
         throw new NotFoundException('Usuário não encontrado');
       }
 
@@ -94,13 +94,13 @@ export class AuthService {
       console.log(`Token de recuperação: ${resetToken}`);
 
       // Registra tentativa de recuperação de senha
-      await this.logLoginAttempt(user.id, LoginStatus.SUCCESS, LoginType.EMAIL_PASSWORD, loginInfo, 'Solicitação de recuperação de senha');
+      await this.logLoginAttempt(user.id, LOGIN_STATUS.SUCCESS, LOGIN_TYPE.EMAIL_PASSWORD, loginInfo, 'Solicitação de recuperação de senha');
 
       return {
         message: 'E-mail enviado com instruções para redefinir a senha',
       };
     } catch (error) {
-      await this.logLoginAttempt(null, LoginStatus.FAILED, LoginType.EMAIL_PASSWORD, loginInfo, `Falha na recuperação de senha: ${error.message}`);
+      await this.logLoginAttempt(null, LOGIN_STATUS.FAILED, LOGIN_TYPE.EMAIL_PASSWORD, loginInfo, `Falha na recuperação de senha: ${error.message}`);
       throw error;
     }
   }
@@ -150,7 +150,7 @@ export class AuthService {
     try {
       const user = await this.UsersService.findById(userId);
       if (!user) {
-        await this.logLoginAttempt(null, LoginStatus.FAILED, LoginType.BIOMETRIC, loginInfo, 'Usuário não encontrado para configuração biométrica');
+        await this.logLoginAttempt(null, LOGIN_STATUS.FAILED, LOGIN_TYPE.BIOMETRIC, loginInfo, 'Usuário não encontrado para configuração biométrica');
         throw new NotFoundException('Usuário não encontrado');
       }
 
@@ -160,11 +160,11 @@ export class AuthService {
       await this.entityManager.save(User, user);
 
       // Registra configuração biométrica
-      await this.logLoginAttempt(userId, LoginStatus.SUCCESS, LoginType.BIOMETRIC, loginInfo, 'Configuração biométrica ativada');
+      await this.logLoginAttempt(userId, LOGIN_STATUS.SUCCESS, LOGIN_TYPE.BIOMETRIC, loginInfo, 'Configuração biométrica ativada');
 
       return { message: 'Login biométrico ativado com sucesso' };
     } catch (error) {
-      await this.logLoginAttempt(userId, LoginStatus.FAILED, LoginType.BIOMETRIC, loginInfo, `Falha na configuração biométrica: ${error.message}`);
+      await this.logLoginAttempt(userId, LOGIN_STATUS.FAILED, LOGIN_TYPE.BIOMETRIC, loginInfo, `Falha na configuração biométrica: ${error.message}`);
       throw error;
     }
   }
@@ -173,7 +173,7 @@ export class AuthService {
     try {
       const user = await this.UsersService.findOneByBiometric(biometricSecret);
       if (!user || !(await compare(biometricSecret, user.biometricSecretHash))) {
-        await this.logLoginAttempt(null, LoginStatus.FAILED, LoginType.BIOMETRIC, loginInfo, 'Credenciais biométricas inválidas');
+        await this.logLoginAttempt(null, LOGIN_STATUS.FAILED, LOGIN_TYPE.BIOMETRIC, loginInfo, 'Credenciais biométricas inválidas');
         throw new UnauthorizedException('Credenciais biométricas inválidas');
       }
 
@@ -181,13 +181,13 @@ export class AuthService {
       const token = this.jwtService.sign(payload);
 
       // Registra login biométrico bem-sucedido
-      await this.logLoginAttempt(user.id, LoginStatus.SUCCESS, LoginType.BIOMETRIC, loginInfo);
+      await this.logLoginAttempt(user.id, LOGIN_STATUS.SUCCESS, LOGIN_TYPE.BIOMETRIC, loginInfo);
 
       return {
         access_token: token,
       };
     } catch (error) {
-      await this.logLoginAttempt(null, LoginStatus.FAILED, LoginType.BIOMETRIC, loginInfo, `Falha no login biométrico: ${error.message}`);
+      await this.logLoginAttempt(null, LOGIN_STATUS.FAILED, LOGIN_TYPE.BIOMETRIC, loginInfo, `Falha no login biométrico: ${error.message}`);
       throw error;
     }
   }
@@ -215,11 +215,11 @@ export class AuthService {
       const token = this.jwtService.sign(payload);
 
       // Registra login social bem-sucedido
-      await this.logLoginAttempt(user.id, LoginStatus.SUCCESS, LoginType.SOCIAL, loginInfo);
+      await this.logLoginAttempt(user.id, LOGIN_STATUS.SUCCESS, LOGIN_TYPE.SOCIAL, loginInfo);
 
       return token;
     } catch (error) {
-      await this.logLoginAttempt(null, LoginStatus.FAILED, LoginType.SOCIAL, loginInfo, `Falha no login social: ${error.message}`);
+      await this.logLoginAttempt(null, LOGIN_STATUS.FAILED, LOGIN_TYPE.SOCIAL, loginInfo, `Falha no login social: ${error.message}`);
       throw error;
     }
   }
@@ -227,8 +227,8 @@ export class AuthService {
   // Método auxiliar para registrar logs de login
   private async logLoginAttempt(
     userId: number | null,
-    status: LoginStatus,
-    loginType: LoginType,
+    status: LOGIN_STATUS,
+    loginType: LOGIN_TYPE,
     loginInfo?: LoginInfo,
     failureReason?: string
   ): Promise<void> {

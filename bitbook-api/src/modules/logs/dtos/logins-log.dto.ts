@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsEnum, IsOptional, IsString, IsDateString, IsNumber } from 'class-validator';
-import { LoginType, LoginStatus } from '../entities/logins-logs.entity';
+import { LOGIN_TYPE, LOGIN_STATUS } from '../enums/login.enum';
 
 export class CreateUserLogDto {
   @ApiProperty({ description: 'ID do usuário' })
@@ -21,13 +21,13 @@ export class CreateUserLogDto {
   @IsString()
   user_agent?: string;
 
-  @ApiProperty({ description: 'Status do login', enum: LoginStatus })
-  @IsEnum(LoginStatus)
-  success: LoginStatus;
+  @ApiProperty({ description: 'Status do login', enum: LOGIN_STATUS })
+  @IsEnum(LOGIN_STATUS)
+  success: LOGIN_STATUS;
 
-  @ApiProperty({ description: 'Tipo de login', enum: LoginType })
-  @IsEnum(LoginType)
-  login_type: LoginType;
+  @ApiProperty({ description: 'Tipo de login', enum: LOGIN_TYPE })
+  @IsEnum(LOGIN_TYPE)
+  login_type: LOGIN_TYPE;
 
   @ApiProperty({ description: 'Motivo da falha (se aplicável)', required: false })
   @IsOptional()
@@ -46,7 +46,7 @@ export class LoginStatisticsDto {
   failed_logins: number;
 
   @ApiProperty({ description: 'Logins por tipo', type: 'object' })
-  logins_by_type: Record<LoginType, number>;
+  logins_by_type: Record<LOGIN_TYPE, number>;
 
   @ApiProperty({ description: 'Logins do dia', type: 'object' })
   logins_by_day: {
