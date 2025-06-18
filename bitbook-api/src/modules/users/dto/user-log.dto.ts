@@ -138,4 +138,10 @@ export class LoginStatisticsDto {
     date: string;
     count: number;
   }>;
+
+  @ApiProperty({ description: 'Registros de usuários por dia', type: 'array' })
+  registers_by_day: Array<{
+    date: string;
+    count: number;
+  }>;
 } 

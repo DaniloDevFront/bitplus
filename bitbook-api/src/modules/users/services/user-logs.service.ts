@@ -3,12 +3,17 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { UserLog, LoginType, LoginStatus } from '../entities/user-log.entity';
 import { CreateUserLogDto, FindTodayLogsDto, FindStatisticsDto, UserLogResponseDto, LoginStatisticsDto } from '../dto/user-log.dto';
+import { User } from '../entities/user.entity';
+import { InjectEntityManager } from '@nestjs/typeorm';
+import { EntityManager } from 'typeorm';
 
 @Injectable()
 export class UserLogsService {
   constructor(
     @InjectRepository(UserLog)
     private readonly userLogRepository: Repository<UserLog>,
+    @InjectEntityManager()
+    private readonly entityManager: EntityManager,
   ) { }
 
   async createLog(createUserLogDto: CreateUserLogDto): Promise<UserLog> {
@@ -130,6 +135,34 @@ export class UserLogsService {
       count: parseInt(item.count),
     }));
 
+    // Registros de usuários por dia
+    let registersByDay: { date: string; count: number }[] = [];
+    if (start_date && end_date) {
+      registersByDay = await this.entityManager
+        .createQueryBuilder(User, 'user')
+        .select('DATE(user.created_at)', 'date')
+        .addSelect('COUNT(*)', 'count')
+        .where('user.created_at BETWEEN :startDate AND :endDate', {
+          startDate: new Date(start_date),
+          endDate: new Date(end_date + 'T23:59:59.999Z'),
+        })
+        .groupBy('DATE(user.created_at)')
+        .orderBy('date', 'ASC')
+        .getRawMany();
+    } else {
+      registersByDay = await this.entityManager
+        .createQueryBuilder(User, 'user')
+        .select('DATE(user.created_at)', 'date')
+        .addSelect('COUNT(*)', 'count')
+        .groupBy('DATE(user.created_at)')
+        .orderBy('date', 'ASC')
+        .getRawMany();
+    }
+    registersByDay = registersByDay.map(item => ({
+      date: item.date,
+      count: typeof item.count === 'string' ? parseInt(item.count) : item.count,
+    }));
+
     const successRate = totalLogins > 0 ? (successfulLogins / totalLogins) * 100 : 0;
 
     return {
@@ -140,6 +173,7 @@ export class UserLogsService {
       success_rate: Math.round(successRate * 100) / 100,
       logins_by_type: loginsByTypeMap,
       logins_by_day: loginsByDayFormatted,
+      registers_by_day: registersByDay,
     };
   }
 } 
