@@ -1,24 +1,20 @@
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { InjectEntityManager } from '@nestjs/typeorm';
+import { EntityManager } from 'typeorm';
 import { UserLog, LoginType, LoginStatus } from '../entities/user-log.entity';
 import { CreateUserLogDto, FindTodayLogsDto, FindStatisticsDto, UserLogResponseDto, LoginStatisticsDto } from '../dto/user-log.dto';
 import { User } from '../entities/user.entity';
-import { InjectEntityManager } from '@nestjs/typeorm';
-import { EntityManager } from 'typeorm';
 
 @Injectable()
 export class UserLogsService {
   constructor(
-    @InjectRepository(UserLog)
-    private readonly userLogRepository: Repository<UserLog>,
     @InjectEntityManager()
     private readonly entityManager: EntityManager,
   ) { }
 
-  async createLog(createUserLogDto: CreateUserLogDto): Promise<UserLog> {
-    const userLog = this.userLogRepository.create(createUserLogDto);
-    return await this.userLogRepository.save(userLog);
+  async createLog(payload: CreateUserLogDto): Promise<UserLog> {
+    const userLog = this.entityManager.create(UserLog, payload);
+    return await this.entityManager.save(UserLog, userLog);
   }
 
   async findTodayLogs(filters?: Partial<FindTodayLogsDto>): Promise<{ logs: UserLogResponseDto[]; total: number }> {
@@ -26,33 +22,16 @@ export class UserLogsService {
     const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate());
     const endOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59, 59, 999);
 
-    const { user_id, success, login_type, ip_address, page = 1, limit = 50 } = filters || {};
+    const { page = 1, limit = 50 } = filters || {};
 
-    const queryBuilder = this.userLogRepository
-      .createQueryBuilder('userLog')
+    const queryBuilder = this.entityManager
+      .createQueryBuilder(UserLog, 'userLog')
       .leftJoinAndSelect('userLog.user', 'user')
       .leftJoinAndSelect('user.profile', 'profile')
       .where('userLog.login_at BETWEEN :startDate AND :endDate', {
         startDate: startOfDay,
         endDate: endOfDay,
       });
-
-    // Outros filtros
-    if (user_id) {
-      queryBuilder.andWhere('userLog.user_id = :user_id', { user_id });
-    }
-
-    if (success) {
-      queryBuilder.andWhere('userLog.success = :success', { success });
-    }
-
-    if (login_type) {
-      queryBuilder.andWhere('userLog.login_type = :login_type', { login_type });
-    }
-
-    if (ip_address) {
-      queryBuilder.andWhere('userLog.ip_address LIKE :ip_address', { ip_address: `%${ip_address}%` });
-    }
 
     // Ordenação e paginação
     queryBuilder
@@ -82,7 +61,7 @@ export class UserLogsService {
   async getLoginStatistics(filters?: Partial<FindStatisticsDto>): Promise<LoginStatisticsDto> {
     const { start_date, end_date } = filters || {};
 
-    const queryBuilder = this.userLogRepository.createQueryBuilder('userLog');
+    const queryBuilder = this.entityManager.createQueryBuilder(UserLog, 'userLog');
 
     // Filtros de data
     if (start_date && end_date) {
@@ -132,7 +111,7 @@ export class UserLogsService {
 
     const loginsByDayFormatted = loginsByDay.map(item => ({
       date: item.date,
-      count: parseInt(item.count),
+      count: typeof item.count === 'string' ? parseInt(item.count) : item.count,
     }));
 
     // Registros de usuários por dia
@@ -162,6 +141,12 @@ export class UserLogsService {
       date: item.date,
       count: typeof item.count === 'string' ? parseInt(item.count) : item.count,
     }));
+    // Transformar em acumulado
+    let acumulado = 0;
+    registersByDay = registersByDay.map(item => {
+      acumulado += item.count;
+      return { date: item.date, count: acumulado };
+    });
 
     const successRate = totalLogins > 0 ? (successfulLogins / totalLogins) * 100 : 0;
 
