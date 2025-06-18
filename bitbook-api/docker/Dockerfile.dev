@@ -51,3 +51,5 @@ EXPOSE 3000
 
 # Comando para iniciar a aplicação em modo desenvolvimento
 CMD ["npm", "run", "start:development"]
+
+# teste
