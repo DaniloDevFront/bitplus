@@ -62,9 +62,11 @@ export class FindEbookDto {
     example: 1
   })
   @IsOptional()
-  @IsNumber()
-  @Transform(({ value }) => value ? Number(value) : undefined)
-  category?: number;
+  @Transform(({ value }) => {
+    if (value === 'all') return 'all';
+    return value ? Number(value) : undefined;
+  })
+  category?: number | 'all';
 
   @ApiPropertyOptional({
     description: 'Filtrar por ebooks em destaque',

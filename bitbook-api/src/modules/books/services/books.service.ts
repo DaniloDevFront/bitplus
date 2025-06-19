@@ -680,9 +680,12 @@ export class BooksService {
     }));
   }
 
-  async findByCategory(category_id: number): Promise<any[]> {
+  async findByCategory(category_id: number | 'all'): Promise<any[]> {
+
+    const condition = category_id === 'all' ? {} : { category: { id: category_id } };
+
     const ebooks = await this.entityManager.find(Books, {
-      where: { category: { id: category_id } },
+      where: condition,
       relations: ['category', 'media', 'media.tracks'],
       order: { id: 'DESC' },
       select: {

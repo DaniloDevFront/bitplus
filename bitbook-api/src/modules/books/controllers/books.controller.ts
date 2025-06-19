@@ -94,19 +94,14 @@ export class BooksController {
   async find(@Query() query: FindEbookDto) {
     const { id, title, premium, category, high, arrived, explore, audiobooks, user_id } = query;
 
-    if (id) {
-      return this.booksService.findById(id, user_id);
-    }
-
+    if (id) return this.booksService.findById(id, user_id);
     if (title) return this.booksService.findByTitle(title);
     if (premium !== undefined) return this.booksService.findByPremium(premium);
-    if (category) return this.booksService.findByCategory(category);
     if (high !== undefined) return this.booksService.findByHigh(high);
     if (arrived) return this.booksService.findByArrived();
     if (audiobooks) return this.booksService.findByAudiobooks();
-    if (explore) {
-      return this.booksService.findByExplore(explore, user_id);
-    }
+    if (explore) return this.booksService.findByExplore(explore, user_id);
+    if (category) return this.booksService.findByCategory(category);
 
     return this.booksService.findAll();
   }
