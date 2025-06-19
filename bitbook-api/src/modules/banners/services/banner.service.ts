@@ -34,7 +34,7 @@ export class BannerService {
 
     const banner = this.bannerRepository.create(payload);
 
-    const uploadResult = await this.uploadsService.uploadFile(file, 'bannersTeste', 'image');
+    const uploadResult = await this.uploadsService.uploadFile(file, 'banners', 'image');
 
     if (uploadResult) {
       banner.banner = uploadResult.url;
@@ -81,7 +81,7 @@ export class BannerService {
     }
 
     if (file) {
-      const uploadResult = await this.uploadsService.uploadFile(file, 'bannersTeste', 'image');
+      const uploadResult = await this.uploadsService.uploadFile(file, 'banners', 'image');
 
       if (uploadResult) {
         if (banner.banner) {
