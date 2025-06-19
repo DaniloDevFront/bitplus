@@ -30,7 +30,7 @@ export class Profile {
   @Column({ nullable: true })
   avatar: string;
 
-  @Column({ nullable: true })
+  @Column({ nullable: true, default: "https://bitplus.s3.sa-east-1.amazonaws.com/default/cover-profile.png" })
   cover: string;
 
   @Column({ nullable: true })
