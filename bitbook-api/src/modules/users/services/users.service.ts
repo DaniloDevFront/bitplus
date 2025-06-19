@@ -99,7 +99,7 @@ export class UsersService {
     return user;
   }
 
-  async delete(id: number): Promise<void> {
+  async delete(id: number): Promise<{ success: boolean; message: string; deleted_at: string }> {
     const user = await this.findById(id);
     if (!user) {
       throw new NotFoundException('Usuário não encontrado');
@@ -116,6 +116,12 @@ export class UsersService {
     }
 
     await this.entityManager.remove(user);
+
+    return {
+      success: true,
+      message: `Usuário com ID ${id} removido com sucesso`,
+      deleted_at: new Date().toISOString()
+    };
   }
 
   async findAll(): Promise<User[]> {

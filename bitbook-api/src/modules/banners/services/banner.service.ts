@@ -115,7 +115,7 @@ export class BannerService {
     return this.findById(id);
   }
 
-  async delete(id: number): Promise<void> {
+  async delete(id: number): Promise<{ success: boolean; message: string; deleted_at: string }> {
     const banner = await this.findById(id);
 
     if (!banner) {
@@ -130,6 +130,12 @@ export class BannerService {
     await this.bannerProviderRepository.delete({ banner_id: id });
 
     await this.bannerRepository.remove(banner);
+
+    return {
+      success: true,
+      message: `Banner com ID ${id} removido com sucesso`,
+      deleted_at: new Date().toISOString()
+    };
   }
 
   async findAll(): Promise<Banner[]> {

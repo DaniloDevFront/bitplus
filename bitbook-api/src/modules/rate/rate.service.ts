@@ -85,7 +85,7 @@ export class RateService {
     return this.entityManager.save(newHistory);
   }
 
-  async delete(id: number): Promise<void> {
+  async delete(id: number): Promise<{ success: boolean; message: string; deleted_at: string }> {
     const history = await this.entityManager.findOne(RateHistory, {
       where: { id, status: true }
     });
@@ -97,6 +97,12 @@ export class RateService {
     // Soft delete - apenas marca como inativo
     history.status = false;
     await this.entityManager.save(history);
+
+    return {
+      success: true,
+      message: `Avaliação com ID ${id} removida com sucesso`,
+      deleted_at: new Date().toISOString()
+    };
   }
 
   async findAll(): Promise<RateHistory[]> {

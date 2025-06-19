@@ -48,7 +48,7 @@ export class CategoryService {
     return this.categoryRepository.save(category);
   }
 
-  async delete(id: number): Promise<void> {
+  async delete(id: number): Promise<{ success: boolean; message: string; deleted_at: string }> {
     const category = await this.findById(id);
 
     if (!category) {
@@ -65,6 +65,12 @@ export class CategoryService {
     }
 
     await this.categoryRepository.remove(category);
+
+    return {
+      success: true,
+      message: `Categoria com ID ${id} removida com sucesso`,
+      deleted_at: new Date().toISOString()
+    };
   }
 
   async findById(id: number): Promise<Category> {

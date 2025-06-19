@@ -43,7 +43,7 @@ export class BookcaseService {
     });
   }
 
-  async delete(book_id: number, user_id: number): Promise<void> {
+  async delete(book_id: number, user_id: number): Promise<{ success: boolean; message: string; deleted_at: string }> {
     const bookcase = await this.entityManager.findOne(Bookcase, {
       where: { book_id, user_id }
     });
@@ -53,6 +53,12 @@ export class BookcaseService {
     }
 
     await this.entityManager.remove(bookcase);
+
+    return {
+      success: true,
+      message: `Livro removido da estante do usuário com sucesso`,
+      deleted_at: new Date().toISOString()
+    };
   }
 
   async findByUser(user_id: number): Promise<any[]> {

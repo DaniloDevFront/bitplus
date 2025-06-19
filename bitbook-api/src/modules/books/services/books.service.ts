@@ -316,7 +316,7 @@ export class BooksService {
     });
   }
 
-  async delete(id: number): Promise<void> {
+  async delete(id: number): Promise<{ success: boolean; message: string; deleted_at: string }> {
     const ebook = await this.entityManager.findOne(Books, {
       where: { id },
       relations: ['sheet', 'media', 'media.tracks']
@@ -363,6 +363,12 @@ export class BooksService {
 
     // Remover o ebook
     await this.entityManager.remove(ebook);
+
+    return {
+      success: true,
+      message: `Book com ID ${id} removido com sucesso`,
+      deleted_at: new Date().toISOString()
+    };
   }
 
   async findAll(): Promise<any[]> {
