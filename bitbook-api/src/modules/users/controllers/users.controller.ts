@@ -58,7 +58,6 @@ export class UsersController {
   }
 
   @Get()
-
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Buscar usuários' })
   async find(@Query() query: FindUserDto) {

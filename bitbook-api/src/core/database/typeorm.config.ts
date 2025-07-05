@@ -13,23 +13,35 @@ const nodeEnv = process.env.NODE_ENV;
 const envFile = resolve(process.cwd(), `.env.${nodeEnv}`);
 config({ path: envFile });
 
-console.log('NODE_ENV:', process.env.NODE_ENV);
-
-// 2. Inicializa o ConfigService como no NestJS
 const configService = new ConfigService();
 
-// 3. Valida as variáveis essenciais
-const required = ['DB_HOST', 'DB_PORT', 'DB_USERNAME', 'DB_PASSWORD', 'DB_DATABASE'];
+// 2. Valida as variáveis essenciais
+const required = ['DB_PORT', 'DB_USERNAME', 'DB_PASSWORD', 'DB_DATABASE'];
 for (const key of required) {
   if (!configService.get(key)) {
     throw new Error(`Variável de ambiente obrigatória '${key}' não está definida.`);
   }
 }
 
+// 3. Determina o host do banco baseado no ambiente
+const getDbHost = () => {
+  const nodeEnv = process.env.NODE_ENV;
+
+  // Ambiente local
+  if (nodeEnv === 'local') {
+    if (process.env.DOCKER_CONTAINER || process.env.INSIDE_DOCKER) {
+      return 'mysql';
+    }
+    return 'localhost';
+  }
+
+  return configService.getOrThrow('DB_HOST');
+};
+
 // 4. Exporta a configuração do DataSource
 export default new DataSource({
   type: 'mysql',
-  host: configService.getOrThrow('DB_HOST'),
+  host: getDbHost(),
   port: parseInt(configService.getOrThrow('DB_PORT'), 10),
   username: configService.getOrThrow('DB_USERNAME'),
   password: configService.getOrThrow('DB_PASSWORD'),

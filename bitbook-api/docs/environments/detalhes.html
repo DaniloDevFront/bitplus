@@ -377,11 +377,11 @@ chmod 600 ~/.ssh/config</code></pre>
                 <div class="container-title">Fluxo de Desenvolvimento</div>
                 <ol>
                   <li>Antes de começar o desenvolvimento:
-                    <pre><code class="language-bash">npm run migration:create</code></pre>
+                    <pre><code class="language-bash">npm run migration:create src/core/database/migrations/CreateNovaTabela</code></pre>
                   </li>
                   <li>Desenvolver as alterações no banco</li>
                   <li>Ao finalizar o desenvolvimento:
-                    <pre><code class="language-bash">npm run migration:generate</code></pre>
+                    <pre><code class="language-bash">npm run migration:generate src/core/database/migrations/CreateNovaTabela</code></pre>
                   </li>
                   <li>Testar localmente:
                     <pre><code class="language-bash">npm run migration:run</code></pre>
