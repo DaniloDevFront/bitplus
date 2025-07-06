@@ -11,18 +11,28 @@ export class PremiumService {
   ) { }
 
   async create(payload: CreatePremiumDto): Promise<Premium> {
-    // Criar a entidade Premium
+    // 1. Desativar o Premium ativo (se houver)
+    const premiumAtivo = await this.entityManager.findOne(Premium, {
+      where: { status: true },
+      order: { created_at: 'DESC' }
+    });
+
+    if (premiumAtivo) {
+      premiumAtivo.status = false;
+      await this.entityManager.save(Premium, premiumAtivo);
+    }
+
+    // 2. Criar a entidade Premium
     const premium = new Premium();
     premium.title = payload.title;
     premium.description = payload.description;
     premium.benefits = payload.benefits;
     premium.status = true;
 
-    // Salvar o Premium primeiro
+    // 3. Salvar o novo Premium
     const savedPremium = await this.entityManager.save(Premium, premium);
 
-    // Criar e salvar os planos com referência ao premium
-    const plans: PremiumPlan[] = [];
+    // 4. Criar e salvar os planos com referência ao premium
     for (const item of payload.plans) {
       const plan = new PremiumPlan();
       plan.recorrence = item.recorrence;
@@ -30,13 +40,13 @@ export class PremiumService {
       plan.price_label = item.price_label;
       plan.price = item.price;
       plan.premium = savedPremium;
-
-      const savedPlan = await this.entityManager.save(PremiumPlan, plan);
-      plans.push(savedPlan);
+      await this.entityManager.save(PremiumPlan, plan);
     }
 
-    // Retornar o premium com os planos relacionados
-    return this.findById(savedPremium.id);
+    return {
+      ...savedPremium,
+      plans: savedPremium.plans,
+    };
   }
 
   async update(id: number, payload: UpdatePremiumDto): Promise<Premium> {
@@ -110,7 +120,6 @@ export class PremiumService {
 
   async findAll(): Promise<Premium[]> {
     const premiums = await this.entityManager.find(Premium, {
-      where: { status: true },
       relations: ['plans'],
       order: {
         created_at: 'DESC',
@@ -118,5 +127,19 @@ export class PremiumService {
     });
 
     return premiums ?? [];
+  }
+
+  async findActive(): Promise<Premium> {
+    const premium = await this.entityManager.findOne(Premium, {
+      where: { status: true },
+      order: { created_at: 'DESC' },
+      relations: ['plans']
+    });
+
+    if (!premium) {
+      throw new NotFoundException(`Assinatura ativa não encontrada`);
+    }
+
+    return premium;
   }
 }   

@@ -55,9 +55,10 @@ export class PremiumController {
   @ApiResponse({ status: 200, description: 'Assinatura encontrada com sucesso' })
   @ApiResponse({ status: 401, description: 'Não autorizado' })
   @ApiResponse({ status: 404, description: 'Assinatura não encontrada' })
-  async findById(@Query() query: { id?: number }) {
-    const { id } = query;
+  async findById(@Query() query: { id?: number, status?: boolean }) {
+    const { id, status } = query;
     if (id !== undefined) return this.premiumService.findById(id);
+    if (status !== undefined) return this.premiumService.findActive();
 
     return this.premiumService.findAll();
   }
