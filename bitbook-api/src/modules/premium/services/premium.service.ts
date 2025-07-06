@@ -14,7 +14,7 @@ export class PremiumService {
     // 1. Desativar o Premium ativo (se houver)
     const premiumAtivo = await this.entityManager.findOne(Premium, {
       where: { status: true },
-      order: { created_at: 'DESC' }
+      order: { created_at: 'DESC' },
     });
 
     if (premiumAtivo) {
@@ -43,10 +43,12 @@ export class PremiumService {
       await this.entityManager.save(PremiumPlan, plan);
     }
 
-    return {
-      ...savedPremium,
-      plans: savedPremium.plans,
-    };
+    const premiumWithPlans = await this.entityManager.findOne(Premium, {
+      where: { id: savedPremium.id },
+      relations: ['plans']
+    });
+
+    return premiumWithPlans;
   }
 
   async update(id: number, payload: UpdatePremiumDto): Promise<Premium> {
