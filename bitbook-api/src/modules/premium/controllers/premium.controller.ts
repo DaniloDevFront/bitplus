@@ -1,13 +1,14 @@
-import { Controller, Post, Body, Put, Param, Delete, Get } from '@nestjs/common';
+import { Controller, Post, Body, Put, Param, Delete, Get, Query } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { SignaturesService } from '../services/signatures.service';
-import { CreateSignatureDto, UpdateSignatureDto } from '../dto/signatures.dto';
+import { PremiumService } from '../services/premium.service';
+import { CreatePremiumDto, UpdatePremiumDto } from '../dto/premium.dto';
 
-
-@ApiTags('Assinaturas')
-@Controller('signatures')
-export class SignaturesController {
-  constructor(private readonly signaturesService: SignaturesService) { }
+@ApiTags('Premium')
+@Controller('premium')
+export class PremiumController {
+  constructor(
+    private readonly premiumService: PremiumService,
+  ) { }
 
   @Post()
   @ApiBearerAuth()
@@ -15,12 +16,12 @@ export class SignaturesController {
   @ApiResponse({
     status: 201,
     description: 'Assinatura criada com sucesso',
-    type: CreateSignatureDto
+    type: CreatePremiumDto
   })
   @ApiResponse({ status: 400, description: 'Dados inválidos' })
   @ApiResponse({ status: 401, description: 'Não autorizado' })
-  async create(@Body() payload: CreateSignatureDto) {
-    return this.signaturesService.create(payload);
+  async create(@Body() payload: CreatePremiumDto) {
+    return this.premiumService.create(payload);
   }
 
   @Put(':id')
@@ -29,13 +30,13 @@ export class SignaturesController {
   @ApiResponse({
     status: 200,
     description: 'Assinatura atualizada com sucesso',
-    type: UpdateSignatureDto
+    type: UpdatePremiumDto
   })
   @ApiResponse({ status: 400, description: 'Dados inválidos' })
   @ApiResponse({ status: 401, description: 'Não autorizado' })
   @ApiResponse({ status: 404, description: 'Assinatura não encontrada' })
-  async update(@Param('id') id: number, @Body() payload: UpdateSignatureDto) {
-    return this.signaturesService.update(id, payload);
+  async update(@Param('id') id: number, @Body() payload: UpdatePremiumDto) {
+    return this.premiumService.update(id, payload);
   }
 
   @Delete(':id')
@@ -45,26 +46,19 @@ export class SignaturesController {
   @ApiResponse({ status: 401, description: 'Não autorizado' })
   @ApiResponse({ status: 404, description: 'Assinatura não encontrada' })
   async delete(@Param('id') id: number) {
-    return this.signaturesService.delete(id);
+    return this.premiumService.delete(id);
   }
 
-  @Get(':id')
+  @Get()
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Buscar assinatura por ID' })
   @ApiResponse({ status: 200, description: 'Assinatura encontrada com sucesso' })
   @ApiResponse({ status: 401, description: 'Não autorizado' })
   @ApiResponse({ status: 404, description: 'Assinatura não encontrada' })
-  async findById(@Param('id') id: number) {
-    return this.signaturesService.findById(id);
-  }
+  async findById(@Query() query: { id?: number }) {
+    const { id } = query;
+    if (id !== undefined) return this.premiumService.findById(id);
 
-  @Get()
-  @ApiBearerAuth()
-  @ApiOperation({ summary: 'Buscar todas as assinaturas' })
-  @ApiResponse({ status: 200, description: 'Assinaturas encontradas com sucesso' })
-  @ApiResponse({ status: 401, description: 'Não autorizado' })
-  async findAll() {
-    return this.signaturesService.findAll();
+    return this.premiumService.findAll();
   }
-
 } 

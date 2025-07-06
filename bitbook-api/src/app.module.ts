@@ -12,7 +12,7 @@ import { BookcaseModule } from './modules/bookcase/bookcase.module';
 import { ReadingModule } from './modules/reading/reading.module';
 import { UploadsModule } from './modules/uploads/uploads.module';
 import { LogsModule } from './modules/logs/logs.module';
-import { SignaturesModule } from './modules/signatures/signatures.module';
+import { PremiumModule } from './modules/premium/premium.module';
 
 @Module({
   imports: [
@@ -27,7 +27,7 @@ import { SignaturesModule } from './modules/signatures/signatures.module';
     ReadingModule,
     UploadsModule,
     LogsModule,
-    SignaturesModule,
+    PremiumModule,
   ],
   controllers: [AppController],
 })

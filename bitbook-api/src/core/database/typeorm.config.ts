@@ -32,6 +32,7 @@ const getDbHost = () => {
     if (process.env.DOCKER_CONTAINER || process.env.INSIDE_DOCKER) {
       return 'mysql';
     }
+
     return 'localhost';
   }
 
