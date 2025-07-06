@@ -43,10 +43,12 @@ export class PremiumService {
       await this.entityManager.save(PremiumPlan, plan);
     }
 
-    return {
-      ...savedPremium,
-      plans: savedPremium.plans,
-    };
+    const premiumWithPlans = await this.entityManager.findOne(Premium, {
+      where: { id: savedPremium.id },
+      relations: ['plans']
+    });
+
+    return premiumWithPlans;
   }
 
   async update(id: number, payload: UpdatePremiumDto): Promise<Premium> {
