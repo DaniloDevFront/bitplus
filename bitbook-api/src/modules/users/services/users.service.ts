@@ -90,6 +90,9 @@ export class UsersService {
       if (payload.profile.cover) {
         profile.cover = payload.profile.cover;
       }
+      if (payload.profile.premium) {
+        user.premium = payload.profile.premium;
+      }
 
       user.profile = profile;
     }
@@ -145,10 +148,16 @@ export class UsersService {
   }
 
   async findByCpf(cpf: string): Promise<User | null> {
-    return this.entityManager.findOne(User, {
+    const user = await this.entityManager.findOne(User, {
       where: { profile: { cpf } },
       relations: ['profile'],
     });
+
+    if (!user) {
+      throw new NotFoundException('Usuário não encontrado');
+    }
+
+    return user;
   }
 
   async findByProvider(provider: number): Promise<User[]> {

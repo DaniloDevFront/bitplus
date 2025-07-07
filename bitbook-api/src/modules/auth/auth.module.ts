@@ -7,6 +7,9 @@ import { UsersModule } from '../users/users.module';
 import { AuthAdminController } from './controllers/auth-admin.controller';
 import { AuthAdminService } from './services/auth-admin.service';
 import { LogsModule } from '../logs/logs.module';
+import { LegacyModule } from '../_legacy/legacy.module';
+import { AuthPartnersController } from './controllers/auth-partners.controller';
+import { AuthPartnersService } from './services/auth.partners.service';
 
 @Module({
   imports: [
@@ -17,9 +20,10 @@ import { LogsModule } from '../logs/logs.module';
     }),
     UsersModule,
     LogsModule,
+    LegacyModule
   ],
-  controllers: [AuthController, AuthAdminController],
-  providers: [AuthService, AuthAdminService],
-  exports: [AuthService, AuthAdminService],
+  controllers: [AuthController, AuthAdminController, AuthPartnersController],
+  providers: [AuthService, AuthAdminService, AuthPartnersService],
+  exports: [AuthService, AuthAdminService, AuthPartnersService],
 })
 export class AuthModule { }

@@ -9,7 +9,7 @@ import { UploadsModule } from '../uploads/uploads.module';
 @Module({
   imports: [
     TypeOrmModule.forFeature([User, Profile]),
-    UploadsModule,
+    UploadsModule
   ],
   controllers: [UsersController],
   providers: [UsersService],

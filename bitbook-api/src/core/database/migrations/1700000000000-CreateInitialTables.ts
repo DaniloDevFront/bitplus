@@ -20,7 +20,26 @@ export class CreateInitialTables1700000000000 implements MigrationInterface {
             ) ENGINE=InnoDB
         `);
 
-        // 2. Criar tabela providers
+        // 2. Criar tabela profiles
+        await queryRunner.query(`
+            CREATE TABLE \`profiles\` (
+                \`id\` int NOT NULL AUTO_INCREMENT,
+                \`name\` varchar(255) NOT NULL,
+                \`phone\` varchar(255) NULL,
+                \`cpf\` varchar(255) NULL UNIQUE,
+                \`birth_date\` date NULL,
+                \`avatar\` varchar(255) NULL,
+                \`cover\` varchar(255) NULL DEFAULT 'https://bitplus.s3.sa-east-1.amazonaws.com/default/cover-profile.png',
+                \`provider_id\` int NULL,
+                \`user_id\` int NOT NULL,
+                \`created_at\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+                \`updated_at\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
+                PRIMARY KEY (\`id\`),
+                CONSTRAINT \`FK_profiles_users\` FOREIGN KEY (\`user_id\`) REFERENCES \`users\`(\`id\`) ON DELETE CASCADE ON UPDATE NO ACTION
+            ) ENGINE=InnoDB
+        `);
+
+        // 3. Criar tabela providers
         await queryRunner.query(`
             CREATE TABLE \`providers\` (
                 \`id\` int NOT NULL AUTO_INCREMENT,
@@ -32,7 +51,7 @@ export class CreateInitialTables1700000000000 implements MigrationInterface {
             ) ENGINE=InnoDB
         `);
 
-        // 3. Criar tabela categories
+        // 4. Criar tabela categories
         await queryRunner.query(`
             CREATE TABLE \`categories\` (
                 \`id\` int NOT NULL AUTO_INCREMENT,
@@ -43,7 +62,7 @@ export class CreateInitialTables1700000000000 implements MigrationInterface {
             ) ENGINE=InnoDB
         `);
 
-        // 4. Criar tabela books
+        // 5. Criar tabela books
         await queryRunner.query(`
             CREATE TABLE \`books\` (
                 \`id\` int NOT NULL AUTO_INCREMENT,
@@ -60,7 +79,7 @@ export class CreateInitialTables1700000000000 implements MigrationInterface {
             ) ENGINE=InnoDB
         `);
 
-        // 5. Criar tabela books_sheets
+        // 6. Criar tabela books_sheets
         await queryRunner.query(`
             CREATE TABLE \`books_sheets\` (
                 \`id\` int NOT NULL AUTO_INCREMENT,
@@ -74,7 +93,7 @@ export class CreateInitialTables1700000000000 implements MigrationInterface {
             ) ENGINE=InnoDB
         `);
 
-        // 6. Criar tabela books_media
+        // 7. Criar tabela books_media
         await queryRunner.query(`
             CREATE TABLE \`books_media\` (
                 \`id\` int NOT NULL AUTO_INCREMENT,
@@ -90,7 +109,7 @@ export class CreateInitialTables1700000000000 implements MigrationInterface {
             ) ENGINE=InnoDB
         `);
 
-        // 7. Criar tabela book_tracks
+        // 8. Criar tabela book_tracks
         await queryRunner.query(`
             CREATE TABLE \`book_tracks\` (
                 \`id\` int NOT NULL AUTO_INCREMENT,
@@ -104,7 +123,7 @@ export class CreateInitialTables1700000000000 implements MigrationInterface {
             ) ENGINE=InnoDB
         `);
 
-        // 8. Criar tabela banners
+        // 9. Criar tabela banners
         await queryRunner.query(`
             CREATE TABLE \`banners\` (
                 \`id\` int NOT NULL AUTO_INCREMENT,
@@ -116,7 +135,7 @@ export class CreateInitialTables1700000000000 implements MigrationInterface {
             ) ENGINE=InnoDB
         `);
 
-        // 9. Criar tabela banner_providers
+        // 10. Criar tabela banner_providers
         await queryRunner.query(`
             CREATE TABLE \`banner_providers\` (
                 \`id\` int NOT NULL AUTO_INCREMENT,
@@ -129,7 +148,7 @@ export class CreateInitialTables1700000000000 implements MigrationInterface {
             ) ENGINE=InnoDB
         `);
 
-        // 10. Criar tabela signatures_plans
+        // 11. Criar tabela signatures_plans
         // await queryRunner.query(`
         //     CREATE TABLE \`signatures_plans\` (
         //         \`id\` int NOT NULL AUTO_INCREMENT,
@@ -143,7 +162,7 @@ export class CreateInitialTables1700000000000 implements MigrationInterface {
         //     ) ENGINE=InnoDB
         // `);
 
-        // 11. Criar tabela signatures
+        // 12. Criar tabela signatures
         // await queryRunner.query(`
         //     CREATE TABLE \`signatures\` (
         //         \`id\` int NOT NULL AUTO_INCREMENT,
@@ -158,7 +177,7 @@ export class CreateInitialTables1700000000000 implements MigrationInterface {
         //     ) ENGINE=InnoDB
         // `);
 
-        // 12. Criar tabela bookcases
+        // 13. Criar tabela bookcases
         await queryRunner.query(`
             CREATE TABLE \`bookcases\` (
                 \`id\` int NOT NULL AUTO_INCREMENT,
@@ -174,7 +193,7 @@ export class CreateInitialTables1700000000000 implements MigrationInterface {
             ) ENGINE=InnoDB
         `);
 
-        // 13. Criar tabela readings
+        // 14. Criar tabela readings
         await queryRunner.query(`
             CREATE TABLE \`readings\` (
                 \`id\` int NOT NULL AUTO_INCREMENT,
@@ -191,7 +210,7 @@ export class CreateInitialTables1700000000000 implements MigrationInterface {
             ) ENGINE=InnoDB
         `);
 
-        // 14. Criar tabela rates
+        // 15. Criar tabela rates
         await queryRunner.query(`
             CREATE TABLE \`rates\` (
                 \`id\` int NOT NULL AUTO_INCREMENT,
@@ -202,7 +221,7 @@ export class CreateInitialTables1700000000000 implements MigrationInterface {
             ) ENGINE=InnoDB
         `);
 
-        // 15. Criar tabela rate_history
+        // 16. Criar tabela rate_history
         await queryRunner.query(`
             CREATE TABLE \`rate_history\` (
                 \`id\` int NOT NULL AUTO_INCREMENT,
@@ -216,7 +235,7 @@ export class CreateInitialTables1700000000000 implements MigrationInterface {
             ) ENGINE=InnoDB
         `);
 
-        // 16. Criar tabela logins_logs
+        // 17. Criar tabela logins_logs
         // await queryRunner.query(`
         //     CREATE TABLE \`logins_logs\` (
         //         \`id\` int NOT NULL AUTO_INCREMENT,
@@ -237,7 +256,7 @@ export class CreateInitialTables1700000000000 implements MigrationInterface {
         //     ) ENGINE=InnoDB
         // `);
 
-        // 17. Criar tabela registration_logs
+        // 18. Criar tabela registration_logs
         // await queryRunner.query(`
         //     CREATE TABLE \`registration_logs\` (
         //         \`id\` int NOT NULL AUTO_INCREMENT,
@@ -263,8 +282,6 @@ export class CreateInitialTables1700000000000 implements MigrationInterface {
         await queryRunner.query(`DROP TABLE \`rates\``);
         await queryRunner.query(`DROP TABLE \`readings\``);
         await queryRunner.query(`DROP TABLE \`bookcases\``);
-        await queryRunner.query(`DROP TABLE \`signatures\``);
-        await queryRunner.query(`DROP TABLE \`signatures_plans\``);
         await queryRunner.query(`DROP TABLE \`banner_providers\``);
         await queryRunner.query(`DROP TABLE \`banners\``);
         await queryRunner.query(`DROP TABLE \`book_tracks\``);
@@ -273,6 +290,7 @@ export class CreateInitialTables1700000000000 implements MigrationInterface {
         await queryRunner.query(`DROP TABLE \`books\``);
         await queryRunner.query(`DROP TABLE \`categories\``);
         await queryRunner.query(`DROP TABLE \`providers\``);
+        await queryRunner.query(`DROP TABLE \`profiles\``);
         await queryRunner.query(`DROP TABLE \`users\``);
     }
 

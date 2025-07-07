@@ -73,6 +73,11 @@ export class UpdateProfileDto {
   @IsOptional()
   name?: string;
 
+  @ApiPropertyOptional({ example: true, default: false })
+  @IsOptional()
+  @IsBoolean()
+  premium?: boolean;
+
   @ApiPropertyOptional({ example: '+5511999999999' })
   @IsString()
   @IsOptional()

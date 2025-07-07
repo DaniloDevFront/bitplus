@@ -1,7 +1,8 @@
 import { CoreModule } from './core/core.module';
 import { Module } from '@nestjs/common';
-
 import { AppController } from './app.controller';
+
+import { LegacyModule } from './modules/_legacy/legacy.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { UsersModule } from './modules/users/users.module';
 import { RateModule } from './modules/rate/rate.module';
@@ -17,6 +18,7 @@ import { PremiumModule } from './modules/premium/premium.module';
 @Module({
   imports: [
     CoreModule,
+    LegacyModule,
     AuthModule,
     UsersModule,
     RateModule,
