@@ -133,11 +133,17 @@ export class UsersService {
     });
   }
 
-  async findById(id: number): Promise<User | null> {
-    return this.entityManager.findOne(User, {
+  async findById(id: number): Promise<User> {
+    const user = await this.entityManager.findOne(User, {
       where: { id },
       relations: ['profile'],
     });
+
+    if (!user) {
+      throw new NotFoundException('Usuário não encontrado');
+    }
+
+    return user;
   }
 
   async findByEmail(email: string): Promise<User | null> {

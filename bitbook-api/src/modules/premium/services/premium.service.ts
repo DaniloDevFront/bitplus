@@ -3,11 +3,13 @@ import { EntityManager } from 'typeorm';
 import { CreatePremiumDto, UpdatePremiumDto } from '../dto/premium.dto';
 import { Premium } from '../entities/premium.entity';
 import { PremiumPlan } from '../entities/premium-plan.entity';
+import { ProvidersService } from 'src/modules/_legacy/services/providers.service';
 
 @Injectable()
 export class PremiumService {
   constructor(
     private entityManager: EntityManager,
+    private providersService: ProvidersService,
   ) { }
 
   async create(payload: CreatePremiumDto): Promise<Premium> {
@@ -143,5 +145,11 @@ export class PremiumService {
     }
 
     return premium;
+  }
+
+  async findByUserId(id: number): Promise<any> {
+    const response = await this.providersService.getPremiumStatusByID(id);
+
+    return response;
   }
 }   

@@ -62,8 +62,6 @@ export class AuthService {
       const token = this.jwtService.sign(jwtPayload);
       const refreshToken = this.jwtService.sign(jwtPayload, { expiresIn: '7d' });
 
-      console.log('user', user);
-
       // Registra login após registro
       await this.logLoginAttempt(user.id, LOGIN_STATUS.SUCCESS, LOGIN_TYPE.EMAIL_PASSWORD, loginInfo, 'Login após registro');
 
