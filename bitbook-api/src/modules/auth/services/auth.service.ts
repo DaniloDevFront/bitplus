@@ -62,6 +62,8 @@ export class AuthService {
       const token = this.jwtService.sign(jwtPayload);
       const refreshToken = this.jwtService.sign(jwtPayload, { expiresIn: '7d' });
 
+      console.log('user', user);
+
       // Registra login após registro
       await this.logLoginAttempt(user.id, LOGIN_STATUS.SUCCESS, LOGIN_TYPE.EMAIL_PASSWORD, loginInfo, 'Login após registro');
 
@@ -238,7 +240,7 @@ export class AuthService {
   ): Promise<void> {
     try {
       await this.loginLogsService.createLog({
-        user_id: userId || 0, // 0 para tentativas sem usuário identificado
+        user_id: userId || null, // null para tentativas sem usuário identificado
         login_at: new Date(),
         ip_address: loginInfo?.ip_address,
         user_agent: loginInfo?.user_agent,

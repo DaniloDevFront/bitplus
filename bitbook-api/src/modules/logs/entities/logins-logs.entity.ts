@@ -20,7 +20,7 @@ export class LoginsLogs {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ name: 'user_id' })
+  @Column({ name: 'user_id', nullable: true })
   user_id: number;
 
   @Column({ type: 'timestamp', name: 'login_at' })
@@ -52,7 +52,7 @@ export class LoginsLogs {
   @CreateDateColumn({ name: 'created_at' })
   created_at: Date;
 
-  @ManyToOne(() => User, { onDelete: 'CASCADE' })
+  @ManyToOne(() => User, { onDelete: 'CASCADE', nullable: true })
   @JoinColumn({ name: 'user_id' })
   user: User;
 } 

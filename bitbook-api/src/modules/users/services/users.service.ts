@@ -39,8 +39,6 @@ export class UsersService {
       provider_id: payload.provider_id,
     });
 
-    console.log('payload.provider_id:', payload.provider_id);
-
     const user = this.entityManager.create(User, {
       email: payload.email,
       password: hashedPassword,
@@ -49,6 +47,8 @@ export class UsersService {
       terms: payload.terms,
       profile,
     });
+
+    console.log('user aqui:', user);
 
     return this.entityManager.save(User, user);
   }
@@ -148,16 +148,10 @@ export class UsersService {
   }
 
   async findByCpf(cpf: string): Promise<User | null> {
-    const user = await this.entityManager.findOne(User, {
+    return await this.entityManager.findOne(User, {
       where: { profile: { cpf } },
       relations: ['profile'],
     });
-
-    if (!user) {
-      throw new NotFoundException('Usuário não encontrado');
-    }
-
-    return user;
   }
 
   async findByProvider(provider: number): Promise<User[]> {

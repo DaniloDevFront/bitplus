@@ -14,7 +14,6 @@ export interface ProviderResponse {
   empresas: Provider[];
 }
 
-
 /**
  * Check Client Provider
  */
