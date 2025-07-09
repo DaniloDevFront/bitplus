@@ -1,5 +1,7 @@
 export interface Access {
   user_id: number;
+  provider_id: number;
+  premium: boolean;
   access_token: {
     token: string;
     refresh_token: string;

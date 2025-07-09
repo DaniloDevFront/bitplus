@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
-import { AuthService } from './services/auth.service';
-import { AuthController } from './controllers/auth.controller';
+import { AuthAppService } from './services/auth-app.service';
+import { AuthAppController } from './controllers/auth-app.controller';
 import { UsersModule } from '../users/users.module';
 import { AuthAdminController } from './controllers/auth-admin.controller';
 import { AuthAdminService } from './services/auth-admin.service';
@@ -22,8 +22,8 @@ import { AuthPartnersService } from './services/auth.partners.service';
     LogsModule,
     LegacyModule
   ],
-  controllers: [AuthController, AuthAdminController, AuthPartnersController],
-  providers: [AuthService, AuthAdminService, AuthPartnersService],
-  exports: [AuthService, AuthAdminService, AuthPartnersService],
+  controllers: [AuthAppController, AuthAdminController, AuthPartnersController],
+  providers: [AuthAppService, AuthAdminService, AuthPartnersService],
+  exports: [AuthAppService, AuthAdminService, AuthPartnersService],
 })
 export class AuthModule { }

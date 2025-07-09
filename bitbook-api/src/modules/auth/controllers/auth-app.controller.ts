@@ -1,5 +1,5 @@
 import { Controller, Post, Body, UseGuards, Request, UseInterceptors } from '@nestjs/common';
-import { AuthService } from '../services/auth.service';
+import { AuthAppService } from '../services/auth-app.service';
 import { ApiBadRequestResponse, ApiBody, ApiCreatedResponse, ApiOperation, ApiResponse, ApiTags, ApiUnauthorizedResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/core/jwt/jwt-auth.guard';
 import { SetBiometricDto, BiometricLoginDto } from '../dto/biometric.dto';
@@ -8,9 +8,9 @@ import { Access } from '../interfaces/access.interface';
 import { LoginInfoInterceptor, LoginInfo } from '../interceptors/login-info.interceptor';
 
 @Controller('auth')
-@ApiTags('Autenticação')
-export class AuthController {
-  constructor(private readonly authService: AuthService) { }
+@ApiTags('Autenticação App')
+export class AuthAppController {
+  constructor(private readonly authService: AuthAppService) { }
 
   @Post('login')
   @UseInterceptors(LoginInfoInterceptor)

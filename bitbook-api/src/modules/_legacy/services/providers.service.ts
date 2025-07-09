@@ -3,7 +3,7 @@ import { HttpService } from "@nestjs/axios";
 import { AxiosResponse } from 'axios';
 import { firstValueFrom } from 'rxjs';
 
-import { AuthPartnerCpfPayload, AuthPartnerCpfResponse, CheckClientPayload, CheckClientResponse, ProviderResponse, SetProviderPayload } from '../models/providers.models';
+import { CheckClientPayload, CheckClientResponse, ProviderResponse } from '../models/providers.models';
 
 const BASE_URL = "https://api-bitbook.bitplus.app.br"
 
@@ -51,44 +51,44 @@ export class ProvidersService {
     }
   }
 
-  async getTokenUser(payload: AuthPartnerCpfPayload): Promise<AuthPartnerCpfResponse> {
-    const url = `${BASE_URL}/oauth/token`
+  // async getTokenUser(payload: AuthPartnerCpfPayload): Promise<AuthPartnerCpfResponse> {
+  //   const url = `${BASE_URL}/oauth/token`
 
-    try {
-      const response: AxiosResponse<AuthPartnerCpfResponse> = await firstValueFrom(this.httpService.post(url, payload))
+  //   try {
+  //     const response: AxiosResponse<AuthPartnerCpfResponse> = await firstValueFrom(this.httpService.post(url, payload))
 
-      return response.data
+  //     return response.data
 
-    } catch (error: any) {
-      const errorMessage = error.response.data.error === 'invalid_credentials'
+  //   } catch (error: any) {
+  //     const errorMessage = error.response.data.error === 'invalid_credentials'
 
-      if (errorMessage) {
-        throw new BadRequestException('CPF ou senha inválidos')
-      }
+  //     if (errorMessage) {
+  //       throw new BadRequestException('CPF ou senha inválidos')
+  //     }
 
-      throw new BadRequestException(
-        error.response?.data.message || 'Erro ao obter token'
-      );
-    }
-  }
+  //     throw new BadRequestException(
+  //       error.response?.data.message || 'Erro ao obter token'
+  //     );
+  //   }
+  // }
 
-  async setProvider(payload: SetProviderPayload, token: string): Promise<any> {
-    const url = `${BASE_URL}/api/users/set-provedor`
+  // async setProvider(payload: SetProviderPayload, token: string): Promise<any> {
+  //   const url = `${BASE_URL}/api/users/set-provedor`
 
-    try {
-      const response: AxiosResponse<any> = await firstValueFrom(this.httpService.post(url, payload, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      }))
+  //   try {
+  //     const response: AxiosResponse<any> = await firstValueFrom(this.httpService.post(url, payload, {
+  //       headers: {
+  //         Authorization: `Bearer ${token}`
+  //       }
+  //     }))
 
-      return response.data
-    } catch (error: any) {
-      throw new BadRequestException(
-        error.response?.data?.resposta || 'Erro ao setar provedor'
-      );
-    }
-  }
+  //     return response.data
+  //   } catch (error: any) {
+  //     throw new BadRequestException(
+  //       error.response?.data?.resposta || 'Erro ao setar provedor'
+  //     );
+  //   }
+  // }
 
   async getPremiumStatusByToken(token: string): Promise<any> {
     const url = `${BASE_URL}/api/users/get-premium-status`

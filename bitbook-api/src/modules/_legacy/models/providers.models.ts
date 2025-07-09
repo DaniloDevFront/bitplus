@@ -30,25 +30,11 @@ export interface CheckClientResponse {
   user_login_ways: string[];
 }
 
-/**
- * Auth Partner login type CPF
- */
-export interface AuthPartnerCpfPayload {
-  client_id: number;
-  client_secret: string;
-  grant_type: string;
-  username: string;
-  password: string;
-}
+
 
 export interface AuthPartnerCpfResponse {
   token_type: string;
   expires_in: number;
   access_token: string;
   refresh_token: string;
-}
-
-export interface SetProviderPayload {
-  cpf: string;
-  provedor_codigo: string;
 }

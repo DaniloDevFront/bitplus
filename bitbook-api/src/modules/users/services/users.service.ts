@@ -54,15 +54,21 @@ export class UsersService {
   }
 
   async update(id: number, payload: UpdateUserDto): Promise<User> {
-
     const user = await this.findById(id);
     if (!user) {
       throw new NotFoundException('Usuário não encontrado');
     }
 
-    // Atualiza dados do user
     if (payload.email) {
       user.email = payload.email;
+    }
+
+    if (payload.premium) {
+      user.premium = payload.premium;
+    }
+
+    if (payload.provider_id) {
+      user.provider_id = payload.provider_id;
     }
 
     // Atualiza dados do profile, se enviados
@@ -75,8 +81,9 @@ export class UsersService {
       if (payload.profile.phone) {
         profile.phone = payload.profile.phone;
       }
+
       if (payload.profile.cpf) {
-        if (profile.provider_id) {
+        if (user.provider_id) {
           throw new BadRequestException('Não é possível atualizar o CPF de um usuário vinculado a um provedor');
         }
         profile.cpf = payload.profile.cpf;
@@ -89,9 +96,6 @@ export class UsersService {
       }
       if (payload.profile.cover) {
         profile.cover = payload.profile.cover;
-      }
-      if (payload.profile.premium) {
-        user.premium = payload.profile.premium;
       }
 
       user.profile = profile;
@@ -154,15 +158,16 @@ export class UsersService {
   }
 
   async findByCpf(cpf: string): Promise<User | null> {
-    return await this.entityManager.findOne(User, {
+    const response = await this.entityManager.findOne(User, {
       where: { profile: { cpf } },
       relations: ['profile'],
     });
+    return response
   }
 
   async findByProvider(provider: number): Promise<User[]> {
     return this.entityManager.find(User, {
-      where: { profile: { provider_id: Number(provider) } },
+      where: { provider_id: Number(provider) },
       relations: ['profile'],
     });
   }

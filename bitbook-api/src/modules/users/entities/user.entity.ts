@@ -25,6 +25,9 @@ export class User {
   @Column({ default: false })
   premium: boolean;
 
+  @Column({ nullable: true })
+  provider_id: number;
+
   @Column({ default: UserRole.CLIENT })
   role: UserRole;
 

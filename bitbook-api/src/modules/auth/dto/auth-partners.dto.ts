@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsOptional, IsString, Matches } from "class-validator";
+import { IsNotEmpty, IsNumber, IsOptional, IsString, Matches } from "class-validator";
 import { ApiProperty } from "@nestjs/swagger";
 
 export class CheckUserPartnerDto {
@@ -22,13 +22,13 @@ export class AuthPartnerCpfDto {
   @Matches(/^\d{3}\.\d{3}\.\d{3}-\d{2}$/, {
     message: 'O CPF deve estar no formato XXX.XXX.XXX-XX (exemplo: 000.000.000-00)'
   })
-  username: string;
+  login: string;
 
   @IsString()
   @IsNotEmpty()
   password: string;
 
-  @IsString()
+  @IsNumber()
   @IsNotEmpty()
-  provider_code: string;
+  provider_id: number;
 } 

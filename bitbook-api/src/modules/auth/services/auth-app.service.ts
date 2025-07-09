@@ -6,14 +6,14 @@ import { InjectEntityManager } from '@nestjs/typeorm';
 import { UsersService } from '../../users/services/users.service';
 import { LoginsLogsService } from '../../logs/services/logins-logs.service';
 import { RegistrationsLogsService } from '../../logs/services/registrations-logs.service';
-import { CreateUserDto } from 'src/modules/users/dto/user.dto';
+import { CreateUserDto, UpdateUserDto } from 'src/modules/users/dto/user.dto';
 import { User } from '../../users/entities/user.entity';
 import { Access } from '../interfaces/access.interface';
 import { LOGIN_TYPE, LOGIN_STATUS } from '../../logs/enums/login.enum';
 import { LoginInfo } from '../interceptors/login-info.interceptor';
 
 @Injectable()
-export class AuthService {
+export class AuthAppService {
   constructor(
     @InjectEntityManager()
     private readonly entityManager: EntityManager,
@@ -41,6 +41,8 @@ export class AuthService {
 
       return {
         user_id: user.id,
+        provider_id: user.provider_id || null,
+        premium: user.premium || false,
         access_token: {
           token,
           refresh_token: refreshToken,
@@ -67,6 +69,8 @@ export class AuthService {
 
       return {
         user_id: user.id,
+        provider_id: user.provider_id || null,
+        premium: user.premium || false,
         access_token: {
           token,
           refresh_token: refreshToken,
