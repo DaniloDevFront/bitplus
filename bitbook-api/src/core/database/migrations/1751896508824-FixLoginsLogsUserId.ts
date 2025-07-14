@@ -4,8 +4,16 @@ export class FixLoginsLogsUserId1751896508824 implements MigrationInterface {
     name = 'FixLoginsLogsUserId1751896508824'
 
     public async up(queryRunner: QueryRunner): Promise<void> {
-        await queryRunner.query(`ALTER TABLE \`profiles\` DROP FOREIGN KEY \`FK_profiles_users\``);
-        await queryRunner.query(`ALTER TABLE \`books_sheets\` DROP FOREIGN KEY \`FK_books_sheets_books\``);
+        try {
+            await queryRunner.query(`ALTER TABLE \`profiles\` DROP FOREIGN KEY \`FK_profiles_users\``);
+        } catch (error) {
+            console.log('FK_profiles_users não existe, pulando...');
+        }
+        try {
+            await queryRunner.query(`ALTER TABLE \`books_sheets\` DROP FOREIGN KEY \`FK_books_sheets_books\``);
+        } catch (error) {
+            console.log('FK_books_sheets_books não existe, pulando...');
+        }
         await queryRunner.query(`ALTER TABLE \`books_media\` DROP FOREIGN KEY \`FK_books_media_books\``);
         await queryRunner.query(`ALTER TABLE \`books\` DROP FOREIGN KEY \`FK_books_categories\``);
         await queryRunner.query(`ALTER TABLE \`readings\` DROP FOREIGN KEY \`FK_readings_books\``);
