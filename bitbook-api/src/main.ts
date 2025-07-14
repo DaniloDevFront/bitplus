@@ -44,7 +44,7 @@ async function bootstrap() {
 
   console.log('\x1b[32m%s\x1b[0m', '🚀 Servidor iniciado com sucesso!');
   console.log('\x1b[36m%s\x1b[0m', `📡 Servidor rodando em: http://localhost:${port}`);
-  console.log('\x1b[35m%s\x1b[0m', `📖 Documentação disponível em: http://localhost:${php}`);
+  console.log('\x1b[35m%s\x1b[0m', `📖 Acesso ao PHPMyAdmin disponível em: http://localhost:${php}`);
   console.log('\x1b[33m%s\x1b[0m', `📚 Documentação Swagger disponível em: http://localhost:${port}/api`);
   console.log('\x1b[35m%s\x1b[0m', `📖 Documentação disponível em: http://localhost:${port}/summary`);
 }

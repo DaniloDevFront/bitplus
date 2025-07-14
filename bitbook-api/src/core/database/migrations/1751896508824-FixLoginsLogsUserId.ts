@@ -4,19 +4,84 @@ export class FixLoginsLogsUserId1751896508824 implements MigrationInterface {
     name = 'FixLoginsLogsUserId1751896508824'
 
     public async up(queryRunner: QueryRunner): Promise<void> {
-        await queryRunner.query(`ALTER TABLE \`profiles\` DROP FOREIGN KEY \`FK_profiles_users\``);
-        await queryRunner.query(`ALTER TABLE \`books_sheets\` DROP FOREIGN KEY \`FK_books_sheets_books\``);
-        await queryRunner.query(`ALTER TABLE \`books_media\` DROP FOREIGN KEY \`FK_books_media_books\``);
-        await queryRunner.query(`ALTER TABLE \`books\` DROP FOREIGN KEY \`FK_books_categories\``);
-        await queryRunner.query(`ALTER TABLE \`readings\` DROP FOREIGN KEY \`FK_readings_books\``);
-        await queryRunner.query(`ALTER TABLE \`readings\` DROP FOREIGN KEY \`FK_readings_users\``);
-        await queryRunner.query(`ALTER TABLE \`rate_history\` DROP FOREIGN KEY \`FK_rate_history_rates\``);
-        await queryRunner.query(`ALTER TABLE \`rates\` DROP FOREIGN KEY \`FK_rates_users\``);
-        await queryRunner.query(`ALTER TABLE \`premium_plans\` DROP FOREIGN KEY \`FK_premium_plans_premium\``);
-        await queryRunner.query(`ALTER TABLE \`bookcases\` DROP FOREIGN KEY \`FK_bookcases_books\``);
-        await queryRunner.query(`ALTER TABLE \`bookcases\` DROP FOREIGN KEY \`FK_bookcases_users\``);
-        await queryRunner.query(`ALTER TABLE \`banner_providers\` DROP FOREIGN KEY \`FK_banner_providers_banners\``);
-        await queryRunner.query(`ALTER TABLE \`banner_providers\` DROP FOREIGN KEY \`FK_banner_providers_providers\``);
+        // Verificar e remover foreign keys se existirem
+        try {
+            await queryRunner.query(`ALTER TABLE \`profiles\` DROP FOREIGN KEY \`FK_profiles_users\``);
+        } catch (error) {
+            console.log('FK_profiles_users não existe, pulando...');
+        }
+
+        try {
+            await queryRunner.query(`ALTER TABLE \`books_sheets\` DROP FOREIGN KEY \`FK_books_sheets_books\``);
+        } catch (error) {
+            console.log('FK_books_sheets_books não existe, pulando...');
+        }
+
+        try {
+            await queryRunner.query(`ALTER TABLE \`books_media\` DROP FOREIGN KEY \`FK_books_media_books\``);
+        } catch (error) {
+            console.log('FK_books_media_books não existe, pulando...');
+        }
+
+        try {
+            await queryRunner.query(`ALTER TABLE \`books\` DROP FOREIGN KEY \`FK_books_categories\``);
+        } catch (error) {
+            console.log('FK_books_categories não existe, pulando...');
+        }
+
+        try {
+            await queryRunner.query(`ALTER TABLE \`readings\` DROP FOREIGN KEY \`FK_readings_books\``);
+        } catch (error) {
+            console.log('FK_readings_books não existe, pulando...');
+        }
+
+        try {
+            await queryRunner.query(`ALTER TABLE \`readings\` DROP FOREIGN KEY \`FK_readings_users\``);
+        } catch (error) {
+            console.log('FK_readings_users não existe, pulando...');
+        }
+
+        try {
+            await queryRunner.query(`ALTER TABLE \`rate_history\` DROP FOREIGN KEY \`FK_rate_history_rates\``);
+        } catch (error) {
+            console.log('FK_rate_history_rates não existe, pulando...');
+        }
+
+        try {
+            await queryRunner.query(`ALTER TABLE \`rates\` DROP FOREIGN KEY \`FK_rates_users\``);
+        } catch (error) {
+            console.log('FK_rates_users não existe, pulando...');
+        }
+
+        try {
+            await queryRunner.query(`ALTER TABLE \`premium_plans\` DROP FOREIGN KEY \`FK_premium_plans_premium\``);
+        } catch (error) {
+            console.log('FK_premium_plans_premium não existe, pulando...');
+        }
+
+        try {
+            await queryRunner.query(`ALTER TABLE \`bookcases\` DROP FOREIGN KEY \`FK_bookcases_books\``);
+        } catch (error) {
+            console.log('FK_bookcases_books não existe, pulando...');
+        }
+
+        try {
+            await queryRunner.query(`ALTER TABLE \`bookcases\` DROP FOREIGN KEY \`FK_bookcases_users\``);
+        } catch (error) {
+            console.log('FK_bookcases_users não existe, pulando...');
+        }
+
+        try {
+            await queryRunner.query(`ALTER TABLE \`banner_providers\` DROP FOREIGN KEY \`FK_banner_providers_banners\``);
+        } catch (error) {
+            console.log('FK_banner_providers_banners não existe, pulando...');
+        }
+
+        try {
+            await queryRunner.query(`ALTER TABLE \`banner_providers\` DROP FOREIGN KEY \`FK_banner_providers_providers\``);
+        } catch (error) {
+            console.log('FK_banner_providers_providers não existe, pulando...');
+        }
         await queryRunner.query(`DROP INDEX \`cpf\` ON \`profiles\``);
         await queryRunner.query(`DROP INDEX \`email\` ON \`users\``);
         await queryRunner.query(`DROP INDEX \`IDX_premium_plans_premium_id\` ON \`premium_plans\``);

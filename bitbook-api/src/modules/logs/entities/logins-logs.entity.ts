@@ -20,8 +20,8 @@ export class LoginsLogs {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ name: 'user_id', nullable: true })
-  user_id: number;
+  @Column({ name: 'user_id', nullable: true, type: 'int' })
+  user_id: number | null;
 
   @Column({ type: 'timestamp', name: 'login_at' })
   login_at: Date;

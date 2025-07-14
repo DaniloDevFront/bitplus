@@ -127,3 +127,8 @@ npm run lint                # Lint com ESLint
 ---
 
 Feito com 💻 por [sua equipe]
+
+
+## INSTALAR MYSQL DENTRO DO CONTAINER
+- docker exec -it bitbook-api bash
+- apt install -y default-mysql-client
