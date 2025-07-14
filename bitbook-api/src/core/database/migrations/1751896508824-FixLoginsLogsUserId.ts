@@ -82,22 +82,53 @@ export class FixLoginsLogsUserId1751896508824 implements MigrationInterface {
         } catch (error) {
             console.log('FK_banner_providers_providers não existe, pulando...');
         }
-        await queryRunner.query(`DROP INDEX \`cpf\` ON \`profiles\``);
-        await queryRunner.query(`DROP INDEX \`email\` ON \`users\``);
-        await queryRunner.query(`DROP INDEX \`IDX_premium_plans_premium_id\` ON \`premium_plans\``);
+        try {
+            await queryRunner.query(`DROP INDEX \`cpf\` ON \`profiles\``);
+        } catch (error) {
+            console.log('Índice cpf não existe, pulando...');
+        }
+
+        try {
+            await queryRunner.query(`DROP INDEX \`email\` ON \`users\``);
+        } catch (error) {
+            console.log('Índice email não existe, pulando...');
+        }
+
+        try {
+            await queryRunner.query(`DROP INDEX \`IDX_premium_plans_premium_id\` ON \`premium_plans\``);
+        } catch (error) {
+            console.log('Índice IDX_premium_plans_premium_id não existe, pulando...');
+        }
         await queryRunner.query(`CREATE TABLE \`books_tracks\` (\`id\` int NOT NULL AUTO_INCREMENT, \`title\` varchar(255) NOT NULL, \`audio_url\` varchar(255) NOT NULL, \`duration\` varchar(255) NOT NULL DEFAULT '00:00:00', \`order\` int NOT NULL DEFAULT '0', \`description\` text NULL, \`cover_small\` text NULL, \`cover_medium\` text NULL, \`cover_large\` text NULL, \`created_at\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), \`updated_at\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6), \`media_id\` int NULL, PRIMARY KEY (\`id\`)) ENGINE=InnoDB`);
-        await queryRunner.query(`ALTER TABLE \`registration_logs\` DROP COLUMN \`success\``);
-        await queryRunner.query(`ALTER TABLE \`registration_logs\` DROP COLUMN \`user_id\``);
+        try {
+            await queryRunner.query(`ALTER TABLE \`registration_logs\` DROP COLUMN \`success\``);
+        } catch (error) {
+            console.log('Coluna success não existe, pulando...');
+        }
+
+        try {
+            await queryRunner.query(`ALTER TABLE \`registration_logs\` DROP COLUMN \`user_id\``);
+        } catch (error) {
+            console.log('Coluna user_id não existe, pulando...');
+        }
         await queryRunner.query(`ALTER TABLE \`profiles\` ADD UNIQUE INDEX \`IDX_30d20cfa6967ffa3e3a9c55469\` (\`cpf\`)`);
         await queryRunner.query(`ALTER TABLE \`profiles\` CHANGE \`user_id\` \`user_id\` int NULL`);
         await queryRunner.query(`ALTER TABLE \`profiles\` ADD UNIQUE INDEX \`IDX_9e432b7df0d182f8d292902d1a\` (\`user_id\`)`);
         await queryRunner.query(`ALTER TABLE \`users\` ADD UNIQUE INDEX \`IDX_97672ac88f789774dd47f7c8be\` (\`email\`)`);
-        await queryRunner.query(`ALTER TABLE \`users\` DROP COLUMN \`role\``);
+        try {
+            await queryRunner.query(`ALTER TABLE \`users\` DROP COLUMN \`role\``);
+        } catch (error) {
+            console.log('Coluna role não existe, pulando...');
+        }
         await queryRunner.query(`ALTER TABLE \`users\` ADD \`role\` varchar(255) NOT NULL DEFAULT 'client'`);
         await queryRunner.query(`ALTER TABLE \`books_sheets\` ADD UNIQUE INDEX \`IDX_5139deff6403868f55adc51723\` (\`books_id\`)`);
         await queryRunner.query(`ALTER TABLE \`books_media\` ADD UNIQUE INDEX \`IDX_cda162d88534fe29f5b853a1f8\` (\`books_id\`)`);
         await queryRunner.query(`ALTER TABLE \`rates\` CHANGE \`user_id\` \`user_id\` int NOT NULL`);
-        await queryRunner.query(`ALTER TABLE \`premium_plans\` DROP COLUMN \`description\``);
+        try {
+            await queryRunner.query(`ALTER TABLE \`premium_plans\` DROP COLUMN \`description\``);
+        } catch (error) {
+            console.log('Coluna description não existe, pulando...');
+        }
         await queryRunner.query(`ALTER TABLE \`premium_plans\` ADD \`description\` varchar(255) NOT NULL`);
         await queryRunner.query(`ALTER TABLE \`premium_plans\` CHANGE \`created_at\` \`created_at\` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP`);
         await queryRunner.query(`ALTER TABLE \`premium_plans\` CHANGE \`updated_at\` \`updated_at\` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP`);
@@ -105,8 +136,16 @@ export class FixLoginsLogsUserId1751896508824 implements MigrationInterface {
         await queryRunner.query(`ALTER TABLE \`premium\` DROP COLUMN \`description\``);
         await queryRunner.query(`ALTER TABLE \`premium\` ADD \`description\` varchar(255) NOT NULL`);
         await queryRunner.query(`ALTER TABLE \`premium\` CHANGE \`created_at\` \`created_at\` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP`);
-        await queryRunner.query(`ALTER TABLE \`logins_logs\` DROP FOREIGN KEY \`FK_fa1f3df64373c21df440b1141b4\``);
-        await queryRunner.query(`DROP INDEX \`IDX_3f28f57c3f0f8ef12dbd8b0fd9\` ON \`logins_logs\``);
+        try {
+            await queryRunner.query(`ALTER TABLE \`logins_logs\` DROP FOREIGN KEY \`FK_fa1f3df64373c21df440b1141b4\``);
+        } catch (error) {
+            console.log('FK_fa1f3df64373c21df440b1141b4 não existe, pulando...');
+        }
+        try {
+            await queryRunner.query(`DROP INDEX \`IDX_3f28f57c3f0f8ef12dbd8b0fd9\` ON \`logins_logs\``);
+        } catch (error) {
+            console.log('Índice IDX_3f28f57c3f0f8ef12dbd8b0fd9 não existe, pulando...');
+        }
         await queryRunner.query(`ALTER TABLE \`logins_logs\` CHANGE \`user_id\` \`user_id\` int NULL`);
         await queryRunner.query(`CREATE UNIQUE INDEX \`REL_9e432b7df0d182f8d292902d1a\` ON \`profiles\` (\`user_id\`)`);
         await queryRunner.query(`CREATE UNIQUE INDEX \`REL_5139deff6403868f55adc51723\` ON \`books_sheets\` (\`books_id\`)`);
