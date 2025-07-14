@@ -51,63 +51,6 @@ export class ProvidersService {
     }
   }
 
-  // async getTokenUser(payload: AuthPartnerCpfPayload): Promise<AuthPartnerCpfResponse> {
-  //   const url = `${BASE_URL}/oauth/token`
-
-  //   try {
-  //     const response: AxiosResponse<AuthPartnerCpfResponse> = await firstValueFrom(this.httpService.post(url, payload))
-
-  //     return response.data
-
-  //   } catch (error: any) {
-  //     const errorMessage = error.response.data.error === 'invalid_credentials'
-
-  //     if (errorMessage) {
-  //       throw new BadRequestException('CPF ou senha inválidos')
-  //     }
-
-  //     throw new BadRequestException(
-  //       error.response?.data.message || 'Erro ao obter token'
-  //     );
-  //   }
-  // }
-
-  // async setProvider(payload: SetProviderPayload, token: string): Promise<any> {
-  //   const url = `${BASE_URL}/api/users/set-provedor`
-
-  //   try {
-  //     const response: AxiosResponse<any> = await firstValueFrom(this.httpService.post(url, payload, {
-  //       headers: {
-  //         Authorization: `Bearer ${token}`
-  //       }
-  //     }))
-
-  //     return response.data
-  //   } catch (error: any) {
-  //     throw new BadRequestException(
-  //       error.response?.data?.resposta || 'Erro ao setar provedor'
-  //     );
-  //   }
-  // }
-
-  async getPremiumStatusByToken(token: string): Promise<any> {
-    const url = `${BASE_URL}/api/users/get-premium-status`
-
-    try {
-      const response: AxiosResponse<any> = await firstValueFrom(this.httpService.get(url, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      }))
-
-      return response.data
-    } catch (error: any) {
-      throw new BadRequestException(
-        error.response?.data?.resposta || 'Erro ao obter status premium'
-      );
-    }
-  }
-
   async getPremiumStatusByID(user_id: number): Promise<any> {
     const url = `${BASE_URL}/api/users/${user_id}/get-premium-status`
 
