@@ -109,17 +109,23 @@ export class CreateInitialTables1700000000000 implements MigrationInterface {
             ) ENGINE=InnoDB
         `);
 
-        // 8. Criar tabela book_tracks
+        // 8. Criar tabela books_tracks
         await queryRunner.query(`
-            CREATE TABLE \`book_tracks\` (
+            CREATE TABLE \`books_tracks\` (
                 \`id\` int NOT NULL AUTO_INCREMENT,
                 \`title\` varchar(255) NOT NULL,
                 \`audio_url\` varchar(255) NOT NULL,
-                \`duration\` int NOT NULL,
-                \`order\` int NOT NULL,
-                \`books_media_id\` int NULL,
+                \`duration\` varchar(255) NOT NULL DEFAULT '00:00:00',
+                \`order\` int NOT NULL DEFAULT '0',
+                \`description\` text NULL,
+                \`cover_small\` text NULL,
+                \`cover_medium\` text NULL,
+                \`cover_large\` text NULL,
+                \`created_at\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+                \`updated_at\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
+                \`media_id\` int NULL,
                 PRIMARY KEY (\`id\`),
-                CONSTRAINT \`FK_book_tracks_books_media\` FOREIGN KEY (\`books_media_id\`) REFERENCES \`books_media\`(\`id\`) ON DELETE CASCADE ON UPDATE NO ACTION
+                CONSTRAINT \`FK_books_tracks_books_media\` FOREIGN KEY (\`media_id\`) REFERENCES \`books_media\`(\`id\`) ON DELETE CASCADE ON UPDATE NO ACTION
             ) ENGINE=InnoDB
         `);
 
@@ -147,35 +153,6 @@ export class CreateInitialTables1700000000000 implements MigrationInterface {
                 CONSTRAINT \`FK_banner_providers_providers\` FOREIGN KEY (\`provider_id\`) REFERENCES \`providers\`(\`id\`) ON DELETE CASCADE ON UPDATE NO ACTION
             ) ENGINE=InnoDB
         `);
-
-        // 11. Criar tabela signatures_plans
-        // await queryRunner.query(`
-        //     CREATE TABLE \`signatures_plans\` (
-        //         \`id\` int NOT NULL AUTO_INCREMENT,
-        //         \`recorrence\` varchar(255) NOT NULL,
-        //         \`description\` varchar(255) NOT NULL,
-        //         \`price_label\` varchar(255) NOT NULL,
-        //         \`price\` varchar(255) NOT NULL,
-        //         \`created_at\` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-        //         \`updated_at\` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-        //         PRIMARY KEY (\`id\`)
-        //     ) ENGINE=InnoDB
-        // `);
-
-        // 12. Criar tabela signatures
-        // await queryRunner.query(`
-        //     CREATE TABLE \`signatures\` (
-        //         \`id\` int NOT NULL AUTO_INCREMENT,
-        //         \`status\` tinyint NOT NULL DEFAULT 1,
-        //         \`title\` varchar(255) NOT NULL,
-        //         \`description\` text NOT NULL,
-        //         \`benefits\` text NOT NULL,
-        //         \`created_at\` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-        //         \`plan_id\` int NULL,
-        //         PRIMARY KEY (\`id\`),
-        //         CONSTRAINT \`FK_signatures_signatures_plans\` FOREIGN KEY (\`plan_id\`) REFERENCES \`signatures_plans\`(\`id\`) ON DELETE SET NULL ON UPDATE NO ACTION
-        //     ) ENGINE=InnoDB
-        // `);
 
         // 13. Criar tabela bookcases
         await queryRunner.query(`
@@ -284,7 +261,7 @@ export class CreateInitialTables1700000000000 implements MigrationInterface {
         await queryRunner.query(`DROP TABLE \`bookcases\``);
         await queryRunner.query(`DROP TABLE \`banner_providers\``);
         await queryRunner.query(`DROP TABLE \`banners\``);
-        await queryRunner.query(`DROP TABLE \`book_tracks\``);
+        await queryRunner.query(`DROP TABLE \`books_tracks\``);
         await queryRunner.query(`DROP TABLE \`books_media\``);
         await queryRunner.query(`DROP TABLE \`books_sheets\``);
         await queryRunner.query(`DROP TABLE \`books\``);
