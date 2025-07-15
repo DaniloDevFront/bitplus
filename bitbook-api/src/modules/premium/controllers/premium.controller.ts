@@ -70,6 +70,7 @@ export class PremiumController {
   @ApiResponse({ status: 401, description: 'Não autorizado' })
   @ApiResponse({ status: 404, description: 'Status de premium não encontrado' })
   async findByUserId(@Param('id') id: number) {
+
     return this.premiumService.findByUserId(id);
   }
 } 

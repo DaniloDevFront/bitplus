@@ -158,7 +158,7 @@ export class PremiumService {
         img_list: premium.empresa.img_lista,
         img_home: premium.empresa.img_home,
       },
-      value: premium.transacao.valor,
+      value: null,
       status: premium.premium,
       integrated: premium.vinculo_atual.data_vinculacao,
       expires: null

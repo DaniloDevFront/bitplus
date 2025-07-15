@@ -52,7 +52,7 @@ export class ProvidersService {
   }
 
   async getPremiumStatusByID(user_id: number): Promise<any> {
-    const url = `${BASE_URL}/api/users/${user_id}/get-premium-status`
+    const url = `${BASE_URL}/api/check-premium/${user_id}`
 
     try {
       const response: AxiosResponse<any> = await firstValueFrom(this.httpService.get(url))
