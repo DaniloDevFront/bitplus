@@ -90,7 +90,7 @@ export class ProvidersService {
 
     // usuario nao liberado no provedor e não possui conta no banco de dados
     if (!user_id && !user_found) {
-      return "Você não está liberado no provedor. Será possível prosseguir, porém sem acesso premium. Prossiga com o registro.";
+      return "Você não está liberado no provedor e não encontramos sua conta. Poderá continuar, mas sem acesso premium. Prossiga com o registro.";
     }
 
     // usuario nao liberado no provedor e possui conta no banco de dados

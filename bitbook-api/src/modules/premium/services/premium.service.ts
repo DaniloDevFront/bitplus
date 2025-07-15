@@ -4,6 +4,7 @@ import { CreatePremiumDto, UpdatePremiumDto } from '../dto/premium.dto';
 import { Premium } from '../entities/premium.entity';
 import { PremiumPlan } from '../entities/premium-plan.entity';
 import { ProvidersService } from 'src/modules/_legacy/services/providers.service';
+import { PremiumByUser } from '../models/premium';
 
 @Injectable()
 export class PremiumService {
@@ -148,8 +149,21 @@ export class PremiumService {
   }
 
   async findByUserId(id: number): Promise<any> {
-    const response = await this.providersService.getPremiumStatusByID(id);
+    const premium: PremiumByUser = await this.providersService.getPremiumStatusByID(id);
 
-    return response;
+    const response = {
+      provider: {
+        id: premium.empresa.id,
+        name: premium.empresa.nome,
+        img_list: premium.empresa.img_lista,
+        img_home: premium.empresa.img_home,
+      },
+      value: premium.transacao.valor,
+      status: premium.premium,
+      integrated: premium.vinculo_atual.data_vinculacao,
+      expires: null
+    };
+
+    return response
   }
 }   
