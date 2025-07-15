@@ -23,14 +23,6 @@ export class AuthPartnersService {
     const response = await this.providersService.checkClientProvider(provider_id, payload)
     const user = await this.userService.findByCpf(payload.chave)
 
-    if (response.user !== user?.id) {
-      return {
-        status: response.user !== null,
-        account: false,
-        message: 'O id do usuário não corresponde ao id do provedor, contate o suporte'
-      }
-    }
-
     return {
       status: response.user !== null, // Verifica se o usuário existe no provedor
       account: user !== null, // Verifica se o usuário existe no banco de dados

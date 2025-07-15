@@ -80,7 +80,7 @@ export class ProvidersService {
   messageResponse(user_id: number, user_found: boolean): string {
     // usuario liberado no provedor e possui conta no banco de dados
     if (user_id && user_found) {
-      return "Você já possui uma conta e está liberado no provedor. Agora é só fazer login.";
+      return "Encontramos sua conta e está liberado no provedor. Agora é só fazer login.";
     }
 
     // usuario liberado no provedor e não possui conta no banco de dados
@@ -95,7 +95,7 @@ export class ProvidersService {
 
     // usuario nao liberado no provedor e possui conta no banco de dados
     if (!user_id && user_found) {
-      return "Você possui uma conta, mas não está liberado no provedor. Será possível prosseguir fazendo o login, porém sem acesso premium.";
+      return "Encontramos sua conta, mas não está liberado no provedor. Será possível prosseguir com o login, porém sem acesso premium.";
     }
 
     return "Erro ao verificar cliente"
