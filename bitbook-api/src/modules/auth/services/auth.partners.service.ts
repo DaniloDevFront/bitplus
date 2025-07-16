@@ -24,9 +24,9 @@ export class AuthPartnersService {
     const user = await this.userService.findByCpf(payload.chave)
 
     return {
-      status: response.user !== null, // Verifica se o usuário existe no provedor
+      status: response.user !== null || response.user_found, // Verifica se o usuário existe no provedor
       account: user !== null, // Verifica se o usuário existe no banco de dados
-      message: this.providersService.messageResponse(response.user, (user !== null)),
+      message: this.providersService.messageResponse((response.user || response.user_found), (user !== null)),
     }
   }
 

@@ -77,7 +77,7 @@ export class ProvidersService {
     }
   }
 
-  messageResponse(user_id: number, user_found: boolean): string {
+  messageResponse(user_id: number | boolean, user_found: boolean): string {
     // usuario liberado no provedor e possui conta no banco de dados
     if (user_id && user_found) {
       return "Encontramos sua conta e está liberado no provedor. Agora é só fazer login.";
