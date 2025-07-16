@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsBoolean, IsEmail, IsNotEmpty, IsString, IsOptional, MinLength, Matches, IsDate } from "class-validator";
+import { IsBoolean, IsEmail, IsNotEmpty, IsString, IsOptional, MinLength, Matches, IsDate, IsNumber } from "class-validator";
 import { Transform } from 'class-transformer';
 
 export class LoginDto {
@@ -54,6 +54,11 @@ export class RegisterDto {
   @ApiProperty({ example: true })
   @IsBoolean()
   terms: boolean;
+
+  @ApiProperty({ example: 1 })
+  @IsNumber()
+  @IsOptional()
+  provider_id?: number;
 }
 
 export class ForgotPasswordDto {

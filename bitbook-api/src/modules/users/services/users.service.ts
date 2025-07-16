@@ -7,6 +7,7 @@ import { Profile } from '../entities/profile.entity';
 import { UserRole } from '../enums/user-role.enum';
 import { ChangePasswordDto, CreateUserDto, UpdateUserDto } from '../dto/user.dto';
 import { UploadsService } from '../../uploads/uploads.service';
+import { ProvidersService } from '../../_legacy/services/providers.service';
 
 @Injectable()
 export class UsersService {
@@ -16,6 +17,7 @@ export class UsersService {
     @InjectEntityManager()
     private readonly entityManager: EntityManager,
     private readonly uploadsService: UploadsService,
+    private readonly providersService: ProvidersService,
   ) { }
 
   async create(payload: CreateUserDto): Promise<User> {
@@ -27,6 +29,18 @@ export class UsersService {
     const existingCpf = await this.findByCpf(payload.cpf);
     if (existingCpf) {
       throw new ConflictException('CPF já está em uso');
+    }
+
+    let premium = false;
+
+    if (payload.provider_id) {
+      const provider = await this.providersService.findProvider(payload.provider_id);
+
+      if (!provider) {
+        throw new BadRequestException('Provedor não encontrado');
+      }
+
+      premium = true;
     }
 
     const hashedPassword = await hash(payload.password, 10);
@@ -43,12 +57,11 @@ export class UsersService {
       email: payload.email,
       password: hashedPassword,
       role: UserRole.CLIENT,
-      premium: payload.premium,
+      premium,
       terms: payload.terms,
+      provider_id: payload.provider_id || null,
       profile,
     });
-
-    console.log('user aqui:', user);
 
     return this.entityManager.save(User, user);
   }

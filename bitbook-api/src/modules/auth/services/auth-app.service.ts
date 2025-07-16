@@ -6,11 +6,11 @@ import { InjectEntityManager } from '@nestjs/typeorm';
 import { UsersService } from '../../users/services/users.service';
 import { LoginsLogsService } from '../../logs/services/logins-logs.service';
 import { RegistrationsLogsService } from '../../logs/services/registrations-logs.service';
-import { CreateUserDto, UpdateUserDto } from 'src/modules/users/dto/user.dto';
 import { User } from '../../users/entities/user.entity';
 import { Access } from '../interfaces/access.interface';
 import { LOGIN_TYPE, LOGIN_STATUS } from '../../logs/enums/login.enum';
 import { LoginInfo } from '../interceptors/login-info.interceptor';
+import { RegisterDto } from '../dto/auth.dto';
 
 @Injectable()
 export class AuthAppService {
@@ -56,7 +56,7 @@ export class AuthAppService {
     }
   }
 
-  async register(payload: CreateUserDto, loginInfo?: LoginInfo): Promise<Access> {
+  async register(payload: RegisterDto, loginInfo?: LoginInfo): Promise<Access> {
     try {
       const user = await this.UsersService.create(payload);
 

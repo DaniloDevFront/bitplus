@@ -5,11 +5,12 @@ import { Profile } from './entities/profile.entity';
 import { UsersService } from './services/users.service';
 import { UsersController } from './controllers/users.controller';
 import { UploadsModule } from '../uploads/uploads.module';
+import { LegacyModule } from '../_legacy/legacy.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([User, Profile]),
-    UploadsModule
+    UploadsModule, LegacyModule
   ],
   controllers: [UsersController],
   providers: [UsersService],

@@ -37,6 +37,7 @@ export class CreateUserDto {
   @IsOptional()
   cpf?: string;
 
+
   @ApiProperty({ example: '23/05/1996' })
   @IsOptional()
   @Transform(({ value }) => {

@@ -65,6 +65,20 @@ export class ProvidersService {
     }
   }
 
+  async findProvider(provider_id: number): Promise<any> {
+    const url = `${BASE_URL}/api/empresas/${provider_id}`
+
+    try {
+      const response: AxiosResponse<any> = await firstValueFrom(this.httpService.get(url))
+
+      return response.data
+    } catch (error: any) {
+      throw new BadRequestException(
+        error.response?.data?.resposta || 'Erro ao buscar provedor'
+      );
+    }
+  }
+
   /**
    * Auxiliary methods
    */
