@@ -258,7 +258,9 @@ export class UsersService {
       const uploadResult = await this.uploadsService.uploadFile(file, 'profiles/covers', 'image');
 
       if (uploadResult && user.profile.cover) {
-        await this.uploadsService.deleteFile(user.profile.cover);
+        if (!user.profile.cover.includes('default')) {
+          await this.uploadsService.deleteFile(user.profile.cover);
+        }
       }
 
       user.profile.cover = uploadResult.url;
