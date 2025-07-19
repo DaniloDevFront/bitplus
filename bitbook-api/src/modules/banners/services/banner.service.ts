@@ -3,9 +3,11 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Banner } from '../entities/banner.entity';
 import { BannerProvider } from '../entities/banner-provider.entity';
+import { User } from '../../users/entities/user.entity';
 import { CreateBannerDto } from '../dto/create-banner.dto';
 import { UpdateBannerDto } from '../dto/update-banner.dto';
 import { UploadsService } from '../../uploads/uploads.service';
+
 
 @Injectable()
 export class BannerService {
@@ -14,6 +16,8 @@ export class BannerService {
     private readonly bannerRepository: Repository<Banner>,
     @InjectRepository(BannerProvider)
     private readonly bannerProviderRepository: Repository<BannerProvider>,
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
     private readonly uploadsService: UploadsService,
   ) { }
 
@@ -170,5 +174,38 @@ export class BannerService {
     });
 
     return bannerProviders.map(bp => bp.banner);
+  }
+
+  async findAllByApp(user_id: number): Promise<Banner[]> {
+    const user = await this.userRepository.findOne({ where: { id: user_id } });
+
+    if (!user) {
+      throw new NotFoundException(`Usuário com ID ${user_id} não encontrado`);
+    }
+
+    const provider_id = user.provider_id;
+
+    // Buscar banners específicos do provider do usuário
+    const bannerProviders = await this.bannerProviderRepository.find({
+      where: { provider_id },
+      relations: ['banner'],
+    });
+
+    const providerBanners = bannerProviders.map(bp => bp.banner);
+
+    // Buscar banners que não estão vinculados a nenhum provider
+    const bannersWithoutProviders = await this.bannerRepository
+      .createQueryBuilder('banner')
+      .leftJoin('banner.providers', 'provider')
+      .where('provider.id IS NULL')
+      .getMany();
+
+    // Combinar os dois resultados e remover duplicatas
+    const allBanners = [...providerBanners, ...bannersWithoutProviders];
+    const uniqueBanners = allBanners.filter((banner, index, self) =>
+      index === self.findIndex(b => b.id === banner.id)
+    );
+
+    return uniqueBanners;
   }
 } 

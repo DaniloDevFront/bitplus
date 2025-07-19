@@ -24,4 +24,10 @@ export class FindBannerDto {
   @IsNumber()
   @IsOptional()
   provider_id?: number;
+
+  @ApiPropertyOptional({ description: 'ID do usuário', required: false })
+  @IsOptional()
+  @IsNumber()
+  @Transform(({ value }) => value ? Number(value) : undefined)
+  user_id?: number;
 } 

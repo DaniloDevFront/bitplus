@@ -51,11 +51,12 @@ export class BannerController {
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Buscar banners' })
   async find(@Query() query: FindBannerDto) {
-    const { id, premium, provider_id } = query;
+    const { id, premium, provider_id, user_id } = query;
 
-    if (id) return this.bannerService.findById(id);
+    if (id !== undefined) return this.bannerService.findById(id);
     if (premium !== undefined) return this.bannerService.findByPremium(premium);
-    if (provider_id) return this.bannerService.findByProvider(provider_id);
+    if (provider_id !== undefined) return this.bannerService.findByProvider(provider_id);
+    if (user_id !== undefined) return this.bannerService.findAllByApp(user_id);
 
     return this.bannerService.findAll();
   }
