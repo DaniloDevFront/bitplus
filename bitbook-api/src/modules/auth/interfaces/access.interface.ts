@@ -1,6 +1,10 @@
 export interface Access {
   user_id: number;
-  provider_id: number;
+  provider: {
+    id: number;
+    name: string;
+    img_home: string;
+  } | null;
   premium: boolean;
   access_token: {
     token: string;

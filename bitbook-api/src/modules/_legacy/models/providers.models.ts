@@ -23,11 +23,23 @@ export interface CheckClientPayload {
 }
 
 export interface CheckClientResponse {
-  empresa: Provider;
-  message: string;
   user: number;
+  empresa: Provider;
   user_found: boolean;
   user_login_ways: string[];
+  assinatura_data: {
+    vinculo_id: number | null;
+    status: number;
+    data_vinculo: string;
+    data_inicio: string;
+    data_desvinculo: string | null;
+    empresa_id: number;
+    user_id: number;
+    cpf: string;
+    ativo: boolean;
+    tipo_vinculo: string;
+  } | null;
+  message: string;
 }
 
 

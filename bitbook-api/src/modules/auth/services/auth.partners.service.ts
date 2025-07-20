@@ -44,15 +44,11 @@ export class AuthPartnersService {
       throw new NotFoundException('Usuário não encontrado')
     }
 
-    const response = await this.providersService.checkClientProvider(payload.provider_id, { chave: user.profile.cpf })
-
-    if (!response.user_found || response.user !== user.id) {
-      throw new NotFoundException('Usuário não pertence ao provedor')
-    }
+    const response = await this.providersService.checkPremiumStatus(payload.provider_id, user.profile.cpf)
 
     const update: UpdateUserDto = {
-      provider_id: response.empresa.id,
-      premium: response.user_found,
+      provider_id: response.provider.id,
+      premium: response.cliente.premium,
     }
 
     await this.userService.update(user.id, update)

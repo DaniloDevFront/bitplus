@@ -122,6 +122,11 @@ export class UpdateUserDto {
   @IsBoolean()
   premium?: boolean;
 
+  @ApiPropertyOptional({ example: 'pre_liberacao' })
+  @IsString()
+  @IsOptional()
+  premium_type?: string;
+
   @ApiPropertyOptional({ example: 1 })
   @IsNumber()
   @IsOptional()

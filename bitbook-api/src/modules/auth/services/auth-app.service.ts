@@ -11,6 +11,7 @@ import { Access } from '../interfaces/access.interface';
 import { LOGIN_TYPE, LOGIN_STATUS } from '../../logs/enums/login.enum';
 import { LoginInfo } from '../interceptors/login-info.interceptor';
 import { RegisterDto } from '../dto/auth.dto';
+import { ProvidersService } from 'src/modules/_legacy/services/providers.service';
 
 @Injectable()
 export class AuthAppService {
@@ -21,6 +22,7 @@ export class AuthAppService {
     private loginLogsService: LoginsLogsService,
     private registrationsLogsService: RegistrationsLogsService,
     private jwtService: JwtService,
+    private providersService: ProvidersService,
   ) { }
 
   async login(login: string, password: string, loginInfo?: LoginInfo): Promise<Access> {
@@ -39,10 +41,16 @@ export class AuthAppService {
       // Registra login bem-sucedido
       await this.logLoginAttempt(user.id, LOGIN_STATUS.SUCCESS, LOGIN_TYPE.EMAIL_PASSWORD, loginInfo);
 
+      const response = await this.providersService.findProvider(user.provider_id)
+
       return {
         user_id: user.id,
-        provider_id: user.provider_id || null,
         premium: user.premium || false,
+        provider: response ? {
+          id: response.id,
+          name: response.nome,
+          img_home: response.img_home || null,
+        } : null,
         access_token: {
           token,
           refresh_token: refreshToken,
@@ -67,10 +75,16 @@ export class AuthAppService {
       // Registra login após registro
       await this.logLoginAttempt(user.id, LOGIN_STATUS.SUCCESS, LOGIN_TYPE.EMAIL_PASSWORD, loginInfo, 'Login após registro');
 
+      const response = await this.providersService.findProvider(user.provider_id)
+
       return {
         user_id: user.id,
-        provider_id: user.provider_id || null,
         premium: user.premium || false,
+        provider: response ? {
+          id: response.id,
+          name: response.nome,
+          img_home: response.img_home || null,
+        } : null,
         access_token: {
           token,
           refresh_token: refreshToken,

@@ -51,11 +51,11 @@ export class ProvidersService {
     }
   }
 
-  async getPremiumStatusByID(user_id: number): Promise<any> {
-    const url = `${BASE_URL}/api/check-premium/${user_id}`
+  async checkPremiumStatus(provider_id: number, chave: string): Promise<any> {
+    const url = `${BASE_URL}/api/empresas/${provider_id}/premium`
 
     try {
-      const response: AxiosResponse<any> = await firstValueFrom(this.httpService.get(url))
+      const response: AxiosResponse<any> = await firstValueFrom(this.httpService.post(url, { chave: chave }))
 
       return response.data
     } catch (error: any) {
