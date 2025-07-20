@@ -3,11 +3,13 @@ import { EntityManager } from 'typeorm';
 import { CreatePremiumDto, UpdatePremiumDto } from '../dto/premium.dto';
 import { Premium } from '../entities/premium.entity';
 import { PremiumPlan } from '../entities/premium-plan.entity';
+import { ProvidersService } from 'src/modules/_legacy/services/providers.service';
 
 @Injectable()
 export class PremiumService {
   constructor(
     private entityManager: EntityManager,
+    private providerService: ProvidersService
   ) { }
 
   async create(payload: CreatePremiumDto): Promise<Premium> {
@@ -143,5 +145,15 @@ export class PremiumService {
     }
 
     return premium;
+  }
+
+  async findByUser(provider_id: number, body: { chave: string }): Promise<any> {
+    const response = await this.providerService.checkPremiumStatus(provider_id, body.chave);
+
+    if (!response) {
+      throw new NotFoundException(`Erro ao verificar o status premium do usuário`);
+    }
+
+    return response;
   }
 }   

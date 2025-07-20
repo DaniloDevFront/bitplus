@@ -63,14 +63,14 @@ export class PremiumController {
     return this.premiumService.findAll();
   }
 
-  @Get("user/:id")
+  @Get("provider/:provider_id")
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Buscar status de premium por ID do usuário' })
   @ApiResponse({ status: 200, description: 'Status de premium encontrado com sucesso' })
   @ApiResponse({ status: 401, description: 'Não autorizado' })
   @ApiResponse({ status: 404, description: 'Status de premium não encontrado' })
-  async findByUserId(@Param('id') id: number) {
+  async findByUserId(@Param('provider_id') provider_id: number, @Body() body: { chave: string }) {
 
-    // return this.premiumService.findByUserId(id);
+    return this.premiumService.findByUser(provider_id, body);
   }
 } 
