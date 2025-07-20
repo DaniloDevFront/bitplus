@@ -63,7 +63,7 @@ export class PremiumController {
     return this.premiumService.findAll();
   }
 
-  @Get("provider/:provider_id")
+  @Post("provider/:provider_id")
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Buscar status de premium por ID do usuário' })
   @ApiResponse({ status: 200, description: 'Status de premium encontrado com sucesso' })
