@@ -71,6 +71,6 @@ export class PremiumController {
   @ApiResponse({ status: 404, description: 'Status de premium não encontrado' })
   async findByUserId(@Param('id') id: number) {
 
-    return this.premiumService.findByUserId(id);
+    // return this.premiumService.findByUserId(id);
   }
 } 
