@@ -43,13 +43,17 @@ export class AuthAppService {
 
       const response = await this.providersService.findProvider(user.provider_id)
 
+      if (!response) {
+        throw new NotFoundException('Erro ao buscar dados do provedor')
+      }
+
       return {
         user_id: user.id,
         premium: user.premium || false,
         provider: response ? {
-          id: response.id,
-          name: response.nome,
-          img_home: response.img_home || null,
+          id: response.registro.id,
+          name: response.registro.nome,
+          img_home: response.registro.img_home || null,
         } : null,
         access_token: {
           token,

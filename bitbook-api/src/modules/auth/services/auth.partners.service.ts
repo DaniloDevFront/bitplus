@@ -46,8 +46,12 @@ export class AuthPartnersService {
 
     const response = await this.providersService.checkPremiumStatus(payload.provider_id, user.profile.cpf)
 
+    if (!response) {
+      throw new NotFoundException('Erro ao verificar status premium')
+    }
+
     const update: UpdateUserDto = {
-      provider_id: response.provider.id,
+      provider_id: response.empresa.id,
       premium: response.cliente.premium,
     }
 
