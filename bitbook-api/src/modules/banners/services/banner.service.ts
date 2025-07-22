@@ -185,6 +185,15 @@ export class BannerService {
 
     const provider_id = user.provider_id;
 
+    // Se o usuário não possui provider_id, retornar apenas banners sem provider
+    if (!provider_id) {
+      return await this.bannerRepository
+        .createQueryBuilder('banner')
+        .leftJoin('banner.providers', 'provider')
+        .where('provider.id IS NULL')
+        .getMany();
+    }
+
     // Buscar banners específicos do provider do usuário
     const bannerProviders = await this.bannerProviderRepository.find({
       where: { provider_id },
