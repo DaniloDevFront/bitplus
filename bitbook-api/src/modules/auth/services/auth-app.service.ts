@@ -41,19 +41,25 @@ export class AuthAppService {
       // Registra login bem-sucedido
       await this.logLoginAttempt(user.id, LOGIN_STATUS.SUCCESS, LOGIN_TYPE.EMAIL_PASSWORD, loginInfo);
 
-      const response = await this.providersService.findProvider(user.provider_id)
+      let provider = null;
 
-      if (!response) {
-        throw new NotFoundException('Erro ao buscar dados do provedor')
+      if (user.provider_id) {
+        const response = await this.providersService.findProvider(user.provider_id)
+
+        if (!response) {
+          throw new NotFoundException('Erro ao buscar dados do provedor')
+        }
+
+        provider = response
       }
 
       return {
         user_id: user.id,
         premium: user.premium || false,
-        provider: response ? {
-          id: response.registro.id,
-          name: response.registro.nome,
-          img_home: response.registro.img_home || null,
+        provider: provider ? {
+          id: provider.registro.id,
+          name: provider.registro.nome,
+          img_home: provider.registro.img_home || null,
         } : null,
         access_token: {
           token,
