@@ -36,7 +36,9 @@ export class CategoryService {
 
       if (uploadResult) {
         if (category.ico) {
-          await this.uploadsService.deleteFile(category.ico);
+          if (!category.ico.includes('default')) {
+            await this.uploadsService.deleteFile(category.ico);
+          }
         }
 
         payload.ico = uploadResult.url;
@@ -61,7 +63,9 @@ export class CategoryService {
     }
 
     if (category.ico) {
-      await this.uploadsService.deleteFile(category.ico);
+      if (!category.ico.includes('default')) {
+        await this.uploadsService.deleteFile(category.ico);
+      }
     }
 
     await this.categoryRepository.remove(category);

@@ -128,10 +128,14 @@ export class UsersService {
     // Deleta os arquivos do S3 antes de remover o usuário
     if (user.profile) {
       if (user.profile.avatar) {
-        await this.uploadsService.deleteFile(user.profile.avatar);
+        if (!user.profile.avatar.includes('default')) {
+          await this.uploadsService.deleteFile(user.profile.avatar);
+        }
       }
       if (user.profile.cover) {
-        await this.uploadsService.deleteFile(user.profile.cover);
+        if (!user.profile.cover.includes('default')) {
+          await this.uploadsService.deleteFile(user.profile.cover);
+        }
       }
     }
 
@@ -231,7 +235,9 @@ export class UsersService {
 
       // ao retornar o upload, deleta o arquivo antigo se houver
       if (uploadResult && user.profile.avatar) {
-        await this.uploadsService.deleteFile(user.profile.avatar);
+        if (!user.profile.avatar.includes('default')) {
+          await this.uploadsService.deleteFile(user.profile.avatar);
+        }
       }
 
       user.profile.avatar = uploadResult.url;

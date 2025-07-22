@@ -194,13 +194,19 @@ export class AudiobooksService {
 
       if (ebook.media) {
         if (ebook.media.img_small) {
-          await this.uploadsService.deleteFile(ebook.media.img_small);
+          if (!ebook.media.img_small.includes('default')) {
+            await this.uploadsService.deleteFile(ebook.media.img_small);
+          }
         }
         if (ebook.media.img_medium) {
-          await this.uploadsService.deleteFile(ebook.media.img_medium);
+          if (!ebook.media.img_medium.includes('default')) {
+            await this.uploadsService.deleteFile(ebook.media.img_medium);
+          }
         }
         if (ebook.media.img_large) {
-          await this.uploadsService.deleteFile(ebook.media.img_large);
+          if (!ebook.media.img_large.includes('default')) {
+            await this.uploadsService.deleteFile(ebook.media.img_large);
+          }
         }
 
         const result = {
@@ -407,13 +413,19 @@ export class AudiobooksService {
       const response = await this.booksMediaHelper.processTrackCover(cover);
 
       if (track.cover_small) {
-        await this.uploadsService.deleteFile(track.cover_small);
+        if (!track.cover_small.includes('default')) {
+          await this.uploadsService.deleteFile(track.cover_small);
+        }
       }
       if (track.cover_medium) {
-        await this.uploadsService.deleteFile(track.cover_medium);
+        if (!track.cover_medium.includes('default')) {
+          await this.uploadsService.deleteFile(track.cover_medium);
+        }
       }
       if (track.cover_large) {
-        await this.uploadsService.deleteFile(track.cover_large);
+        if (!track.cover_large.includes('default')) {
+          await this.uploadsService.deleteFile(track.cover_large);
+        }
       }
 
       // Atualiza com as novas covers
