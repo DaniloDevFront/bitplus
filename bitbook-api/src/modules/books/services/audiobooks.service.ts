@@ -27,7 +27,8 @@ export class AudiobooksService {
     payload: CreateEbookDto,
     cover: Express.Multer.File,
     tracks: Express.Multer.File[],
-    trackCovers?: Express.Multer.File[]
+    trackCovers?: Express.Multer.File[],
+    file?: Express.Multer.File
   ): Promise<any> {
     const { sheet, category_id, ...ebookData } = payload;
     let uploadedFiles: string[] = [];
@@ -43,10 +44,16 @@ export class AudiobooksService {
           throw new NotFoundException(`Categoria com ID ${category_id} não encontrada`);
         }
 
+        const type = {
+          [ContentType.EBOOK]: ContentType.EBOOK,
+          [ContentType.AUDIOBOOK]: ContentType.AUDIOBOOK,
+          [ContentType.AMBOS]: ContentType.AMBOS
+        }
+
         // Criar o ebook
         const ebook = manager.create(Books, {
           ...ebookData,
-          type: ContentType.AUDIOBOOK,
+          type: type[payload.type],
           category
         });
         await manager.save(ebook);
@@ -62,22 +69,28 @@ export class AudiobooksService {
         await manager.save(bookSheet);
 
         // Processar e salvar a mídia
-        const mediaData = await this.booksMediaHelper.processBookMedia(cover, tracks, ContentType.AUDIOBOOK);
+        const mediaData = await this.booksMediaHelper.processBookMedia(cover, tracks, payload.type, file);
 
         // Armazenar URLs dos arquivos enviados para possível rollback
-        if (mediaData.tracks) {
-          uploadedFiles = mediaData.tracks.map(track => track.file_url);
-        }
+        if (mediaData.tracks) uploadedFiles = mediaData.tracks.map(track => track.file_url);
+        if (mediaData.file_url) uploadedFiles.push(mediaData.file_url);
         if (mediaData.img_small) uploadedFiles.push(mediaData.img_small);
         if (mediaData.img_medium) uploadedFiles.push(mediaData.img_medium);
         if (mediaData.img_large) uploadedFiles.push(mediaData.img_large);
 
-        const media = manager.create(BooksMedia, {
+        const mediaDataToSave: any = {
           img_small: mediaData.img_small,
           img_medium: mediaData.img_medium,
           img_large: mediaData.img_large,
           book: ebook
-        });
+        };
+
+        // Adicionar file_url apenas se existir
+        if (mediaData.file_url) {
+          mediaDataToSave.file_url = mediaData.file_url;
+        }
+
+        const media = manager.create(BooksMedia, mediaDataToSave);
 
         await manager.save(media);
 
@@ -132,6 +145,7 @@ export class AudiobooksService {
           description: createdEbook.description,
           media: createdEbook.media ? {
             id: createdEbook.media.id,
+            file_url: createdEbook.media.file_url || null,
             img_small: createdEbook.media.img_small,
             img_medium: createdEbook.media.img_medium,
             img_large: createdEbook.media.img_large,

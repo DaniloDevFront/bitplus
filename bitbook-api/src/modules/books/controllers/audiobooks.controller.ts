@@ -7,6 +7,7 @@ import { AudiobooksService } from '../services/audiobooks.service';
 import { UpdateEbookDto } from '../dto/update-ebook.dto';
 import { TrackResponse, UpdateBookTrackDto } from '../dto/create-book-track.dto';
 import { CreateBookTrackDto } from '../dto/create-book-track.dto';
+import { ContentType } from '../interfaces/ebook.interface';
 
 @ApiTags('Audiobooks')
 @Controller('audiobooks')
@@ -28,7 +29,8 @@ export class AudiobooksController {
     FileFieldsInterceptor([
       { name: 'cover', maxCount: 1 },
       { name: 'tracks', maxCount: 10 },
-      { name: 'track_covers', maxCount: 10 }
+      { name: 'track_covers', maxCount: 10 },
+      { name: 'file', maxCount: 1 }
     ])
   )
   @ApiConsumes('multipart/form-data')
@@ -37,9 +39,16 @@ export class AudiobooksController {
     @UploadedFiles() files: {
       cover?: Express.Multer.File[],
       tracks?: Express.Multer.File[],
-      track_covers?: Express.Multer.File[]
+      track_covers?: Express.Multer.File[],
+      file?: Express.Multer.File[]
     }
   ) {
+    if (payload.type === ContentType.AMBOS) {
+      if (!files.file?.[0]) {
+        throw new BadRequestException('PDF é obrigatório');
+      }
+    }
+
     if (!files.cover?.[0]) {
       throw new BadRequestException('Arquivo de imagem é obrigatório');
     }
@@ -64,7 +73,7 @@ export class AudiobooksController {
       }
     }
 
-    return this.audiobooksService.create(payload, files.cover?.[0], files.tracks, files.track_covers);
+    return this.audiobooksService.create(payload, files.cover?.[0], files.tracks, files.track_covers, files.file?.[0]);
   }
 
   @Put(':id')

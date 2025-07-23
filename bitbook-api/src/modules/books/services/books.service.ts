@@ -336,7 +336,7 @@ export class BooksService {
       if (ebook.media.img_large) filesToDelete.push(ebook.media.img_large);
 
       // Se for ebook, adicionar URL do arquivo
-      if (ebook.type === ContentType.EBOOK && ebook.media.file_url) {
+      if ((ebook.type === ContentType.EBOOK || ebook.type === ContentType.AMBOS) && ebook.media.file_url) {
         filesToDelete.push(ebook.media.file_url);
       }
 

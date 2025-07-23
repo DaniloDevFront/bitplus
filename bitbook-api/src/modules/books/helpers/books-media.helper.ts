@@ -30,7 +30,8 @@ export class BooksMediaHelper {
   async processBookMedia(
     cover: Express.Multer.File | null,
     contentFile: Express.Multer.File | Express.Multer.File[],
-    type: ContentType
+    type: ContentType,
+    file?: Express.Multer.File,
   ): Promise<BookMediaResponse> {
     const response: BookMediaResponse = {};
 
@@ -88,6 +89,36 @@ export class BooksMediaHelper {
       );
 
       response.tracks = trackUrls;
+    } else if (type === ContentType.AMBOS) {
+      // Para tipo AMBOS, processar tanto o arquivo quanto os tracks
+
+      // Processar arquivo (PDF) se fornecido
+      if (file) {
+        const contentUpload = await this.uploadsService.uploadFile(file, 'books/files', 'document');
+
+        if (!contentUpload) {
+          throw new Error('Falha ao fazer upload do arquivo de conteúdo');
+        }
+
+        response.file_url = contentUpload.url;
+      }
+
+      // Processar tracks se fornecidos
+      if (Array.isArray(contentFile) && contentFile.length > 0) {
+        const trackUrls = await Promise.all(
+          contentFile.map(async (track, index) => {
+            const trackUpload = await this.uploadsService.uploadFile(track, 'books/tracks', 'audio');
+
+            if (!trackUpload) {
+              throw new Error(`Falha ao fazer upload da faixa ${index + 1}`);
+            }
+
+            return { file_url: trackUpload.url };
+          })
+        );
+
+        response.tracks = trackUrls;
+      }
     }
 
     return response;

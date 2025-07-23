@@ -30,7 +30,7 @@ export class CreateEbookDto {
   @Transform(({ value }) => {
     if (typeof value === 'string') {
       const lowerValue = value.toLowerCase();
-      if (lowerValue === 'ebook' || lowerValue === 'audiobook') {
+      if (lowerValue === 'ebook' || lowerValue === 'audiobook' || lowerValue === 'ambos') {
         return lowerValue;
       }
     }

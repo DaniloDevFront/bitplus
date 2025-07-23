@@ -1,6 +1,7 @@
 export enum ContentType {
   EBOOK = 'ebook',
-  AUDIOBOOK = 'audiobook'
+  AUDIOBOOK = 'audiobook',
+  AMBOS = 'ambos'
 }
 
-export type ContentTypeEnum = 'ebook' | 'audiobook'; 
+export type ContentTypeEnum = 'ebook' | 'audiobook' | 'ambos'; 
