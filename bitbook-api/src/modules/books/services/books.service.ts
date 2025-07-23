@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectEntityManager } from '@nestjs/typeorm';
-import { EntityManager } from 'typeorm';
+import { EntityManager, In } from 'typeorm';
 import { Books } from '../entities/books.entity';
 import { BooksSheet } from '../entities/book-sheet.entity';
 import { CreateEbookDto } from '../dto/create-ebook.dto';
@@ -781,10 +781,16 @@ export class BooksService {
 
     const ebooks = await this.entityManager.find(Books, query);
 
+    const type = {
+      [ContentType.AUDIOBOOK]: 'Audiobook',
+      [ContentType.EBOOK]: 'Ebook',
+      [ContentType.AMBOS]: 'Ambos',
+    }
+
     return ebooks.map(ebook => ({
       id: ebook.id,
       title: ebook.title,
-      type: ebook.type === ContentType.AUDIOBOOK ? 'Audiobook' : 'Ebook',
+      type: type[ebook.type],
       premium: ebook.premium,
       high: ebook.high,
       media: ebook.media ? {
@@ -847,7 +853,7 @@ export class BooksService {
 
   async findByAudiobooks(): Promise<any[]> {
     const ebooks = await this.entityManager.find(Books, {
-      where: { type: ContentType.AUDIOBOOK },
+      where: { type: In([ContentType.AUDIOBOOK, ContentType.AMBOS]) },
       relations: ['media'],
       order: { id: 'DESC' },
       take: 5,
