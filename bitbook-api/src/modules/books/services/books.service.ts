@@ -702,10 +702,16 @@ export class BooksService {
       }
     });
 
+    const type = {
+      [ContentType.AUDIOBOOK]: 'Audiobook',
+      [ContentType.EBOOK]: 'Ebook',
+      [ContentType.AMBOS]: 'Ambos',
+    }
+
     return ebooks.map(ebook => ({
       id: ebook.id,
       title: ebook.title,
-      type: ebook.type === ContentType.AUDIOBOOK ? 'Audiobook' : 'Ebook',
+      type: type[ebook.type],
       premium: ebook.premium,
       high: ebook.high,
       media: ebook.media ? {
