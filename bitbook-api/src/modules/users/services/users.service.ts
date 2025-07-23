@@ -56,7 +56,7 @@ export class UsersService {
     const user = this.entityManager.create(User, {
       email: payload.email,
       password: hashedPassword,
-      role: UserRole.CLIENT,
+      role: payload.role || UserRole.CLIENT,
       premium,
       terms: payload.terms,
       provider_id: payload.provider_id || null,
@@ -74,6 +74,10 @@ export class UsersService {
 
     if (payload.email) {
       user.email = payload.email;
+    }
+
+    if (payload.role) {
+      user.role = payload.role;
     }
 
     if (payload.premium) {

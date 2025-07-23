@@ -27,6 +27,11 @@ export class CreateUserDto {
   @IsNotEmpty()
   email: string;
 
+  @ApiProperty({ example: 'admin' })
+  @IsEnum(UserRole)
+  @IsOptional()
+  role?: UserRole;
+
   @ApiProperty({ example: '(11) 99999-9999' })
   @IsString()
   @IsOptional()
@@ -121,6 +126,11 @@ export class UpdateUserDto {
   @IsOptional()
   @IsBoolean()
   premium?: boolean;
+
+  @ApiPropertyOptional({ example: true, default: false })
+  @IsOptional()
+  @IsBoolean()
+  role?: UserRole;
 
   @ApiPropertyOptional({ example: 'pre_liberacao' })
   @IsString()
