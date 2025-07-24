@@ -30,7 +30,7 @@ export class Profile {
   @Column({ nullable: true })
   avatar: string;
 
-  @Column({ nullable: true, default: "https://bitplus.s3.sa-east-1.amazonaws.com/default/cover-profile.png" })
+  @Column({ nullable: true, default: "https://bitplus.s3.sa-east-1.amazonaws.com/default/cover-default.png" })
   cover: string;
 
   @OneToOne(() => User, user => user.profile, {
