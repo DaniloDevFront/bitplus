@@ -34,35 +34,3 @@ export class CreateUserLogDto {
   @IsString()
   failure_reason?: string;
 }
-
-export class LoginStatisticsDto {
-  @ApiProperty({ description: 'Total de logins no período' })
-  total_logins: number;
-
-  @ApiProperty({ description: 'Logins bem-sucedidos' })
-  successful_logins: number;
-
-  @ApiProperty({ description: 'Logins falhados' })
-  failed_logins: number;
-
-  @ApiProperty({ description: 'Logins por tipo', type: 'object' })
-  logins_by_type: Record<LOGIN_TYPE, number>;
-
-  @ApiProperty({ description: 'Logins do dia', type: 'object' })
-  logins_by_day: {
-    date: string;
-    count: number;
-  };
-
-  @ApiProperty({ description: 'Registros de usuários do dia', type: 'object' })
-  registers_by_day: {
-    date: string;
-    count: number;
-  };
-
-  @ApiProperty({ description: 'Total de registros no período' })
-  total_registers: number;
-
-  @ApiProperty({ description: 'Registros falhados' })
-  failed_registers: number;
-} 
