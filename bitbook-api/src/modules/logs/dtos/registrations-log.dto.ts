@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsOptional, IsString, IsDateString } from 'class-validator';
+import { IsOptional, IsString, IsDateString, IsEnum } from 'class-validator';
 
 export class CreateRegistrationLogDto {
   @ApiProperty({ description: 'Email do usuário tentando se registrar' })
@@ -15,6 +15,11 @@ export class CreateRegistrationLogDto {
   @IsOptional()
   @IsString()
   user_agent?: string;
+
+  @ApiProperty({ description: 'Status do registro', enum: ['success', 'failed'], default: 'success' })
+  @IsOptional()
+  @IsEnum(['success', 'failed'])
+  status?: 'success' | 'failed';
 
   @ApiProperty({ description: 'Motivo da falha (se aplicável)', required: false })
   @IsOptional()

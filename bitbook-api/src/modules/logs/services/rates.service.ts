@@ -18,8 +18,8 @@ export class RatesService {
       date: string;
       count: number;
     };
-    total_max: number;
-    total_min: number;
+    total_rates_max: number;
+    total_rates_low: number;
   }> {
     const timeZone = 'America/Sao_Paulo';
     const now = new Date();
@@ -28,12 +28,12 @@ export class RatesService {
     const startOfDay = new Date(`${dateString}T00:00:00.000-03:00`);
     const endOfDay = new Date(`${dateString}T23:59:59.999-03:00`);
 
-    // Total de avaliações
-    const totalRates = await this.entityManager.count(RateHistory, {
-      where: { status: true }
-    });
+    // Total de avaliações (todas as avaliações individuais)
+    const totalRates = await this.entityManager
+      .createQueryBuilder(RateHistory, 'rateHistory')
+      .getCount();
 
-    // Avaliações do dia atual
+    // Avaliações do dia atual (todas as avaliações individuais)
     const ratesByDayResult = await this.entityManager
       .createQueryBuilder(RateHistory, 'rateHistory')
       .select('COUNT(*)', 'count')
@@ -41,7 +41,6 @@ export class RatesService {
         startDate: startOfDay,
         endDate: endOfDay
       })
-      .andWhere('rateHistory.status = :status', { status: true })
       .getRawOne();
 
     const ratesByDay = {
@@ -49,25 +48,23 @@ export class RatesService {
       count: ratesByDayResult && ratesByDayResult.count ? parseInt(ratesByDayResult.count) : 0,
     };
 
-    // Total de avaliações com nota máxima (5.0)
+    // Total de avaliações com nota alta (≥ 4.0) - todas as avaliações individuais
     const totalMaxRates = await this.entityManager
       .createQueryBuilder(RateHistory, 'rateHistory')
-      .where('rateHistory.rating = :rating', { rating: 5.0 })
-      .andWhere('rateHistory.status = :status', { status: true })
+      .where('rateHistory.rating >= :rating', { rating: 4.0 })
       .getCount();
 
-    // Total de avaliações com nota baixa (≤ 4.0)
+    // Total de avaliações com nota baixa (≤ 3.0) - todas as avaliações individuais
     const totalMinRates = await this.entityManager
       .createQueryBuilder(RateHistory, 'rateHistory')
-      .where('rateHistory.rating <= :rating', { rating: 4.0 })
-      .andWhere('rateHistory.status = :status', { status: true })
+      .where('rateHistory.rating <= :rating', { rating: 3.0 })
       .getCount();
 
     return {
       total: totalRates,
       by_day: ratesByDay,
-      total_max: totalMaxRates,
-      total_min: totalMinRates,
+      total_rates_max: totalMaxRates,
+      total_rates_low: totalMinRates,
     };
   }
 } 

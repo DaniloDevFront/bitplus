@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { EntityManager } from 'typeorm';
 import { compare, hash, genSalt } from 'bcrypt';
@@ -76,11 +76,14 @@ export class AuthAppService {
 
   async register(payload: RegisterDto, loginInfo?: LoginInfo): Promise<Access> {
     try {
-      const user = await this.UsersService.create(payload);
+      const user = await this.UsersService.create(payload)
 
       const jwtPayload = { sub: user.id };
       const token = this.jwtService.sign(jwtPayload);
       const refreshToken = this.jwtService.sign(jwtPayload, { expiresIn: '7d' });
+
+      // Registra sucesso no registro
+      await this.logRegistrationAttempt(payload.email, loginInfo, undefined, 'success');
 
       // Registra login após registro
       await this.logLoginAttempt(user.id, LOGIN_STATUS.SUCCESS, LOGIN_TYPE.EMAIL_PASSWORD, loginInfo, 'Login após registro');
@@ -103,7 +106,7 @@ export class AuthAppService {
       };
     } catch (error) {
       // Registra falha no registro
-      await this.logRegistrationAttempt(payload.email, loginInfo, error.message);
+      await this.logRegistrationAttempt(payload.email, loginInfo, error.message, 'failed');
       throw error;
     }
   }
@@ -284,13 +287,15 @@ export class AuthAppService {
   private async logRegistrationAttempt(
     email: string,
     loginInfo?: LoginInfo,
-    failureReason?: string
+    failureReason?: string,
+    status: 'success' | 'failed' = 'failed'
   ): Promise<void> {
     try {
       await this.registrationsLogsService.createLog({
         email,
         ip_address: loginInfo?.ip_address,
         user_agent: loginInfo?.user_agent,
+        status,
         failure_reason: failureReason,
       });
     } catch (error) {

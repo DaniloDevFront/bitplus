@@ -18,9 +18,8 @@ export class ReadingController {
     description: 'Leitura iniciada com sucesso',
   })
   @ApiResponse({ status: 401, description: 'Não autorizado' })
-  async create(@Body() payload: CreateReadingDto, @Request() req) {
-    const user_id = req.user.userId;
-    return this.readingService.create(payload, user_id);
+  async create(@Body() payload: CreateReadingDto) {
+    return this.readingService.create(payload);
   }
 
   @Put('progress')

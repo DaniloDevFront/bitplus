@@ -4,6 +4,8 @@ import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { TransformInterceptor } from './core/interceptors/transform.interceptor';
 import { NestExpressApplication } from '@nestjs/platform-express';
+import { ErrorLoggingInterceptor } from './core/interceptors/error-logging.interceptor';
+import { ErrorsLogsService } from './modules/logs/services/errors-logs.service';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -37,6 +39,10 @@ async function bootstrap() {
   }));
 
   app.useGlobalInterceptors(new TransformInterceptor());
+
+  // Obter o serviço de logs de erro do container de dependências
+  const errorsLogsService = app.get(ErrorsLogsService);
+  app.useGlobalInterceptors(new ErrorLoggingInterceptor(errorsLogsService));
 
   const port = process.env.APP_PORT || 3000;
   const php = process.env.PHPMYADMIN_PORT || 8081;

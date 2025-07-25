@@ -14,13 +14,13 @@ export class ReadingService {
     private readonly entityManager: EntityManager,
   ) { }
 
-  async create(createReadingDto: CreateReadingDto, user_id: number): Promise<Reading> {
-    const user = await this.entityManager.findOne(User, { where: { id: user_id } });
+  async create(payload: CreateReadingDto): Promise<Reading> {
+    const user = await this.entityManager.findOne(User, { where: { id: payload.user_id } });
     if (!user) {
       throw new NotFoundException('Usuário não encontrado');
     }
 
-    const book = await this.entityManager.findOne(Books, { where: { id: createReadingDto.book_id } });
+    const book = await this.entityManager.findOne(Books, { where: { id: payload.book_id } });
     if (!book) {
       throw new NotFoundException('Livro não encontrado');
     }
@@ -28,8 +28,8 @@ export class ReadingService {
     // Verifica se já existe uma leitura ativa para este livro
     const existingReading = await this.entityManager.findOne(Reading, {
       where: {
-        user: { id: user_id },
-        book: { id: createReadingDto.book_id },
+        user: { id: payload.user_id },
+        book: { id: payload.book_id },
         status: true
       }
     });
@@ -40,14 +40,14 @@ export class ReadingService {
 
     // Calcula o progresso se current_page e total_pages forem fornecidos
     let progress = 0;
-    if (createReadingDto.current_page && createReadingDto.total_pages) {
-      progress = (createReadingDto.current_page / createReadingDto.total_pages) * 100;
+    if (payload.current_page && payload.total_pages) {
+      progress = (payload.current_page / payload.total_pages) * 100;
     }
 
     const reading = this.entityManager.create(Reading, {
-      user: { id: user_id },
-      book: { id: createReadingDto.book_id },
-      current_page: createReadingDto.current_page || 0,
+      user: { id: payload.user_id },
+      book: { id: payload.book_id },
+      current_page: payload.current_page || 0,
       progress: Number(progress.toFixed(2)),
       status: true
     });

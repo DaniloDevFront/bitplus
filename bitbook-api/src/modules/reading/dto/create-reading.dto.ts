@@ -2,6 +2,10 @@ import { ApiProperty } from '@nestjs/swagger';
 import { IsNumber, IsOptional, Min } from 'class-validator';
 
 export class CreateReadingDto {
+  @ApiProperty({ description: 'ID do usuário' })
+  @IsNumber()
+  user_id: number;
+
   @ApiProperty({ description: 'ID do livro' })
   @IsNumber()
   book_id: number;
