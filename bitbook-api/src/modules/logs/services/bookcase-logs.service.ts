@@ -10,9 +10,7 @@ export interface TopBookcaseBook {
     title: string;
     type: ContentType;
   };
-  bookcase: {
-    status: boolean;
-  };
+  count: number;
 }
 
 @Injectable()
@@ -44,9 +42,7 @@ export class BookcaseLogsService {
         title: item.book_title,
         type: item.book_type,
       },
-      bookcase: {
-        status: true,
-      },
+      count: parseInt(item.bookcase_count),
     }));
   }
 
