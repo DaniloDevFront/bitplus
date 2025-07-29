@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { EntityManager } from 'typeorm';
 import { compare, hash, genSalt } from 'bcrypt';
@@ -28,10 +28,16 @@ export class AuthAppService {
   async login(login: string, password: string, loginInfo?: LoginInfo): Promise<Access> {
     try {
       const user = await this.validateUser(login, password);
+
       if (!user) {
         // Registra tentativa de login falhada
         await this.logLoginAttempt(null, LOGIN_STATUS.FAILED, LOGIN_TYPE.EMAIL_PASSWORD, loginInfo, 'Credenciais inválidas');
         throw new UnauthorizedException('Credenciais inválidas');
+      }
+
+      // Se o usuário é legacy e fez login com sucesso, migra para o novo formato
+      if (user.legacy) {
+        await this.migrateLegacyUser(user.id, password);
       }
 
       const payload = { sub: user.id };
@@ -171,12 +177,74 @@ export class AuthAppService {
   private async validateUser(login: string, password: string): Promise<Omit<User, 'password'> | null> {
     const user = await this.UsersService.findByLogin(login);
 
-    if (user && (await compare(password, user.password))) {
-      const { password, ...result } = user;
-      return result;
+    if (!user) {
+      return null;
+    }
+
+    // Verifica se é um usuário legacy (vindo do Laravel)
+    if (user.legacy) {
+      const isValidLegacyPassword = await this.validateLegacyPassword(password, user.password);
+      if (isValidLegacyPassword) {
+        const { password, ...result } = user;
+        return result;
+      }
+    } else {
+      // Usuário novo - usa bcrypt padrão
+      const isValidPassword = await compare(password, user.password);
+      if (isValidPassword) {
+        const { password, ...result } = user;
+        return result;
+      }
     }
 
     return null;
+  }
+
+  /**
+ * Valida senha legacy do Laravel (bcrypt com formato $2y$)
+ * O Laravel usa $2y$ enquanto o Node.js bcrypt usa $2a$ ou $2b$
+ */
+  private async validateLegacyPassword(password: string, hashedPassword: string): Promise<boolean> {
+    try {
+      // Verifica se o hash tem o formato do Laravel ($2y$)
+      if (!hashedPassword.startsWith('$2y$')) {
+        return false;
+      }
+
+      // Converte o formato $2y$ para $2a$ (compatível com bcrypt do Node.js)
+      const convertedHash = hashedPassword.replace('$2y$', '$2a$');
+
+      // Compara a senha com o hash convertido
+      return await compare(password, convertedHash);
+    } catch (error) {
+      console.error('Erro ao validar senha legacy:', error);
+      return false;
+    }
+  }
+
+  /**
+   * Migra usuário legacy para o novo formato de hash
+   * Converte a senha do formato Laravel para o formato Node.js
+   */
+  private async migrateLegacyUser(userId: number, password: string): Promise<void> {
+    try {
+      // Gera novo hash no formato Node.js
+      const newHash = await hash(password, 10);
+
+      // Atualiza o usuário removendo a flag legacy e atualizando o hash
+      await this.entityManager
+        .createQueryBuilder()
+        .update(User)
+        .set({
+          password: newHash,
+          legacy: false
+        })
+        .where('id = :userId', { userId })
+        .execute();
+    } catch (error) {
+      console.error(`Erro ao migrar usuário ${userId}:`, error);
+      // Não lança erro para não interromper o login
+    }
   }
 
   async setBiometricSecret(userId: number, biometricSecret: string, loginInfo?: LoginInfo): Promise<{ message: string }> {
