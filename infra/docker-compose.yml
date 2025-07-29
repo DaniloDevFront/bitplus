@@ -77,3 +77,4 @@ services:
 networks:
   bitplus-network:
     driver: bridge
+# rebuild
