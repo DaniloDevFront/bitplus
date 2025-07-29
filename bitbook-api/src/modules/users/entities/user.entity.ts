@@ -41,6 +41,9 @@ export class User {
   @Column({ default: false })
   isBiometricEnabled: boolean;
 
+  @Column({ default: false })
+  legacy: boolean;
+
   @CreateDateColumn()
   created_at: Date;
 
