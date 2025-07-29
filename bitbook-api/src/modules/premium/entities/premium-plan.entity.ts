@@ -18,6 +18,12 @@ export class PremiumPlan {
   @Column({ name: 'price' })
   price: string;
 
+  @Column({ name: 'id_apple' })
+  id_apple: string;
+
+  @Column({ name: 'id_google' })
+  id_google: string;
+
   @Column({ name: 'created_at', default: () => 'CURRENT_TIMESTAMP' })
   created_at: Date;
 
