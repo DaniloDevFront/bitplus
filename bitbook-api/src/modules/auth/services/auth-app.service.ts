@@ -12,6 +12,8 @@ import { LOGIN_TYPE, LOGIN_STATUS } from '../../logs/enums/login.enum';
 import { LoginInfo } from '../interceptors/login-info.interceptor';
 import { RegisterDto } from '../dto/auth.dto';
 import { ProvidersService } from 'src/modules/_legacy/services/providers.service';
+import { EmailService } from '../../email/email.service';
+import { generateSecurePassword } from '../../email/utils/password-generator.util';
 
 @Injectable()
 export class AuthAppService {
@@ -23,6 +25,7 @@ export class AuthAppService {
     private registrationsLogsService: RegistrationsLogsService,
     private jwtService: JwtService,
     private providersService: ProvidersService,
+    private emailService: EmailService,
   ) { }
 
   async login(login: string, password: string, loginInfo?: LoginInfo): Promise<Access> {
@@ -122,21 +125,30 @@ export class AuthAppService {
       const user = await this.UsersService.findByLogin(login);
       if (!user) {
         await this.logLoginAttempt(null, LOGIN_STATUS.FAILED, LOGIN_TYPE.EMAIL_PASSWORD, loginInfo, 'Usuário não encontrado para recuperação de senha');
+
         throw new NotFoundException('Usuário não encontrado');
       }
 
-      const salt = await genSalt(10);
-      const resetToken = await hash(Math.random().toString(36), salt);
+      // Gerar nova senha aleatória segura
+      const newPassword = generateSecurePassword(12);
 
-      // Aqui você pode salvar o token no banco ou enviar via email
-      // Exemplo fictício:
-      console.log(`Token de recuperação: ${resetToken}`);
+      // Hash da nova senha
+      const hashedPassword = await hash(newPassword, 10);
+
+      // Atualizar senha do usuário no banco
+      await this.entityManager.update(User, user.id, {
+        password: hashedPassword
+      });
+
+      // Enviar email com a nova senha
+      const userName = user.profile?.name || user.email.split('@')[0];
+      await this.emailService.sendPasswordResetEmail(user.email, newPassword, userName);
 
       // Registra tentativa de recuperação de senha
-      await this.logLoginAttempt(user.id, LOGIN_STATUS.SUCCESS, LOGIN_TYPE.EMAIL_PASSWORD, loginInfo, 'Solicitação de recuperação de senha');
+      await this.logLoginAttempt(user.id, LOGIN_STATUS.SUCCESS, LOGIN_TYPE.EMAIL_PASSWORD, loginInfo, 'Solicitação de recuperação de senha - nova senha enviada');
 
       return {
-        message: 'E-mail enviado com instruções para redefinir a senha',
+        message: 'Nova senha enviada para o seu e-mail',
       };
     } catch (error) {
       await this.logLoginAttempt(null, LOGIN_STATUS.FAILED, LOGIN_TYPE.EMAIL_PASSWORD, loginInfo, `Falha na recuperação de senha: ${error.message}`);
@@ -246,6 +258,7 @@ export class AuthAppService {
       // Não lança erro para não interromper o login
     }
   }
+
 
   async setBiometricSecret(userId: number, biometricSecret: string, loginInfo?: LoginInfo): Promise<{ message: string }> {
     try {
