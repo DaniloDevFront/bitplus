@@ -137,7 +137,8 @@ export class AuthAppService {
 
       // Atualizar senha do usuário no banco
       await this.entityManager.update(User, user.id, {
-        password: hashedPassword
+        password: hashedPassword,
+        legacy: false
       });
 
       // Enviar email com a nova senha
