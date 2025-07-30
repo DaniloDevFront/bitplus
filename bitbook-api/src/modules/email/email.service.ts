@@ -82,9 +82,11 @@ export class EmailService {
             margin-bottom: 30px;
           }
           .logo {
+            background: #926ad8;
+            padding: 16px 0;
             font-size: 24px;
             font-weight: bold;
-            color: #2c3e50;
+            color: #FFFFFFFF;
             margin-bottom: 10px;
           }
           .content {
@@ -133,7 +135,6 @@ export class EmailService {
         <div class="container">
           <div class="header">
             <div class="logo">Bitbook</div>
-            <h2>Nova Senha Gerada</h2>
           </div>
           
           <div class="content">
