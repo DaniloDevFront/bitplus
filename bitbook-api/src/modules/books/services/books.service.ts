@@ -201,8 +201,7 @@ export class BooksService {
           file_url: mediaData.file_url,
           img_small: mediaData.img_small,
           img_medium: mediaData.img_medium,
-          img_large: mediaData.img_large,
-          books: ebook
+          img_large: mediaData.img_large
         }
 
         await this.entityManager.update(BooksMedia, ebook.media.id, result);
