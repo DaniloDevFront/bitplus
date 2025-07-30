@@ -78,14 +78,16 @@ export class EmailService {
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
           }
           .header {
+            width: 100%;
             text-align: center;
             margin-bottom: 30px;
           }
           .logo {
+            width: 100%;
+            background: #926ad8;
             font-size: 24px;
             font-weight: bold;
-            color: #2c3e50;
-            margin-bottom: 10px;
+            color: #FFFFFFFF;
           }
           .content {
             margin-bottom: 30px;
