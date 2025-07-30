@@ -82,11 +82,9 @@ export class EmailService {
             margin-bottom: 30px;
           }
           .logo {
-            background: #926ad8;
-            padding: 16px 0;
             font-size: 24px;
             font-weight: bold;
-            color: #FFFFFFFF;
+            color: #2c3e50;
             margin-bottom: 10px;
           }
           .content {
