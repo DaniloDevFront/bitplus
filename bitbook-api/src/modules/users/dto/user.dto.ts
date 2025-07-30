@@ -42,7 +42,6 @@ export class CreateUserDto {
   @IsOptional()
   cpf?: string;
 
-
   @ApiProperty({ example: '23/05/1996' })
   @IsOptional()
   @Transform(({ value }) => {
@@ -127,9 +126,9 @@ export class UpdateUserDto {
   @IsBoolean()
   premium?: boolean;
 
-  @ApiPropertyOptional({ example: true, default: false })
+  @ApiPropertyOptional({ example: 'admin', enum: UserRole })
   @IsOptional()
-  @IsBoolean()
+  @IsEnum(UserRole)
   role?: UserRole;
 
   @ApiPropertyOptional({ example: 'pre_liberacao' })
