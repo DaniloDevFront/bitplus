@@ -30,7 +30,7 @@ export class EmailService {
         },
         Message: {
           Subject: {
-            Data: 'Nova Senha - Bitbook',
+            Data: '🔐 IMPORTANTE: Nova Senha - Bitbook',
             Charset: 'UTF-8',
           },
           Body: {
@@ -57,7 +57,10 @@ export class EmailService {
       <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Nova Senha - Bitbook</title>
+        <meta name="X-Priority" content="1">
+        <meta name="X-MSMail-Priority" content="High">
+        <meta name="Importance" content="High">
+        <title>🔐 Nova Senha - Bitbook</title>
         <style>
           body {
             font-family: Arial, sans-serif;
@@ -83,6 +86,19 @@ export class EmailService {
             font-weight: bold;
             color: #2c3e50;
             margin-bottom: 10px;
+          }
+          .important-badge {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin: 10px 0;
+            display: inline-block;
+            box-shadow: 0 2px 8px rgba(255, 107, 107, 0.3);
           }
           .content {
             margin-bottom: 30px;
@@ -130,6 +146,7 @@ export class EmailService {
         <div class="container">
           <div class="header">
             <div class="logo">Bitbook</div>
+            <div class="important-badge">🔐 IMPORTANTE</div>
             <h2>Nova Senha Gerada</h2>
           </div>
           
