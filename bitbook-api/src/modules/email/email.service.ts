@@ -19,7 +19,7 @@ export class EmailService {
 
   async sendPasswordResetEmail(email: string, newPassword: string, userName: string): Promise<void> {
     try {
-      const fromEmail = 'contato@bitplus.app.br';
+      const fromEmail = 'Bitbook <contato@bitplus.app.br>'
 
       const htmlBody = this.generatePasswordResetTemplate(userName, newPassword);
 
