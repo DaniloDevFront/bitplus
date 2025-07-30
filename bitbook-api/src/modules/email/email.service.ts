@@ -85,6 +85,7 @@ export class EmailService {
           .logo {
             width: 100%;
             background: #926ad8;
+            padding: 16px;
             font-size: 24px;
             font-weight: bold;
             color: #FFFFFFFF;
