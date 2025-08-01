@@ -10,6 +10,7 @@ export class AddLandpageToBooks1752518000001 implements MigrationInterface {
     // Atualiza todos os registros existentes para ter landpage = false
     await queryRunner.query(`UPDATE books SET landpage = false WHERE landpage IS NULL`);
   }
+  // fix
 
   public async down(queryRunner: QueryRunner): Promise<void> {
     // Remove a coluna landpage
