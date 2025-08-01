@@ -102,4 +102,17 @@ export class FindEbookDto {
   @IsOptional()
   @IsEnum(ExploreLabelEnum)
   explore?: ExploreLabel;
+
+  @ApiPropertyOptional({
+    description: 'Filtrar para landpage',
+    example: true
+  })
+  @IsOptional()
+  @IsBoolean()
+  @Transform(({ value }) => {
+    if (value === 'true') return true;
+    if (value === 'false') return false;
+    return undefined;
+  })
+  landpage?: boolean;
 } 

@@ -18,6 +18,9 @@ export class Books {
   @Column({ default: false })
   high: boolean;
 
+  @Column({ default: false })
+  landpage: boolean;
+
   @Column({
     type: 'enum',
     enum: ContentType,

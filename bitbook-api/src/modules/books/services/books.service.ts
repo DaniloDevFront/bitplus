@@ -889,4 +889,19 @@ export class BooksService {
       } : null,
     }));
   }
+
+  async findByLandpage(): Promise<any[]> {
+    const ebooks = await this.entityManager.find(Books, {
+      where: { landpage: true },
+      relations: ['media'],
+      order: { id: 'DESC' },
+      take: 5,
+    });
+
+    return ebooks.map(ebook => ({
+      id: ebook.id,
+      title: ebook.title,
+      cover: ebook.media?.img_large ?? null
+    }));
+  }
 } 

@@ -92,7 +92,7 @@ export class BooksController {
   })
   @ApiResponse({ status: 401, description: 'Não autorizado' })
   async find(@Query() query: FindEbookDto) {
-    const { id, title, premium, category, high, arrived, explore, audiobooks, user_id } = query;
+    const { id, title, premium, category, high, arrived, explore, audiobooks, user_id, landpage } = query;
 
     if (id) return this.booksService.findById(id, user_id);
     if (title) return this.booksService.findByTitle(title);
@@ -102,6 +102,7 @@ export class BooksController {
     if (audiobooks) return this.booksService.findByAudiobooks();
     if (explore) return this.booksService.findByExplore(explore, user_id);
     if (category) return this.booksService.findByCategory(category);
+    if (landpage === true) return this.booksService.findByLandpage();
 
     return this.booksService.findAll();
   }
