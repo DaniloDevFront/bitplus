@@ -56,7 +56,7 @@ export class ReadingService {
     return this.entityManager.save(Reading, reading);
   }
 
-  async updateProgress(book_id: number, current_page: number, user_id: number): Promise<Reading> {
+  async updateProgress(book_id: number, current_page: number, user_id: number): Promise<any> {
     const reading = await this.entityManager.findOne(Reading, {
       where: {
         user: { id: user_id },
@@ -75,7 +75,15 @@ export class ReadingService {
 
     reading.current_page = current_page;
     reading.progress = Number(progress.toFixed(2));
-    return this.entityManager.save(Reading, reading);
+    await this.entityManager.save(Reading, reading);
+
+    return {
+      id: reading.id,
+      current_page: reading.current_page,
+      total_pages: reading.total_pages,
+      progress: reading.progress,
+      status: reading.status,
+    }
   }
 
   async remove(book_id: number, user_id: number): Promise<void> {
