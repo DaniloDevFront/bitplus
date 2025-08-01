@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Put, Param, Delete, UseGuards, Request, Query, ForbiddenException } from '@nestjs/common';
+import { Controller, Get, Post, Body, Put, Param, Delete, UseGuards, Request, Query, ForbiddenException, NotFoundException } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/core/jwt/jwt-auth.guard';
 import { ReadingService } from '../services/reading.service';
@@ -54,14 +54,19 @@ export class ReadingController {
     description: 'Lista de leituras encontradas',
   })
   @ApiResponse({ status: 401, description: 'Não autorizado' })
-  async find(@Query() query: { book_id?: number }, @Request() req) {
-    const user_id = req.user.userId;
-    const { book_id } = query;
+  async find(@Query() query: { book_id?: number, user_id?: number }) {
+    const { book_id, user_id } = query;
 
-    if (book_id) {
+    if (book_id !== undefined && user_id === undefined) {
+      throw new NotFoundException('Nenhum parametro informado');
+    }
+
+    if (book_id !== undefined && user_id !== undefined) {
       return this.readingService.findByUserAndBook(user_id, book_id);
     }
 
-    return this.readingService.findAllByUser(user_id);
+    if (user_id !== undefined) {
+      return this.readingService.findAllByUser(user_id);
+    }
   }
 } 
