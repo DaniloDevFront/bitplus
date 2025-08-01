@@ -40,8 +40,8 @@ COPY --from=builder /app/src/core/database/typeorm.config.ts ./src/core/database
 COPY --from=builder /app/src/core/database/migrations ./src/core/database/migrations
 COPY --from=builder /app/docs ./docs
 
-# Instala apenas dependências de produção
-RUN npm ci --only=production
+# Instala apenas dependências de produção (versão corrigida)
+RUN npm install --only=production --no-optional
 
 # Define variáveis de ambiente
 ENV NODE_ENV=development
