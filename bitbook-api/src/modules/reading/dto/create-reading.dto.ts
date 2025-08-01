@@ -21,4 +21,19 @@ export class CreateReadingDto {
   @IsNumber()
   @Min(1)
   total_pages?: number;
+}
+
+export class UpdateReadingDto {
+  @ApiProperty({ description: 'ID do usuário' })
+  @IsNumber()
+  user_id: number;
+
+  @ApiProperty({ description: 'ID do livro' })
+  @IsNumber()
+  book_id: number;
+
+  @ApiProperty({ description: 'Página atual' })
+  @IsNumber()
+  @Min(0)
+  current_page: number;
 } 

@@ -2,7 +2,7 @@ import { Controller, Get, Post, Body, Put, Param, Delete, UseGuards, Request, Qu
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/core/jwt/jwt-auth.guard';
 import { ReadingService } from '../services/reading.service';
-import { CreateReadingDto } from '../dto/create-reading.dto';
+import { CreateReadingDto, UpdateReadingDto } from '../dto/create-reading.dto';
 
 @ApiTags('Readings')
 @Controller('readings')
@@ -22,8 +22,6 @@ export class ReadingController {
     return this.readingService.create(payload);
   }
 
-
-
   @Put('progress')
   @ApiOperation({ summary: 'Atualizar progresso da leitura' })
   @ApiResponse({
@@ -32,13 +30,8 @@ export class ReadingController {
   })
   @ApiResponse({ status: 401, description: 'Não autorizado' })
   @ApiResponse({ status: 403, description: 'Você não tem permissão para atualizar esta leitura' })
-  async updateProgress(
-    @Query('book_id') book_id: number,
-    @Body('current_page') current_page: number,
-    @Request() req
-  ) {
-    const user_id = req.user.userId;
-    return this.readingService.updateProgress(book_id, current_page, user_id);
+  async updateProgress(@Body() payload: UpdateReadingDto) {
+    return this.readingService.updateProgress(payload.book_id, payload.current_page, payload.user_id);
   }
 
   @Delete()
