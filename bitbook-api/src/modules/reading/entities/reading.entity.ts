@@ -10,6 +10,9 @@ export class Reading {
   @Column({ type: 'int', default: 0 })
   current_page: number;
 
+  @Column({ type: 'int', default: 0 })
+  total_pages: number;
+
   @Column({ type: 'float', default: 0 })
   progress: number;
 

@@ -35,7 +35,7 @@ export class ReadingService {
     });
 
     if (existingReading) {
-      throw new ForbiddenException('Você já possui uma leitura ativa para este livro');
+      return existingReading;
     }
 
     // Calcula o progresso se current_page e total_pages forem fornecidos
@@ -48,6 +48,7 @@ export class ReadingService {
       user: { id: payload.user_id },
       book: { id: payload.book_id },
       current_page: payload.current_page || 0,
+      total_pages: payload.total_pages || 0,
       progress: Number(progress.toFixed(2)),
       status: true
     });
@@ -55,7 +56,7 @@ export class ReadingService {
     return this.entityManager.save(Reading, reading);
   }
 
-  async updateProgress(book_id: number, current_page: number, total_pages: number, user_id: number): Promise<Reading> {
+  async updateProgress(book_id: number, current_page: number, user_id: number): Promise<Reading> {
     const reading = await this.entityManager.findOne(Reading, {
       where: {
         user: { id: user_id },
@@ -69,7 +70,8 @@ export class ReadingService {
       throw new NotFoundException('Leitura não encontrada');
     }
 
-    const progress = (current_page / total_pages) * 100;
+    // Calcula o progresso usando o total_pages armazenado na tabela readings
+    const progress = reading.total_pages > 0 ? (current_page / reading.total_pages) * 100 : 0;
 
     reading.current_page = current_page;
     reading.progress = Number(progress.toFixed(2));

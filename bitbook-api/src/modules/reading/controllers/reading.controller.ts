@@ -22,6 +22,8 @@ export class ReadingController {
     return this.readingService.create(payload);
   }
 
+
+
   @Put('progress')
   @ApiOperation({ summary: 'Atualizar progresso da leitura' })
   @ApiResponse({
@@ -33,11 +35,10 @@ export class ReadingController {
   async updateProgress(
     @Query('book_id') book_id: number,
     @Body('current_page') current_page: number,
-    @Body('total_pages') total_pages: number,
     @Request() req
   ) {
     const user_id = req.user.userId;
-    return this.readingService.updateProgress(book_id, current_page, total_pages, user_id);
+    return this.readingService.updateProgress(book_id, current_page, user_id);
   }
 
   @Delete()
