@@ -14,6 +14,7 @@ import { BooksMedia } from '../entities/books-media.entity';
 import { BooksMediaHelper } from '../helpers/books-media.helper';
 import { DateHelper } from '../../../shared/helpers/date.helper';
 import { UploadsService } from '../../uploads/uploads.service';
+import { Reading } from 'src/modules/reading/entities/reading.entity';
 
 @Injectable()
 export class BooksService {
@@ -491,12 +492,31 @@ export class BooksService {
     }
 
     let inBookcase = false;
+    let userProgress = null;
 
     if (user_id) {
       const bookcase = await this.entityManager.findOne(Bookcase, {
         where: { book_id: id, user_id, status: true }
       });
       inBookcase = !!bookcase;
+
+      // buscar reading do usuario
+      const reading = await this.entityManager.findOne(Reading, {
+        where: {
+          book: { id },
+          user: { id: user_id },
+          status: true
+        }
+      });
+
+      if (reading) {
+        userProgress = {
+          current_page: reading.current_page,
+          total_pages: reading.total_pages,
+          progress: reading.progress,
+          updated_at: reading.updated_at
+        };
+      }
     }
 
     return {
@@ -534,6 +554,7 @@ export class BooksService {
         id: ebook.category.id,
         category_name: ebook.category.name
       }],
+      progress: userProgress ?? null,
       created_at: DateHelper.formatDateTime(ebook.created_at)
     };
   }
