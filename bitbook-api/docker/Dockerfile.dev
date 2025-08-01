@@ -14,8 +14,8 @@ WORKDIR /app
 # Copia arquivos de dependências
 COPY package*.json ./
 
-# Instala dependências incluindo opcionais (necessário para Sharp)
-RUN npm install --include=optional
+# Instala dependências
+RUN npm install
 
 # Copia o código fonte
 COPY . .
@@ -40,8 +40,8 @@ COPY --from=builder /app/src/core/database/typeorm.config.ts ./src/core/database
 COPY --from=builder /app/src/core/database/migrations ./src/core/database/migrations
 COPY --from=builder /app/docs ./docs
 
-# Instala apenas dependências de produção incluindo opcionais (Sharp)
-RUN npm install --only=production --include=optional
+# Instala apenas dependências de produção
+RUN npm ci --only=production
 
 # Define variáveis de ambiente
 ENV NODE_ENV=development
@@ -51,3 +51,5 @@ EXPOSE 3000
 
 # Comando para iniciar a aplicação em modo desenvolvimento
 CMD ["npm", "run", "start:development"]
+
+# teste
