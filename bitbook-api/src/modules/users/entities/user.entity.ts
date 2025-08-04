@@ -41,6 +41,9 @@ export class User {
   @Column({ default: false })
   isBiometricEnabled: boolean;
 
+  @Column({ nullable: true, default: null })
+  subscription_id: string;
+
   @Column({ default: false })
   legacy: boolean;
 
