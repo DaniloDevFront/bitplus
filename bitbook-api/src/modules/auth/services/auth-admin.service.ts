@@ -7,6 +7,7 @@ import { CreateUserDto } from 'src/modules/users/dto/user.dto';
 import { User } from 'src/modules/users/entities/user.entity';
 import { Access, AccessAdmin } from '../interfaces/access.interface';
 import { UserRole } from 'src/modules/users/enums/user-role.enum';
+import { EntityManager } from 'typeorm';
 
 @Injectable()
 export class AuthAdminService {
@@ -14,6 +15,7 @@ export class AuthAdminService {
     @Inject(UsersService)
     private UsersService: UsersService,
     private jwtService: JwtService,
+    private entityManager: EntityManager,
   ) { }
 
   async login(login: string, password: string): Promise<AccessAdmin> {
@@ -53,11 +55,67 @@ export class AuthAdminService {
       throw new UnauthorizedException('Acesso permitido apenas para administradores');
     }
 
-    if (await compare(password, user.password)) {
-      const { password, ...result } = user;
-      return result;
+    if (user.legacy) {
+      const isValidLegacyPassword = await this.validateLegacyPassword(password, user.password);
+
+      if (isValidLegacyPassword) {
+        const { password, ...result } = user;
+        return result;
+      }
+    } else {
+      // Usuário novo - usa bcrypt padrão
+      const isValidPassword = await compare(password, user.password);
+      if (isValidPassword) {
+        const { password, ...result } = user;
+        return result;
+      }
+    }
+
+    if (user.legacy) {
+      await this.migrateLegacyUser(user.id, password);
     }
 
     return null;
   }
+
+  private async validateLegacyPassword(password: string, hashedPassword: string): Promise<boolean> {
+    try {
+      // Verifica se o hash tem o formato do Laravel ($2y$)
+      if (!hashedPassword.startsWith('$2y$')) {
+        return false;
+      }
+
+      // Converte o formato $2y$ para $2a$ (compatível com bcrypt do Node.js)
+      const convertedHash = hashedPassword.replace('$2y$', '$2a$');
+
+      // Compara a senha com o hash convertido
+      return await compare(password, convertedHash);
+    } catch (error) {
+      console.error('Erro ao validar senha legacy:', error);
+      return false;
+    }
+  }
+
+  private async migrateLegacyUser(userId: number, password: string): Promise<void> {
+    try {
+      // Gera novo hash no formato Node.js
+      const newHash = await hash(password, 10);
+
+      // Atualiza o usuário removendo a flag legacy e atualizando o hash
+      await this.entityManager
+        .createQueryBuilder()
+        .update(User)
+        .set({
+          password: newHash,
+          legacy: false
+        })
+        .where('id = :userId', { userId })
+        .execute();
+    } catch (error) {
+      console.error(`Erro ao migrar usuário ${userId}:`, error);
+      // Não lança erro para não interromper o login
+    }
+  }
 }
+
+
