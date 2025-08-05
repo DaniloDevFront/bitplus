@@ -168,7 +168,7 @@ export class UsersService {
     });
   }
 
-  async findById(id: number): Promise<User & { provider: Provider }> {
+  async findById(id: number): Promise<User & { provider: any }> {
     const user = await this.entityManager.findOne(User, {
       where: { id },
       relations: ['profile'],
@@ -182,7 +182,17 @@ export class UsersService {
 
     return {
       ...user,
-      provider: provider ? provider : null,
+      provider: provider ? {
+        id: provider.registro.id,
+        name: provider.registro.nome,
+        media: {
+          small: provider.registro.img || null,
+          large: provider.registro.img_grande || null,
+          list: provider.registro.img_lista || null,
+          home: provider.registro.img_home || null,
+        },
+        method: provider.registro.campo_vinculacao === "subscriberId" ? "login" : "cpf",
+      } : null,
     };
   }
 
