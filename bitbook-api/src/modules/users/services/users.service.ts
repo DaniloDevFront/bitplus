@@ -5,7 +5,7 @@ import { hash, compare } from 'bcrypt';
 import { User } from '../entities/user.entity';
 import { Profile } from '../entities/profile.entity';
 import { UserRole } from '../enums/user-role.enum';
-import { ChangePasswordDto, CreateUserDto, UpdateUserDto } from '../dto/user.dto';
+import { ChangePasswordDto, CreateUserDto, CreateUserExternalDto, UpdateUserDto } from '../dto/user.dto';
 import { UploadsService } from '../../uploads/uploads.service';
 import { ProvidersService } from '../../_legacy/services/providers.service';
 
@@ -64,6 +64,34 @@ export class UsersService {
       subscription_login: payload.subscription_login || null,
       profile,
     });
+
+    return this.entityManager.save(User, user);
+  }
+
+  async createExternal(payload: CreateUserExternalDto): Promise<User> {
+    const existingSubscriptionLogin = await this.findBySubscriptionLogin(payload.subscription_login);
+
+    if (existingSubscriptionLogin) {
+      throw new ConflictException('Usuário já existe');
+    }
+
+    const user = this.entityManager.create(User, {
+      role: UserRole.CLIENT,
+      premium: true,
+      terms: true,
+      provider_id: payload.provider_id,
+      subscription_login: payload.subscription_login,
+      subscription_id: payload.subscription_id,
+    });
+
+    const profile = this.entityManager.create(Profile, {
+      name: null,
+      phone: null,
+      cpf: null,
+      birth_date: null,
+    });
+
+    user.profile = profile;
 
     return this.entityManager.save(User, user);
   }

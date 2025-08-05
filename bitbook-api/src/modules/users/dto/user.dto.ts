@@ -82,6 +82,23 @@ export class CreateUserDto {
   subscription_login?: string;
 }
 
+export class CreateUserExternalDto {
+  @ApiProperty({ example: '1234567890' })
+  @IsString()
+  @IsOptional()
+  provider_id?: number;
+
+  @ApiProperty({ example: '1234567890' })
+  @IsString()
+  @IsOptional()
+  subscription_id?: string;
+
+  @ApiProperty({ example: '1234567890' })
+  @IsString()
+  @IsOptional()
+  subscription_login?: string;
+}
+
 export class UpdateProfileDto {
   @ApiPropertyOptional({ example: 'Jane Doe' })
   @IsString()
@@ -221,7 +238,6 @@ export class FindUserDto {
   })
   premium?: boolean;
 }
-
 export class ChangePasswordDto {
   @ApiProperty({ example: 'senhaAntiga123' })
   @IsString()
@@ -234,12 +250,10 @@ export class ChangePasswordDto {
   @MinLength(6)
   new_password: string;
 }
-
 export class UpdateAvatarDto {
   @ApiProperty({ type: 'string', format: 'binary' })
   avatar: Express.Multer.File;
 }
-
 export class UpdateCoverDto {
   @ApiProperty({ type: 'string', format: 'binary' })
   cover: Express.Multer.File;

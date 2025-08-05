@@ -6,6 +6,7 @@ import { UsersService } from 'src/modules/users/services/users.service';
 import { LoginInfo } from '../interceptors/login-info.interceptor';
 import { AuthPartnerCpfDto, AuthPartnerExternalDto, CheckUserPartnerDto } from '../dto/auth-partners.dto';
 import { User } from 'src/modules/users/entities/user.entity';
+import { UserRole } from 'src/modules/users/enums/user-role.enum';
 @Injectable()
 export class AuthPartnersService {
   constructor(
@@ -83,21 +84,21 @@ export class AuthPartnersService {
     const user = await this.userService.findBySubscriptionLogin(payload.login)
 
     if (!user) {
-      return {
-        status: true,
-        account: false,
-        message: "Você está liberado no provedor, mas não possui uma conta. Prossiga com o registro."
+      await this.userService.createExternal({
+        subscription_login: payload.login,
+        subscription_id: authentication.subscriberId,
+        provider_id: payload.provider_id,
+      })
+    } else {
+      const update: UpdateUserDto = {
+        provider_id: payload.provider_id,
+        premium: true,
+        subscription_id: authentication.subscriberId,
+        subscription_login: payload.login,
       }
-    }
 
-    const update: UpdateUserDto = {
-      provider_id: payload.provider_id,
-      premium: true,
-      subscription_id: authentication.subscriberId,
-      subscription_login: payload.login,
+      await this.userService.update(user.id, update)
     }
-
-    await this.userService.update(user.id, update)
 
     return await this.authService.login(payload.login, payload.password, loginInfo, true)
   }
