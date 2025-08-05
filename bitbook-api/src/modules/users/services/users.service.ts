@@ -60,6 +60,8 @@ export class UsersService {
       premium,
       terms: payload.terms,
       provider_id: payload.provider_id || null,
+      subscription_id: payload.subscription_id || null,
+      subscription_login: payload.subscription_login || null,
       profile,
     });
 

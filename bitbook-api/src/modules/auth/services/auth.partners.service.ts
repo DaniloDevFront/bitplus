@@ -6,8 +6,6 @@ import { UsersService } from 'src/modules/users/services/users.service';
 import { LoginInfo } from '../interceptors/login-info.interceptor';
 import { AuthPartnerCpfDto, AuthPartnerExternalDto, CheckUserPartnerDto } from '../dto/auth-partners.dto';
 import { User } from 'src/modules/users/entities/user.entity';
-import { threadId } from 'worker_threads';
-
 @Injectable()
 export class AuthPartnersService {
   constructor(

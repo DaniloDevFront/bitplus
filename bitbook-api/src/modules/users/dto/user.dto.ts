@@ -70,6 +70,16 @@ export class CreateUserDto {
   @IsOptional()
   @IsNumber()
   provider_id?: number;
+
+  @ApiProperty({ example: '1234567890' })
+  @IsString()
+  @IsOptional()
+  subscription_id?: string;
+
+  @ApiProperty({ example: '1234567890' })
+  @IsString()
+  @IsOptional()
+  subscription_login?: string;
 }
 
 export class UpdateProfileDto {

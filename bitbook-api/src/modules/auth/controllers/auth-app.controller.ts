@@ -64,6 +64,7 @@ export class AuthAppController {
   @ApiBody({ type: RegisterDto })
   async register(@Body() payload: RegisterDto, @Request() req): Promise<Access> {
     const loginInfo: LoginInfo = req.loginInfo;
+
     return this.authService.register(payload, loginInfo);
   }
 
