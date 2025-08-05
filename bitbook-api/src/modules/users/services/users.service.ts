@@ -1,4 +1,4 @@
-import { Injectable, ConflictException, NotFoundException, BadRequestException, Logger } from '@nestjs/common';
+import { Injectable, ConflictException, NotFoundException, BadRequestException, Logger, Provider } from '@nestjs/common';
 import { InjectEntityManager } from '@nestjs/typeorm';
 import { EntityManager } from 'typeorm';
 import { hash, compare } from 'bcrypt';
@@ -168,7 +168,7 @@ export class UsersService {
     });
   }
 
-  async findById(id: number): Promise<User> {
+  async findById(id: number): Promise<User & { provider: Provider }> {
     const user = await this.entityManager.findOne(User, {
       where: { id },
       relations: ['profile'],
@@ -178,7 +178,12 @@ export class UsersService {
       throw new NotFoundException('Usuário não encontrado');
     }
 
-    return user;
+    const provider = await this.providersService.findProvider(user.provider_id);
+
+    return {
+      ...user,
+      provider: provider ? provider : null,
+    };
   }
 
   async findByEmail(email: string): Promise<User | null> {
