@@ -1,9 +1,10 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
 import { HttpService } from "@nestjs/axios";
 import { AxiosResponse } from 'axios';
 import { firstValueFrom } from 'rxjs';
 
 import { CheckClientPayload, CheckClientResponse, ProviderResponse } from '../models/providers.models';
+import { AuthPartnerExternalDto } from 'src/modules/auth/dto/auth-partners.dto';
 
 const BASE_URL = "https://api-bitbook.bitplus.app.br"
 
@@ -75,6 +76,53 @@ export class ProvidersService {
     } catch (error: any) {
       throw new BadRequestException(
         error.response?.data?.resposta || 'Erro ao buscar provedor'
+      );
+    }
+  }
+
+  async checkPartnerExternal(payload: AuthPartnerExternalDto) {
+
+    const data = {
+      username: payload.login,
+      password: payload.password,
+    }
+
+    const url = `${BASE_URL}/api/passive/${payload.provider_id}/authentication`
+
+    try {
+      const response: AxiosResponse<any> = await firstValueFrom(this.httpService.post(url, data))
+
+      const authorization = await this.getAuthorizationUserExternal(payload.provider_id, response.data.subscriberId)
+
+      return {
+        authorization,
+        authentication: {
+          ...response.data
+        }
+      }
+    } catch (error: any) {
+
+      throw new BadRequestException(
+        error.response?.data?.resposta || 'Erro ao autenticar parceiro externo'
+      );
+    }
+  }
+
+  async getAuthorizationUserExternal(provider_id: number, subscription_id: string) {
+    const url = `${BASE_URL}/api/passive/${provider_id}/authorization`
+
+    const payload = {
+      empresa_id: provider_id,
+      subscriberId: subscription_id
+    }
+
+    try {
+      const response: AxiosResponse<any> = await firstValueFrom(this.httpService.post(url, payload))
+      return response.data
+
+    } catch (error: any) {
+      throw new BadRequestException(
+        error.response?.data?.resposta || 'Erro ao autenticar parceiro externo'
       );
     }
   }

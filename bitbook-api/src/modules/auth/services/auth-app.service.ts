@@ -28,9 +28,16 @@ export class AuthAppService {
     private emailService: EmailService,
   ) { }
 
-  async login(login: string, password: string, loginInfo?: LoginInfo): Promise<Access> {
+  async login(login: string, password: string, loginInfo?: LoginInfo, login_subscription: boolean = false): Promise<Access> {
     try {
-      const user = await this.validateUser(login, password);
+
+      let user = null;
+
+      if (login_subscription) {
+        user = await this.UsersService.findBySubscriptionLogin(login);
+      } else {
+        user = await this.validateUser(login, password);
+      }
 
       if (!user) {
         // Registra tentativa de login falhada

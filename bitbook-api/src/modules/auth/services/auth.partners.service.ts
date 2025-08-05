@@ -4,8 +4,9 @@ import { AuthAppService } from './auth-app.service';
 import { UpdateUserDto } from 'src/modules/users/dto/user.dto';
 import { UsersService } from 'src/modules/users/services/users.service';
 import { LoginInfo } from '../interceptors/login-info.interceptor';
-import { AuthPartnerCpfDto, CheckUserPartnerDto } from '../dto/auth-partners.dto';
+import { AuthPartnerCpfDto, AuthPartnerExternalDto, CheckUserPartnerDto } from '../dto/auth-partners.dto';
 import { User } from 'src/modules/users/entities/user.entity';
+import { threadId } from 'worker_threads';
 
 @Injectable()
 export class AuthPartnersService {
@@ -58,5 +59,48 @@ export class AuthPartnersService {
     await this.userService.update(user.id, update)
 
     return await this.authService.login(login, password, loginInfo)
+  }
+
+  async authPartnerExternal(payload: AuthPartnerExternalDto, loginInfo: LoginInfo) {
+    const response = await this.providersService.checkPartnerExternal(payload)
+
+    const { authentication, authorization } = response
+
+    if (authentication.error) {
+      throw new NotFoundException(authentication.message)
+    }
+
+    if (authorization.error) {
+      throw new NotFoundException(authorization.message)
+    }
+
+    if (!authorization.success) {
+      return {
+        status: false,
+        account: false,
+        message: "Você não está liberado no provedor. Sua assinatura pode estar expirada ou não estar ativa. Verifique sua assinatura no provedor."
+      }
+    }
+
+    const user = await this.userService.findBySubscriptionLogin(payload.login)
+
+    if (!user) {
+      return {
+        status: true,
+        account: false,
+        message: "Você está liberado no provedor, mas não possui uma conta. Prossiga com o registro."
+      }
+    }
+
+    const update: UpdateUserDto = {
+      provider_id: payload.provider_id,
+      premium: true,
+      subscription_id: authentication.subscriberId,
+      subscription_login: payload.login,
+    }
+
+    await this.userService.update(user.id, update)
+
+    return await this.authService.login(payload.login, payload.password, loginInfo, true)
   }
 }

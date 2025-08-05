@@ -161,6 +161,16 @@ export class UpdateUserDto {
   @ValidateNested()
   @Type(() => UpdateProfileDto)
   profile?: UpdateProfileDto;
+
+  @ApiPropertyOptional({ example: '1234567890' })
+  @IsString()
+  @IsOptional()
+  subscription_id?: string;
+
+  @ApiPropertyOptional({ example: '1234567890' })
+  @IsString()
+  @IsOptional()
+  subscription_login?: string;
 }
 
 export class FindUserDto {

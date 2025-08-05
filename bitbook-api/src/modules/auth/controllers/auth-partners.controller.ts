@@ -1,5 +1,5 @@
 import { Controller, Post, Body, Param, Request } from '@nestjs/common';
-import { AuthPartnerCpfDto, CheckUserPartnerDto } from '../dto/auth-partners.dto';
+import { AuthPartnerCpfDto, AuthPartnerExternalDto, CheckUserPartnerDto } from '../dto/auth-partners.dto';
 import { LoginInfo } from '../interceptors/login-info.interceptor';
 import { AuthPartnersService } from '../services/auth.partners.service';
 
@@ -20,9 +20,9 @@ export class AuthPartnersController {
   }
 
   @Post('external')
-  async authPartnerExternal(@Body() payload: AuthPartnerCpfDto, @Request() req) {
+  async authPartnerExternal(@Body() payload: AuthPartnerExternalDto, @Request() req) {
     const login_info: LoginInfo = req.loginInfo;
 
-    return await this.authPartnersService.authPartnerInternal(payload, login_info);
+    return await this.authPartnersService.authPartnerExternal(payload, login_info);
   }
 } 

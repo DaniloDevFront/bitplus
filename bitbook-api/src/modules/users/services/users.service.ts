@@ -88,6 +88,14 @@ export class UsersService {
       user.provider_id = payload.provider_id;
     }
 
+    if (payload.subscription_id) {
+      user.subscription_id = payload.subscription_id;
+    }
+
+    if (payload.subscription_login) {
+      user.subscription_login = payload.subscription_login;
+    }
+
     // Atualiza dados do profile, se enviados
     if (payload.profile) {
       const profile = user.profile || this.entityManager.create(Profile, {});
@@ -183,6 +191,14 @@ export class UsersService {
       where: { profile: { cpf } },
       relations: ['profile'],
     });
+    return response
+  }
+
+  async findBySubscriptionLogin(subscription_login: string): Promise<User | null> {
+    const response = await this.entityManager.findOne(User, {
+      where: { subscription_login: subscription_login },
+    })
+
     return response
   }
 

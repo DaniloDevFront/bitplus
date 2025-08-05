@@ -31,4 +31,19 @@ export class AuthPartnerCpfDto {
   @IsNumber()
   @IsNotEmpty()
   provider_id: number;
-} 
+}
+
+
+export class AuthPartnerExternalDto {
+  @IsString()
+  @IsNotEmpty()
+  login: string;
+
+  @IsString()
+  @IsNotEmpty()
+  password: string;
+
+  @IsNumber()
+  @IsNotEmpty()
+  provider_id: number;
+}
