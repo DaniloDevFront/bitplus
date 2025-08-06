@@ -206,7 +206,16 @@ export class UsersService {
       throw new NotFoundException('Usuário não encontrado');
     }
 
-    const provider = await this.providersService.findProvider(user.provider_id);
+    let provider = null;
+
+    if (user.provider_id) {
+      try {
+        provider = await this.providersService.findProvider(user.provider_id);
+      } catch (error) {
+        this.logger.warn(`Erro ao buscar provider ${user.provider_id} para usuário ${id}:`, error.message);
+        // Continua sem o provider em caso de erro
+      }
+    }
 
     return {
       ...user,
