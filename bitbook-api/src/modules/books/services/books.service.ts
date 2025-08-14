@@ -326,6 +326,12 @@ export class BooksService {
       throw new NotFoundException(`Books com ID ${id} não encontrado`);
     }
 
+    // Remover registros relacionados em readings (antes do livro)
+    await this.entityManager.delete('readings', { book_id: id });
+
+    // Remover registros relacionados em bookcases (antes do livro)
+    await this.entityManager.delete('bookcases', { book_id: id });
+
     if (ebook.media) {
       // Coletar URLs dos arquivos para remoção
       const filesToDelete: string[] = [];
