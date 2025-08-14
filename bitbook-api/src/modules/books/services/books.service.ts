@@ -327,10 +327,10 @@ export class BooksService {
     }
 
     // Remover registros relacionados em readings (antes do livro)
-    await this.entityManager.delete('readings', { book_id: id });
+    await this.entityManager.delete(Reading, { book: { id } });
 
     // Remover registros relacionados em bookcases (antes do livro)
-    await this.entityManager.delete('bookcases', { book_id: id });
+    await this.entityManager.delete(Bookcase, { book: { id } });
 
     if (ebook.media) {
       // Coletar URLs dos arquivos para remoção
