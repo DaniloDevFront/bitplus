@@ -32,4 +32,7 @@ export class Reading {
   @ManyToOne(() => Books)
   @JoinColumn({ name: 'book_id' })
   book: Books;
+
+  @Column({ nullable: true })
+  reading_time: string;
 } 

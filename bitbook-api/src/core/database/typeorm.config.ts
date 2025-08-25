@@ -29,11 +29,12 @@ const getDbHost = () => {
 
   // Ambiente local
   if (nodeEnv === 'local') {
-    if (process.env.DOCKER_CONTAINER || process.env.INSIDE_DOCKER) {
-      return 'mysql';
-    }
+    // if (process.env.DOCKER_CONTAINER || process.env.INSIDE_DOCKER) {
+    //   return 'mysql';
+    // }
 
-    return 'localhost';
+    // return 'localhost';
+    return 'mysql';
   }
 
   return configService.getOrThrow('DB_HOST');
